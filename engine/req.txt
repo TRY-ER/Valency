@@ -1,0 +1,11 @@
+rdkit
+pytest
+biopython
+matplotlib
+pypdb
+redis
+google-genai
+google-cloud-aiplatform
+google-cloud-storage
+sentence-transformers
+pandas

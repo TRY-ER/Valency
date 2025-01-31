@@ -1,0 +1,31 @@
+.infobox-container{
+    flex: 4;
+}
+
+.info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.info-label {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    text-align: left;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: var(--color-text-primary);
+    font-weight: 600;
+    text-align: right;
+}

@@ -1,0 +1,126 @@
+@import "../../App.css";
+
+.progress-container {
+  padding: 5px;
+}
+
+.progress-track {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+}
+
+.progress-unfil {
+  position: absolute;
+  height: 4px;
+  background-color: var(--color-bg-secondary);
+  width: calc(100% - 20px);
+  margin: 0 10px;
+  transform: translateY(10px);
+}
+
+
+.progress-fill {
+  position: absolute;
+  height: 4px;
+  background: var(--color-success) !important;
+  transition: width 0.3s ease;
+  border-radius: 2px;
+  margin: 0 10px;
+  transform: translateY(10px);
+}
+
+.progress-bullet {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  opacity: 1 !important;
+}
+
+.bullet-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.bullet-point {
+  width: 20px;
+  height: 20px;
+  background: var(--color-bg-secondary);
+  border: 2px solid var(--color-text-secondary);
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.step-label {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.progress-bullet.active .step-label {
+  color: var(--color-text-primary);
+}
+
+.label-container {
+  margin-top: 5px;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+}
+
+@keyframes bulletBlip {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.progress-bullet.disabled .bullet-point {
+  background: #6c757d;
+  border-color: #616161;
+}
+
+.progress-bullet.pending .bullet-point {
+  border-color: var(--color-success);
+  animation: bulletBlip 2s infinite;
+}
+
+.progress-bullet.completed .bullet-point {
+  background: var(--color-success) !important;
+  border-color: var(--color-success) !important;
+}
+
+.progress-bullet.failed .bullet-point {
+  background: var(--color-alert) !important;
+  border-color: var(--color-alert) !important;
+}
+
+.step-label {
+  color: white;
+  font-weight: 600;
+}
+
+.progress-label {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.progress-label-left, .progress-label-right{
+  padding-top: 5px;
+  margin-left: 10px;
+  margin-right: 10px;
+}

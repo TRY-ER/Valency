@@ -1,0 +1,5 @@
+.explorer-row-2{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}

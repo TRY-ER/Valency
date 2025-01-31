@@ -1,0 +1,8 @@
+.twod-container{
+    flex: 6;
+}
+
+.twod-container img{
+    margin: 20px;
+    width: 75%;
+}
