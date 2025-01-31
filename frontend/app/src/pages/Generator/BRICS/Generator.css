@@ -1,0 +1,19 @@
+.functional-container-nested{
+    display: flex;
+    flex-direction: row;
+}
+
+.generator-container{
+    display: flex;
+    flex-direction: column;
+}
+
+.generator-row-1{
+    display: flex;
+    flex-direction: column;
+}
+
+.generator-row-2{
+    display: flex;
+    flex-direction: row;
+}

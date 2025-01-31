@@ -1,0 +1,20 @@
+.functional-container{
+    display: flex;
+    flex-direction: row;
+    overflow-y: hidden;
+    height: auto;
+    max-height: 100%;
+}
+
+.functional-item{
+    overflow-y: auto;
+    flex: 1;
+    margin-bottom: 40px;
+}
+
+
+.functional-doc{
+    overflow-y: auto;
+    width: 20vw;
+}
+

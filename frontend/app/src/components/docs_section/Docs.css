@@ -1,0 +1,44 @@
+/* .doc-container{
+    position: relative;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+} */
+
+.doc-container {
+    transition: height 0.3s ease;
+}
+
+
+.doc-container {
+    position: relative;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+}
+
+.doc-container.collapsed {
+    max-height: 50vh;
+    /* Limit height when collapsed */
+}
+
+.doc-container.expanded {
+    max-height: none;
+    /* Allow full height when expanded */
+}
+
+.doc-container .doc-paragraph {
+    text-align: justify;
+    font-size: 14px;
+}
+
+.doc-container .doc-header {
+    text-align: left;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.doc-drop-img {
+    cursor: pointer;
+    position: absolute;
+    top: 30px;
+    right: 30px;
+}

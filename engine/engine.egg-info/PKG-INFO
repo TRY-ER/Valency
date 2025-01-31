@@ -1,0 +1,8 @@
+Metadata-Version: 2.2
+Name: engine
+Version: 0.1.0
+Author: TRY-ER
+Author-email: 
+Requires-Dist: rdkit
+Dynamic: author
+Dynamic: requires-dist

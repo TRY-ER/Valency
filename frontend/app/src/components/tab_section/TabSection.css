@@ -1,0 +1,22 @@
+@import "../../App.css";
+
+.tab-container{
+    display:flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.tab-tag{
+    padding: 5px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.tab-tag.active{
+    background-color: var(--color-success)!important;
+}
+
+.tab-tag-text{
+    margin: 0;
+    padding: 0;
+}

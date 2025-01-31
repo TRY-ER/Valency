@@ -1,0 +1,1 @@
+ALLOWED_TYPES = ["MOL","PROT", "POLY"]
