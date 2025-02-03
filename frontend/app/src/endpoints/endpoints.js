@@ -74,7 +74,18 @@ const generate_endpoints = {
     } 
 }
 
+const discriminate_endpoints = {
+    ssearch: {
+        method: 'post',
+        url: `${baseURL}/discriminator/ssearch/local`,
+        params: "input_type: string, input_type should be one of ['MOL', 'POLY', 'PROT'], data: query to do the similarity search with, k: number of candidates to generate",    
+        description: "This endpoint is used to conduct structural similarity search with the query string",
+        return_types: "status: string, results: list of results, message: string (retured if status is failed)"
+    }
+}
+
 export {
     endpoints,
-    generate_endpoints
+    generate_endpoints,
+    discriminate_endpoints
 }

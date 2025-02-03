@@ -1,0 +1,28 @@
+.similarity-card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    width: 100%;
+}
+
+.similarity-card {
+    background-color: transparent;
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+}
+
+.similarity-card img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 0.5rem;
+}
+
+.card-details p {
+    margin: 0.25rem 0;
+    text-align: left;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+
+}

@@ -1,0 +1,18 @@
+.gen-num-action-btn-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.action-btn-right-container{
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 1rem;
+    margin-right: 10px;
+}
+
+.action-btn{
+    font-size: 1.5rem !important;
+    cursor: pointer;
+}

@@ -1,6 +1,7 @@
 from engine.validator.base import Validator
 from rdkit import Chem
 from typing import Tuple, List
+from engine.discriminator.similarity_w_rcsb import RCSBSearcher, RCSBQuery
 import re
 
 
@@ -26,18 +27,24 @@ class ProtValidator(Validator):
 
     def validate(self, source_str: str):
         try:
-            if re.match(r'^[1-9][A-Za-z0-9]{3}$', query):
+            query = RCSBQuery(entry_id=source_str, rows=1)
+            searcher = RCSBSearcher()
+            results = searcher.search(query)
+            print("results >>", results)
+            print("comparable >>", results["result_set"][0]["identifier"])
+            print("source str>>", source_str) 
+            if source_str == results["result_set"][0]["identifier"]:
                 return True
             else:
                 return False
-        except:
+        except Exception as e:
             return False
 
 
 class PolymerValidator(Validator):
 
     def __init__(self):
-        self.type = "PROT"
+        self.type = "POLY"
 
     def validate(self, source_str: str):
         # check if the source str contains at least 2 "*" characters
