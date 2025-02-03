@@ -5,9 +5,8 @@ import json
 from google.cloud import aiplatform
 import os
 
-# set env var ["GOOGLE_APPLICATION_CREDENTIALS"] = "../../../creds/xonext-449315-27fef23be86d.json"
 os.environ[
-    "GOOGLE_APPLICATION_CREDENTIALS"] = "../../../creds/xonext-449315-27fef23be86d.json"
+    "GOOGLE_APPLICATION_CREDENTIALS"] = "xx"
 
 PROJECT_ID = "xonext-449315"
 LOCATION = "us-central1"
@@ -61,9 +60,9 @@ def get_vector_store_response(feature_vector,
     from google.cloud import aiplatform_v1
 
     # Set variables for the current deployed index.
-    API_ENDPOINT = "223390248.us-central1-458397502377.vdb.vertexai.goog"
-    INDEX_ENDPOINT = "projects/458397502377/locations/us-central1/indexEndpoints/5532914034782765056"
-    DEPLOYED_INDEX_ID = "sample_store_1738307284740"
+    API_ENDPOINT = "xx"
+    INDEX_ENDPOINT = "xx"
+    DEPLOYED_INDEX_ID = "xx"
 
     # Configure Vector Search client
     client_options = {"api_endpoint": API_ENDPOINT}

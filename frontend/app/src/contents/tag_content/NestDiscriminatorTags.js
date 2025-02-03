@@ -8,14 +8,21 @@ const SimilaritySearchTabContents = [
         id: 1,
         title: 'SMILES',
         link: '/proe',
-        component: <SSContent />, 
-        docs: <ProDocs />,
+        component: <SSContent key="smiles" inputType={"MOL"} />, 
+        docs: <ProDocs  />,
     },
     {
         id: 2,
         title: 'PSMILES',
         link: '/moe',
-        component: <BRICSComponent key="psmiles" inputType="psmiles"/>, 
+        component:  <SSContent key="psmiles" inputType={"POLY"} />,
+        docs: <ProDocs />,
+    },
+    {
+        id: 3,
+        title: 'Protein',
+        link: '/moe',
+        component:  <SSContent key="pdb" inputType={"PROT"} />,
         docs: <ProDocs />,
     }
 ];

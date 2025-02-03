@@ -17,7 +17,7 @@ const MolInputBox = ({
     placeholder = "Try C for demo"
 }) => {
     useEffect(() => {
-        if (inputType !== "PROT") {
+        // if (inputType !== "PROT") {
             if (activeMol.length > 0) {
                 // Check if the molecule is valid
                 const payload = {
@@ -26,6 +26,7 @@ const MolInputBox = ({
                 }
                 call_endpoint_async(endpoints.validate, payload).then((response) => {
                     if (response.data.status === "success") {
+                        console.log("prot val response >>", response.data)
                         setIsValidMol(response.data.valid);
                     }
                 }).catch((error) => {
@@ -35,7 +36,7 @@ const MolInputBox = ({
             else {
                 setIsValidMol(false);
             }
-        }
+        // }
     }, [activeMol]);
 
     return <>

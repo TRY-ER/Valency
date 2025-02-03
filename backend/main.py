@@ -1,3 +1,5 @@
+from env_utils import set_env_vars
+set_env_vars(".env")
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import (
@@ -5,7 +7,8 @@ from app.routers import (
     validator,
     visualize,
     informer,
-    generator
+    generator,
+    discriminator
 )
 import uvicorn
 
@@ -26,7 +29,7 @@ app.include_router(validator.router, prefix="/validate", tags=["validator"]) # I
 app.include_router(visualize.router, prefix="/visualize", tags=["visualize"]) # Include the validator router
 app.include_router(informer.router, prefix="/inform", tags=["inform"]) # Include the validator router
 app.include_router(generator.router, prefix="/generate", tags=["generate"]) # Include the validator router
-
+app.include_router(discriminator.router, prefix="/discriminator", tags=["discriminate"]) # Include the validator router
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) # Run the app
