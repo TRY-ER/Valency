@@ -1,6 +1,7 @@
 import Discriminator from "../pages/Discriminator/Discriminator";
 import Explorer from "../pages/Explorer/Explorer";
 import Generator from "../pages/Generator/Generator";
+import ChatInterface from "../components/chat_interface/ChatInterface";
 
 const menuContent = [
     {
@@ -29,7 +30,7 @@ const menuContent = [
         title: 'Chatbot',
         iconPath: 'images/chatbot.png',
         link: '/chatbot',
-        component: null
+        component: <ChatInterface /> 
     }
 ]
 

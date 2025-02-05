@@ -1,0 +1,59 @@
+/* CustomToggler.css */
+.custom-toggler {
+    width: 10vw;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.toggler-label {
+    margin-bottom: 10px;
+}
+
+.toggler-slider {
+    width: 50px;
+    height: 23px;
+    border: solid 2px var(--c-deep-light);
+    border-radius: 30px;
+    cursor: pointer;
+    position: relative;
+}
+
+.toggler-slider.enabled.dark {
+    background-color: var(--c-deep-light);
+}
+
+.toggler-slider.enabled.dark {
+    background-color: var(--c-lite);
+}
+
+.toggler-slider.disabled.dark {
+    border: solid 2px var(--c-lite);
+}
+
+.toggler-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: var(--c-deep-light);
+    border-radius: 50%;
+    position: absolute;
+    transition: transform 0.3s;
+    border: solid 2px black;
+}
+
+.toggler-thumb.enabled {
+    transform: translateX(30px);
+    background-color: var(--c-deep-dark);
+}
+
+.toggler-thumb.disabled.dark {
+    background-color: var(--c-lite);
+}
+
+.toggle-instruction-text {
+    padding-top: 4px;
+    font-size: 0.8rem;
+}
+
+/* dark theme setup */

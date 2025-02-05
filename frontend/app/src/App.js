@@ -30,8 +30,12 @@ function App() {
 
   return (
     <div className="App">
+      <div className="sidebar-content">
         <Sidebar activeMenu={activeMenu} setActiveMenu={setActiveMenu} />
+      </div>
+      <div className="side-content">
         <ReRoutes />
+      </div>
     </div>
   );
 }
