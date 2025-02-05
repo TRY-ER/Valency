@@ -1,0 +1,41 @@
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 5vh; /* Or any desired height */
+}
+
+.loader-container .loader {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 4px solid var(--c-deep-black, red);
+  border-top-color: var(--c-lite, green);
+  animation: spin 0.3s linear infinite;
+}
+
+.loader-container.dark .loader{
+  border: 4px solid var(--c-lite, green);
+  border-top-color: green !important;
+}
+
+.loader-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--c-deep, blue);
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  transform: translate(-50%, -50%);
+  animation: bounce 0.3s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(0.4); }
+  50% { transform: scale(1); }
+}

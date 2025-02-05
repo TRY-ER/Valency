@@ -1,0 +1,4 @@
+const jsonTypeMap = {
+}
+
+export { jsonTypeMap };

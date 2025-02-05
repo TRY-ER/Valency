@@ -14,10 +14,10 @@ with open("../.env") as f:
 
 if API_KEY:
     client = genai.Client(api_key=API_KEY)
-    response = client.models.generate_content(
-        model="gemini-2.0-flash-exp", contents="Explain how AI works"
+    response = client.models.generate_content_stream(
+        model="gemini-2.0-flash-exp", contents="Explain how AI works",
     )
-
-    print("response >>", response.text)
+    for r in response:
+        print("response >>", r.candidates[0].content.parts[0].text)
 else:
     print("could not get the api key")

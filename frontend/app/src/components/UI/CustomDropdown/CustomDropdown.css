@@ -1,0 +1,126 @@
+@import "../../../App.css";
+
+/* Custom Dropdown Container */
+.custom-dropdown {
+    position: relative;
+    width: 10vw;
+    border: 1px solid #ccc;
+}
+
+/* Selected Option Display */
+.selected-option {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    background-color: var(--color-bg-secondary);
+}
+
+.selected-option.dark,
+.selected-option.dark:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+
+
+
+.selected-option:hover {
+    background-color: rgba(255, 255, 255, 0.4);
+}
+
+
+
+/* Dropdown Options */
+.dropdown-options {
+    padding: 0;
+    max-height: 150px;
+    overflow-y: auto;
+    border: none;
+    border-top: none;
+    border-radius: 0 0 5px 5px;
+    /* display: none; */
+    background-color: var(--color-bg-secondary);
+}
+
+.dropdown-options.dark {
+    background-color: var(--c-deep-light);
+}
+
+/* Dropdown Option Items */
+.dropdown-options li {
+    padding: 10px;
+    cursor: pointer;
+    list-style: none;
+    transition: ease 0.2s background-color;
+}
+
+.scrollbar-custom {
+    /* Ensure scrollbar visibility, as it might be hidden by default */
+    scrollbar-width: thin;
+    /* Firefox */
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+    /* WebKit-based browsers (Chrome, Safari, Opera) */
+    width: 5px;
+    /* Adjust scrollbar width as needed */
+    border-radius: 2px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+    /* Adjust track background color */
+    border-radius: 2px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+    background-color: #888;
+    /* Adjust thumb color */
+    border-radius: 2px;
+}
+
+/* Optional: Hover effect for thumb */
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+}
+
+.dropdown-options li:hover {
+    background-color: var(--c-deep-light);
+    border-radius: 5px;
+    color: #fff;
+}
+
+.dropdown-options.dark li:hover {
+    background-color: var(--c-lite);
+    border-radius: 5px;
+    color: black;
+}
+
+/* Display Dropdown Options on Open */
+.custom-dropdown:hover .dropdown-options {
+    display: block;
+}
+
+
+.custom-drop-tog-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.custom-drop-tog-container svg {
+    padding-left: 10px;
+    padding-top: 5px;
+    cursor: pointer;
+}
+
+
+.custom-drop-tog-container.dark svg {
+    filter: invert(100%);
+}
+
+@media (max-width: 800px) {
+    .custom-dropdown {
+        width: 300px;
+    }
+}

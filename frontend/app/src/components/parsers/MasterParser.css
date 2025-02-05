@@ -1,0 +1,35 @@
+@import "../../App.css";
+
+/* .parsable-div .res-image{
+} */
+
+
+
+.parsable-div img {
+    height: 10vw;
+    border: solid 1px black;
+    border-radius: 5px;
+}
+
+.parsable-div .json-container {
+    background-color: rgba(255, 255, 255, 0.89);
+    margin: 10px 0px;
+    padding: 10px;
+    text-align: left !important;
+    border-radius: 5px;
+    width: 20vw;
+}
+
+.parsable-div.dark .json-container p,h{
+    filter: invert(100%);
+}
+
+@media (max-width: 800px) {
+    .parsable-div .json-container { 
+        width: 40vw;
+    }
+    .parsable-div .doctor-image img {
+        width: calc(40vw - 5px);
+        height: auto;
+    }
+}

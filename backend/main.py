@@ -8,7 +8,8 @@ from app.routers import (
     visualize,
     informer,
     generator,
-    discriminator
+    discriminator,
+    chat
 )
 import uvicorn
 
@@ -30,6 +31,7 @@ app.include_router(visualize.router, prefix="/visualize", tags=["visualize"]) # 
 app.include_router(informer.router, prefix="/inform", tags=["inform"]) # Include the validator router
 app.include_router(generator.router, prefix="/generate", tags=["generate"]) # Include the validator router
 app.include_router(discriminator.router, prefix="/discriminator", tags=["discriminate"]) # Include the validator router
+app.include_router(chat.router, prefix="/chat", tags=["chat"]) # Include the validator router
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) # Run the app

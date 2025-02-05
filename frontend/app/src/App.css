@@ -12,6 +12,19 @@
   --color-text-secondary: rgb(179, 179, 179);
   --color-success: rgb(5, 173, 5);
   --color-alert: red;
+  --c-deep-dark: #ffffff;
+  --c-deep-light: rgb(132, 132, 132);
+  --c-deep-black: rgb(32, 32, 32);
+  --c-deep-trans: #000f3b90;
+  --c-bright: #eec230;
+  --c-lite: rgb(246, 246, 246); 
+  --c-deep-second: #004254;
+  --c-light-border: black;
+  --c-shadow-back-light: rgb(132, 132, 132);
+  /* --f-family: Rubik, Ariel; */
+  --f-size-title: 2rem;
+  --f-size-mid: 1.2rem;
+  --f-size-para: 0.6rem;
 }
 
 .App {
@@ -85,4 +98,10 @@
 *::-webkit-scrollbar-thumb:hover {
   background-color: rgba(255, 255, 255, 0.6);
   border-radius: 5px;
+}
+
+.side-content{
+  flex: 1;
+  height: auto;
+  overflow: hidden;
 }
