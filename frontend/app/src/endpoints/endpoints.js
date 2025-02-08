@@ -93,12 +93,12 @@ const chat_endpoint = {
         return_types: "status: string, id: string (unique id for the chat stream)"
     },
     stream: {
-            method: 'get@sse',
-            url: `${baseURL}/chat/stream`,
-            params: "id: uuid of the set chat stream session (passed in the url)",
-            description: "This endpoint is used to stream the chat content",
-            return_types: "server side event streaming"
-        }
+        method: 'get@sse',
+        url: `${baseURL}/chat/stream`,
+        params: "id: uuid of the set chat stream session (passed in the url)",
+        description: "This endpoint is used to stream the chat content",
+        return_types: "server side event streaming"
+    }
 }
 
 export {

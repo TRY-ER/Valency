@@ -10,21 +10,21 @@ const ExploreTabContents = [
     {
         id: 1,
         title: 'Molecule Explorer',
-        link: '/moe',
+        link: '',
         component: <MolEComponent />, 
         docs: <MoEDocs />,
     },
     {
         id: 2,
         title: 'Protein Explorer',
-        link: '/proe',
+        link: 'proe',
         component: <ProtEComponent />, 
         docs: <ProDocs />,
     },
     {
         id: 3,
         title: 'Polymer Explorer',
-        link: '/polye',
+        link: 'polye',
         component: <PolyEComponent />, 
         docs: <PolyDocs />,
     }

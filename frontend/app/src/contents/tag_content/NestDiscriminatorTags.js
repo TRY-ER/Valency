@@ -7,21 +7,21 @@ const SimilaritySearchTabContents = [
     {
         id: 1,
         title: 'SMILES',
-        link: '/proe',
+        link: '',
         component: <SSContent key="smiles" inputType={"MOL"} />, 
         docs: <ProDocs  />,
     },
     {
         id: 2,
         title: 'PSMILES',
-        link: '/moe',
+        link: 'psmiles',
         component:  <SSContent key="psmiles" inputType={"POLY"} />,
         docs: <ProDocs />,
     },
     {
         id: 3,
         title: 'Protein',
-        link: '/moe',
+        link: 'protein',
         component:  <SSContent key="pdb" inputType={"PROT"} />,
         docs: <ProDocs />,
     }
