@@ -3,23 +3,60 @@ import TabContainer from "../../../components/tab_section/TabSection";
 import Divider from "../../../components/divider";
 import FunctionalSection from "../../../components/functional_section/Functional";
 import { SimilaritySearchTabContents } from "../../../contents/tag_content/NestDiscriminatorTags";
+import { Routes, Route, useLocation, useNavigate, Outlet, NavLink } from 'react-router-dom';
 
-const SSComponent = () => {
-    const [activeTabId, setActiveTabId] = useState(1);
+const SSComponent = ({
+    tabContent, basePath = "discriminators"
+}) => {
+    const location = useLocation();
 
     return (
         <>
-            <TabContainer
-                tabDetails={SimilaritySearchTabContents}
-                activeTabId={activeTabId}
-                setActiveTabId={setActiveTabId}
-            />
+            <div className="tab-container">
+                {/* {
+                    tabContent.map((tab) => {
+                        return (
+                            <NavLink
+                                key={tab.id}
+                                to={`/${basePath}/${tab.link}`}
+                                className={({ isActive }) => `tab-link ${isActive ? "active" : ""}`}
+                            >
+                                <div className={`tab-tag glassy-feel`}>
+                                    <p className="tab-tag-text">{tab.title}</p>
+                                </div>
+                            </NavLink>
+                        )
+                    })
+                } */}
+                {
+                    tabContent.map((tab) => {
+                        return (
+                           <NavLink
+                                key={tab.id}
+                                to={ tab.link == "" ? `/${basePath}` : `/${basePath}/${tab.link}`}
+                                // className={({ isActive }) => `tab-link ${isActive ? "active" : ""}`}
+                                className={() =>{
+                                    if (location.pathname === `/${basePath}` && tab.link === ""){
+                                        return `tab-link active`
+                                    }
+                                    else if(location.pathname === `/${basePath}/${tab.link}`){
+                                        return `tab-link active`
+                                    }
+                                    else{
+                                        return `tab-link`
+                                    }
+                                }} 
+                            >
+                                <div className={`tab-tag glassy-feel`}>
+                                    <p className="tab-tag-text">{tab.title}</p>
+                                </div>
+                            </NavLink>
+                        )
+                    })
+                }
+            </div>
             <Divider />
-            <FunctionalSection
-                docElem={SimilaritySearchTabContents[activeTabId - 1].docs}
-                funcElem={SimilaritySearchTabContents[activeTabId - 1].component}
-                customClassName={"functional-container-nested"}
-            />
+            <Outlet /> 
         </>
     ) 
 }

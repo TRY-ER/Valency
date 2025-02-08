@@ -8,7 +8,7 @@ const DiscriminatorTabContents = [
     {
         id: 1,
         title: 'Similarity Search',
-        link: '/ssearch',
+        link: 'ss',
         component: <SSComponent />, 
         docs: null,
     },

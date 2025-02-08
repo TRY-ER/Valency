@@ -71,7 +71,7 @@
     background-color: var(--color-bg-secondary);
 }
 
-.sidebar-menu-content.active{
+.sidebar-menu-item.active .sidebar-menu-content{
     background-color: var(--color-bg-secondary);
 }
 

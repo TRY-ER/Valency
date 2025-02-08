@@ -12,11 +12,17 @@
     cursor: pointer;
 }
 
-.tab-tag.active{
+.tab-link.active .tab-tag{
     background-color: var(--color-success)!important;
+}
+
+.tab-link{
+    text-decoration: none;
+    color: var(--color-text-primary);
 }
 
 .tab-tag-text{
     margin: 0;
     padding: 0;
+    color: var(--color-text-primary);
 }

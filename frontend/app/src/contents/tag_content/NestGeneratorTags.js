@@ -7,15 +7,17 @@ const BRICSGeneratorTabContents = [
     {
         id: 1,
         title: 'SMILES',
-        link: '/proe',
+        link: '',
         component: <BRICSComponent key="smiles" inputType="smiles"/>, 
+        includeDocs: true, 
         docs: <ProDocs />,
     },
     {
         id: 2,
         title: 'PSMILES',
-        link: '/moe',
+        link: 'psmiles',
         component: <BRICSComponent key="psmiles" inputType="psmiles"/>, 
+        includeDocs: true, 
         docs: <ProDocs />,
     }
 ];
@@ -24,14 +26,15 @@ const LSTMGeneratorTabContents = [
     {
         id: 1,
         title: 'PSMILES',
-        link: '/proe',
+        link: '',
         component: <LSTMComponent key="psmiles" />, 
+        includeDocs: true, 
         docs: <ProDocs />,
     },
     {
         id: 2,
         title: 'WDG',
-        link: '/moe',
+        link: 'moe',
         component: <LSTMComponent inputType="wdg" key="wdg" />,
         docs: <ProDocs />,
     }
