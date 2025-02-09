@@ -71,7 +71,7 @@ const Sidebar = ({ }) => {
         <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
             <div className={`logo ${isCollapsed ? 'collapsed' : ''}`}>
                 {/* Placeholder for Logo */}
-                <img src="images/valency_logo_light_600x600.png" alt="Logo" />
+                <img src="/images/valency_logo_light_600x600.png" alt="Logo" />
             </div>
             {
                 isCollapsed ? <>
