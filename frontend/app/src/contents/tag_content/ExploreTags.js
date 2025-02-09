@@ -6,28 +6,32 @@ import MolEComponent from "../../pages/Explorer/MolExplorer/MolExplorer";
 import ProtEComponent from "../../pages/Explorer/ProtExplorer/ProtExplorer";
 import PolyEComponent from "../../pages/Explorer/PolyExplorer/PolyExplorer";
 
-const ExploreTabContents = [
+
+const ExplorerTabContent = [
     {
         id: 1,
         title: 'Molecule Explorer',
         link: '',
-        component: <MolEComponent />, 
+        description: 'Explore the Molecule Explorer',
+        component: <MolEComponent />,
         docs: <MoEDocs />,
     },
     {
         id: 2,
         title: 'Protein Explorer',
         link: 'proe',
-        component: <ProtEComponent />, 
+        description: 'Explore the Protein Explorer',
+        component: <ProtEComponent />,
         docs: <ProDocs />,
     },
     {
         id: 3,
         title: 'Polymer Explorer',
         link: 'polye',
-        component: <PolyEComponent />, 
+        description: 'Explore the Polymer Explorer',
+        component: <PolyEComponent />,
         docs: <PolyDocs />,
     }
-];
+]
 
-export default ExploreTabContents;
+export default ExplorerTabContent;
