@@ -36,7 +36,7 @@ const LSTMGeneratorTabContents = [
     {
         id: 2,
         title: 'WDG',
-        link: 'moe',
+        link: 'wdg',
         description: 'Generate molecules using WDG strings.',
         component: <LSTMComponent inputType="wdg" key="wdg" />,
         docs: <ProDocs />,

@@ -6,6 +6,9 @@
 .generator-container{
     display: flex;
     flex-direction: column;
+    flex: 1 !important;
+    /* height: 2000px; */
+    overflow-y: scroll;
 }
 
 .generator-row-1{
