@@ -25,7 +25,9 @@
   --f-size-title: 2rem;
   --f-size-mid: 1.2rem;
   --f-size-para: 0.6rem;
+  --glassy-color: rgba(255, 255, 255, 0.2);
 }
+
 
 .App {
   text-align: center;
@@ -39,9 +41,12 @@
 }
 
 .base-page-container{
+  display: flex;
+  flex-direction: column;
   flex: 1;
   margin: 40px 40px 0px 40px;
   overflow: hidden;
+  height: 100vh;
 }
 
 .base-page-container {
@@ -102,6 +107,6 @@
 
 .side-content{
   flex: 1;
-  height: auto;
+  height: 100vh;
   overflow: hidden;
 }

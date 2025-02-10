@@ -6,7 +6,6 @@ import ToolInterface from "../components/tool_interface/ToolInterface";
 import GeneratorTabContents from "./tag_content/GeneratorTags";
 import ExplorerTabContent from "./tag_content/ExploreTags";
 import DiscriminatorTabContents from "./tag_content/DiscriminatorTags";
-import { desc } from "framer-motion/client";
 
 const menuContent = [
     {
@@ -14,6 +13,7 @@ const menuContent = [
         title: 'Explorers',
         iconPath: '/images/explorer.png',
         link: '',
+        description: 'Explorers are used to explore molecules, proteins, and polymers.',
         component: <Explorer tabContent={ExplorerTabContent} />,
         includeDocs: true,
         subElements: ExplorerTabContent

@@ -50,11 +50,6 @@ export default function Discriminator({
 
     return (
         <div className="base-page-container">
-            {/* <TabContainer
-                tabDetails={DiscriminatorTabContents}
-                activeTabId={activeTabId}
-                setActiveTabId={setActiveTabId}
-            /> */}
             <div className="tab-container">
                 {
                     tabContent.map((tab) => {

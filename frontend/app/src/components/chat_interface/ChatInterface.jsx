@@ -721,7 +721,7 @@ const ChatInterface = () => {
                                     <button className="del-btn"
                                         // onMouseEnter={(e) => { handleShowTag(e, "Delete Query and Response") }}
                                         // onMouseLeave={handleHideTag}
-                                        onClick={() => { delHandler(index) }}><img src="icons/delete-icon-2.png" /></button>
+                                        onClick={() => { delHandler(index) }}><img src="/icons/delete-icon-2.png" /></button>
                                 </div>
                                 <div>
                                     <p>
@@ -730,7 +730,7 @@ const ChatInterface = () => {
                                 </div>
                             </div>
                             <div className="query-profile">
-                                <img src="icons/user-picture_dark.svg"
+                                <img src="/icons/user-picture_dark.svg"
                                     alt="logo"
                                 />
                             </div>
@@ -784,11 +784,11 @@ const ChatInterface = () => {
                                             <button className="copy-btn" onClick={() => { handleClipboard(index) }}
                                             // onMouseEnter={(e) => { handleShowTag(e, "Copy Response") }}
                                             // onMouseLeave={handleHideTag}
-                                            ><img src="icons/copy to clipboard.png" /></button>
+                                            ><img src="/icons/copy to clipboard.png" /></button>
                                             {item.content[0].response.like === 0 || item.content[0].response.like === 1 ?
                                                 <button
                                                     className="like-btn"
-                                                    onClick={() => { handleLike(index) }}><img src="icons/like-unfilled.png"
+                                                    onClick={() => { handleLike(index) }}><img src="/icons/like-unfilled.png"
                                                     // onMouseEnter={(e) => { handleShowTag(e, "Like Response") }}
                                                     // onMouseLeave={handleHideTag}
                                                     /></button>
@@ -800,7 +800,7 @@ const ChatInterface = () => {
                                                     // onMouseEnter={(e) => { handleShowTag(e, "Like Response") }}
                                                     // onMouseLeave={handleHideTag}
                                                     onClick={() => { handleLike(index) }}
-                                                ><img src="icons/like-filled.png" /></button>
+                                                ><img src="/icons/like-filled.png" /></button>
                                                 :
                                                 ""
                                             }
@@ -809,7 +809,7 @@ const ChatInterface = () => {
                                                 <button className="dislike-btn" onClick={() => { handleDislike(index) }}
                                                 // onMouseEnter={(e) => { handleShowTag(e, "Dislike Response") }}
                                                 // onMouseLeave={handleHideTag}
-                                                ><img src="icons/dislike-unfilled.png" /></button>
+                                                ><img src="/icons/dislike-unfilled.png" /></button>
                                                 :
                                                 ""
                                             }
@@ -817,7 +817,7 @@ const ChatInterface = () => {
                                                 <button className="dislike-btn" onClick={() => { handleDislike(index) }}
                                                 // onMouseEnter={(e) => { handleShowTag(e, "Dislike Response") }}
                                                 // onMouseLeave={handleHideTag}
-                                                ><img src="icons/dislike-filled.png" /></button>
+                                                ><img src="/icons/dislike-filled.png" /></button>
                                                 :
                                                 ""
                                             }
@@ -844,7 +844,7 @@ const ChatInterface = () => {
                                 // initial="initial"
                                 // animate="animate"
                                 >
-                                    <img src="icons/anchor-left-arrow-dark.svg"
+                                    <img src="/icons/anchor-left-arrow-dark.svg"
                                         alt="logo"
                                         // onMouseEnter={(e) => { handleShowTag(e, "Hide Pane") }}
                                         // onMouseLeave={handleHideTag}
@@ -861,7 +861,7 @@ const ChatInterface = () => {
                                 // initial="initial"
                                 // animate="animate"
                                 >
-                                    <img src="icons/user-picture_dark.svg"
+                                    <img src="/icons/user-picture_dark.svg"
                                             alt="logo"
                                             id="side-profile-image"
                                             // onMouseEnter={(e) => { handleShowTag(e, "Profile", 12) }}
@@ -874,7 +874,7 @@ const ChatInterface = () => {
                                 // initial="initial"
                                 // animate="animate"
                                 >
-                                    <img src="icons/configuration-with-gear_dark.svg"
+                                    <img src="/icons/configuration-with-gear_dark.svg"
                                         alt="logo"
                                         className={`side-logo ${isDark ? "dark" : ""}`}
                                         onClick={showConfig}

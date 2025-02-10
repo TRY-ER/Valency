@@ -13,21 +13,6 @@ const SSComponent = ({
     return (
         <>
             <div className="tab-container">
-                {/* {
-                    tabContent.map((tab) => {
-                        return (
-                            <NavLink
-                                key={tab.id}
-                                to={`/${basePath}/${tab.link}`}
-                                className={({ isActive }) => `tab-link ${isActive ? "active" : ""}`}
-                            >
-                                <div className={`tab-tag glassy-feel`}>
-                                    <p className="tab-tag-text">{tab.title}</p>
-                                </div>
-                            </NavLink>
-                        )
-                    })
-                } */}
                 {
                     tabContent.map((tab) => {
                         return (

@@ -13,7 +13,6 @@ const TabContainer = ({ tabDetails, basePath = "" }) => {
                         return (
                             <NavLink 
                              key={tab.id} 
-                             to={`${tab.link}`}
                              className={({ isActive }) => `tab-link ${isActive ? "active" : ""}`}
                             > 
                                 <div className={`tab-tag glassy-feel`}>

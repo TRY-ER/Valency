@@ -1,12 +1,15 @@
 .functional-container{
     display: flex;
     flex-direction: row;
-    overflow-y: hidden;
-    height: auto;
-    max-height: 100%;
+    overflow-y: auto;
+    /* height: auto; */
+    /* max-height: 100%; */
+    flex: 1;
 }
 
 .functional-item{
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
     flex: 1;
     margin-bottom: 40px;
@@ -14,6 +17,8 @@
 
 
 .functional-doc{
+    display: flex;
+    flex-direction: column;
     overflow-y: auto;
     width: 20vw;
 }
