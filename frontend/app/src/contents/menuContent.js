@@ -13,7 +13,9 @@ const menuContent = [
         title: 'Explorers',
         iconPath: '/images/explorer.png',
         link: '',
-        description: 'Explorers are used to explore molecules, proteins, and polymers.',
+        description: `Explorers are used to explore molecules, proteins, and polymers.
+                      This is the main tool below which there are three more tools consisting
+                      tools specfic to molecules, proteins and polymers`,
         component: <Explorer tabContent={ExplorerTabContent} />,
         includeDocs: true,
         subElements: ExplorerTabContent
@@ -23,7 +25,9 @@ const menuContent = [
         title: 'Discriminators',
         iconPath: '/images/discriminator.png',
         link: 'discriminators',
-        description: 'Discriminators are used to classify and understand molecules, proteins, and polymers.',
+        description: `Discriminators tool cosists of tools to discriminate molecules, proteins, and polymers.
+                      But as of now we have similarity search implemented as a sub tool. This sub tool contains
+                      structural similarity search for molecules, proteins, and polymers handled as sub-sub tools.`,
         includeDocs: true,
         component: <Discriminator tabContent={DiscriminatorTabContents} basePath="discriminators" />,
         subElements: DiscriminatorTabContents 
@@ -33,7 +37,9 @@ const menuContent = [
         title: 'Generators',
         iconPath: '/images/generator.png',
         link: 'generators',
-        description: 'Generators are used to create molecules, proteins, and polymers.',
+        description: `Generators are used to create hypothetical molecules, polymers (protein generation is not yet implemented).
+                      It has two sub-tools name BRICS and LSTM generators. Both of these tools have sub tools for generation for SMILES
+                      and PSMILES format for molecules and polymers respectively.`,
         includeDocs: true,
         component: <Generator tabContent={GeneratorTabContents} basePath="generators" />,
         subElements: GeneratorTabContents

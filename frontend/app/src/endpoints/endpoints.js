@@ -98,6 +98,13 @@ const chat_endpoint = {
         params: "id: uuid of the set chat stream session (passed in the url)",
         description: "This endpoint is used to stream the chat content",
         return_types: "server side event streaming"
+    },
+    config: {
+        method: 'post',
+        url: `${baseURL}/chat/config`,
+        params: "config: dict of configuration parameters tools to be used in the prompt for the chat",
+        description: "This endpoint is used to set the configuration parameters of the tools for the chat",
+        return_types: "status: string"
     }
 }
 
