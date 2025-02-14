@@ -11,6 +11,10 @@ from engine.chat.utils import postproces_response_for_stream
 
 router = APIRouter()
 
+# variable to store the tool configs
+
+TOOL_CONFIG = [] 
+
 # Simple in-memory store of user queries
 queries = {}
 
@@ -55,3 +59,11 @@ def stream_responses(id: str):
     Q = queries.get(id)
     del queries[id]
     return StreamingResponse(event_generator(Q.query, Q.config), media_type="text/event-stream")
+
+@router.post("/config")
+def set_config(data: dict):
+    """
+    A POST endpoint to save the tool config in memory.
+    """
+    TOOL_CONFIG = (data["data"])
+    return {"status": "success"}

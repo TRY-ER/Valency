@@ -3,6 +3,8 @@ import "./ToolInterface.css";
 import menuContent from "../../contents/menuContent";
 import GlassyContainer from "../glassy_container/gc";
 import { MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowUp } from "react-icons/md";
+import { chat_endpoint } from "../../endpoints/endpoints";
+import { call_endpoint_async } from "../../endpoints/caller";
 
 const ExcludeToolTitles = ["Chatbot", "Tool Config"];
 
@@ -65,7 +67,7 @@ const ToolInterface = () => {
   if (backupMasterTool) {
     processible = backupMasterTool
   }
-  else{
+  else {
     processible = constructMasterTool(menuContent);
   }
 
@@ -73,8 +75,20 @@ const ToolInterface = () => {
 
   useEffect(() => {
     console.log("master tool >>", masterTool);
-    localStorage.setItem("masterTool", JSON.stringify(masterTool)); 
+    localStorage.setItem("masterTool", JSON.stringify(masterTool));
   }, [masterTool]);
+
+  useEffect(() => {
+    const setToolConfig = async () => {
+      if (masterTool !== "") {
+        console.log(" >>", masterTool);
+        const response = await call_endpoint_async(chat_endpoint.config, {"data" : masterTool}) 
+        console.log("tool config response >>", response);
+      }
+    }
+    setToolConfig();
+  }, [])
+
 
   // Toggle expansion for top-level tool items
   const toggleToolExpansion = (toolId) => {
