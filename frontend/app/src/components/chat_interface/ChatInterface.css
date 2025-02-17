@@ -350,6 +350,7 @@
     -moz-box-shadow: -10px 12px 16px -9px var(--c-shadow-back-light);
     box-shadow: -10px 12px 16px -9px var(--c-shadow-back-light);
     line-height: 1.5rem;
+    text-align: right;
 }
 
 .chat-query.dark {
@@ -480,6 +481,16 @@
     text-align: justify;
     height: auto;
     font-weight: 300;
+}
+
+.chat-response button{
+    background-color: var(--color-success);
+    margin-left: 10px;
+    border: none;
+    padding: 5px;
+    border-radius: 15px;
+    color: white;
+    font-weight: 800;
 }
 
 .chat-response.dark {

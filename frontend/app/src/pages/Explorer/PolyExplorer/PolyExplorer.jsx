@@ -4,13 +4,19 @@ import "./PolyExplorer.css";
 import MolInputBox from "../../../components/UI/InputBox/InputBox";
 import InfoBox from "../../../components/UI/InfoBox/InfoBox";
 import TwoDViewer from "../../../components/UI/TwoDViewer/TwoDViewer";
+import { motion } from "framer-motion";
+import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";
 
 const PolyEComponent = () => {
     const [activeMol, setActiveMol] = useState("");
     const [isValidMol, setIsValidMol] = useState(false);
 
     return <>
-        <div className="explore-container">
+        <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUpVariantStatic}
+        className="explore-container">
             <div className="explorer-row-1">
                 <MolInputBox 
                     activeMol={activeMol}
@@ -26,7 +32,7 @@ const PolyEComponent = () => {
                 <InfoBox activeMol={activeMol} isValidMol={isValidMol} infoType={"POLY"}/>
                 <TwoDViewer activeMol={activeMol} isValidMol={isValidMol} visType={"POLY"}/>
             </div>
-        </div>
+        </motion.div>
     </> 
 }
 

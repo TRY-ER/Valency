@@ -5,6 +5,8 @@ import Divider from '../../../components/divider';
 import { LSTMGeneratorTabContents } from '../../../contents/tag_content/NestGeneratorTags';
 import "./LSTMGenerator.css";
 import { useLocation, useNavigate, Outlet, NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { fadeInDownVariants } from '../../../components/animations/framerAnim';
 
 export default function LSTMGenerator({
     tabContent, basePath = "generators/lstm"
@@ -15,7 +17,7 @@ export default function LSTMGenerator({
         <>
             <div className="tab-container">
                 {
-                    tabContent.map((tab) => {
+                    tabContent.map((tab, index) => {
                         return (
                            <NavLink
                                 key={tab.id}
@@ -33,9 +35,14 @@ export default function LSTMGenerator({
                                     }
                                 }} 
                             >
-                                <div className={`tab-tag glassy-feel`}>
+                                <motion.div 
+                                initial="hidden"
+                                animate="visible"
+                                variants={fadeInDownVariants}
+                                custom={index} 
+                                className={`tab-tag glassy-feel`}>
                                     <p className="tab-tag-text">{tab.title}</p>
-                                </div>
+                                </motion.div>
                             </NavLink>
                         )
                     })

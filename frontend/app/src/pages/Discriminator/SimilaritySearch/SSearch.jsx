@@ -4,6 +4,8 @@ import Divider from "../../../components/divider";
 import FunctionalSection from "../../../components/functional_section/Functional";
 import { SimilaritySearchTabContents } from "../../../contents/tag_content/NestDiscriminatorTags";
 import { Routes, Route, useLocation, useNavigate, Outlet, NavLink } from 'react-router-dom';
+import { fadeInDownVariants } from "../../../components/animations/framerAnim";
+import { motion } from "framer-motion";
 
 const SSComponent = ({
     tabContent, basePath = "discriminators"
@@ -14,7 +16,7 @@ const SSComponent = ({
         <>
             <div className="tab-container">
                 {
-                    tabContent.map((tab) => {
+                    tabContent.map((tab, index) => {
                         return (
                            <NavLink
                                 key={tab.id}
@@ -32,9 +34,14 @@ const SSComponent = ({
                                     }
                                 }} 
                             >
-                                <div className={`tab-tag glassy-feel`}>
+                                <motion.div 
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={fadeInDownVariants} 
+                                    custom={index}
+                                className={`tab-tag glassy-feel`}>
                                     <p className="tab-tag-text">{tab.title}</p>
-                                </div>
+                                </motion.div>
                             </NavLink>
                         )
                     })

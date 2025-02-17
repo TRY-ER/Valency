@@ -1,6 +1,7 @@
 import React from 'react';
 import './ProgressSection.css';
-
+import { motion } from 'framer-motion';
+import { fadeInUpVariantStatic } from '../animations/framerAnim';
 import GlassyContainer from '../glassy_container/gc';
 
 const ProgressSection = ({ processSteps }) => {
@@ -9,6 +10,11 @@ const ProgressSection = ({ processSteps }) => {
         return step.status === 'completed' ? idx : acc;
       }, -1);
     return (
+        <motion.div 
+            variants={fadeInUpVariantStatic}
+            initial="hidden"
+            animate="visible" 
+        >
         <GlassyContainer>
             <div className="progress-container">
                 <div className="progress-track">
@@ -39,6 +45,7 @@ const ProgressSection = ({ processSteps }) => {
                 </div>
             </div>
         </GlassyContainer>
+        </motion.div>
     );
 };
 

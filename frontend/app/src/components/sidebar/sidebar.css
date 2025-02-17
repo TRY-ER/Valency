@@ -89,3 +89,9 @@
 
 .sidebar-menu-container.collapsed {
 }
+
+.temp-arrow-sec{
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+}
