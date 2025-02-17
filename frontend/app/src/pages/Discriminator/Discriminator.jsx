@@ -9,6 +9,8 @@ import Divider from '../../components/divider';
 import MoEDocs from '../../contents/doc_content/explorer_content/MoEDocs';
 import ExploreTabContents from '../../contents/tag_content/ExploreTags';
 import { Routes, Route, NavLink } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { fadeInDownVariants } from '../../components/animations/framerAnim';
 
 export default function Discriminator({
     tabContent,
@@ -52,11 +54,8 @@ export default function Discriminator({
         <div className="base-page-container">
             <div className="tab-container">
                 {
-                    tabContent.map((tab) => {
+                    tabContent.map((tab, index) => {
                         const allNestPaths = constructNestPath(tab);
-                        console.log("current path >>", location.pathname);
-                        console.log("allNestPaths >>", allNestPaths);
-                        console.log("bool res >>", allNestPaths.includes(location.pathname));
                         return (
                             <NavLink
                                 key={tab.id}
@@ -67,9 +66,14 @@ export default function Discriminator({
                                         : "tab-link"
                                 }
                             >
-                                <div className={`tab-tag glassy-feel`}>
+                                <motion.div 
+                                variants={fadeInDownVariants} 
+                                initial="hidden"
+                                animate="visible"
+                                custom={index}
+                                className={`tab-tag glassy-feel`}>
                                     <p className="tab-tag-text">{tab.title}</p>
-                                </div>
+                                </motion.div>
                             </NavLink>
                         )
                     })

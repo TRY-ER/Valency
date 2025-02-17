@@ -4,6 +4,8 @@ import FunctionalSection from '../../../components/functional_section/Functional
 import Divider from '../../../components/divider';
 import { BRICSGeneratorTabContents } from '../../../contents/tag_content/NestGeneratorTags';
 import { useLocation, useNavigate, NavLink, Outlet } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { fadeInDownVariants } from '../../../components/animations/framerAnim';
 import "./Generator.css";
 
 export default function BRICSGenerator({
@@ -35,7 +37,7 @@ export default function BRICSGenerator({
         <>
             <div className="tab-container">
                 {
-                    tabContent.map((tab) => {
+                    tabContent.map((tab, index) => {
                         return (
                            <NavLink
                                 key={tab.id}
@@ -53,9 +55,14 @@ export default function BRICSGenerator({
                                     }
                                 }} 
                             >
-                                <div className={`tab-tag glassy-feel`}>
+                                <motion.div 
+                                initial="hidden"
+                                animate="visible"
+                                variants={fadeInDownVariants}
+                                custom={index} 
+                                className={`tab-tag glassy-feel`}>
                                     <p className="tab-tag-text">{tab.title}</p>
-                                </div>
+                                </motion.div>
                             </NavLink>
                         )
                     })

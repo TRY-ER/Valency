@@ -2,6 +2,8 @@ import React from 'react';
 import "./Functional.css";
 import DocsContainer from '../docs_section/Docs';
 import FunctionContainer from '../function_container/FunctionContainer';
+import { motion } from 'framer-motion';
+import { fadeInRightVariantStatic } from '../animations/framerAnim';
 
 const FunctionalSection = ({ docElem, funcElem, customClassName=null }) => {
     return (
@@ -10,7 +12,8 @@ const FunctionalSection = ({ docElem, funcElem, customClassName=null }) => {
                 <FunctionContainer functionalComponents={funcElem} />
             </div>
             {
-                docElem && <div className="functional-doc">
+                docElem && <div 
+                className="functional-doc">
                     <DocsContainer docElem={docElem} />
                 </div>
             }

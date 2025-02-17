@@ -37,7 +37,9 @@ class GeminiLLM(BaseLLM):
         instruction_dict = {}
         if "instruction_dict" in kwargs:
             instruction_dict = kwargs["instruction_dict"]
+        # print("instruction_dict >>", instruction_dict)
         query = self.formatter.format(query, instruction_dict=instruction_dict, history=self.history)
+        print("query >>", query)
         response = self.client.models.generate_content_stream(
             model=self.model_name, contents=query
         )

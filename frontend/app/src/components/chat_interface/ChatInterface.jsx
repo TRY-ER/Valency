@@ -13,11 +13,12 @@ import { baseURL } from "../../endpoints/base";
 import { call_endpoint_async, call_eventsource } from "../../endpoints/caller";
 
 import { MODEL_OPTIONS_TYPES } from "./extendedVariables";
-import masterParser from "../parsers/MasterParser";
 import SpinningLoader from "../UI/SpinLoader/SpinLoader";
 import CustomToggler from "../UI/CustomToggler/CustomToggler";
 import CustomDropdown from "../UI/CustomDropdown/CustomDropdown";
 import GlassyContainer from "../glassy_container/gc";
+import Markdown from "react-markdown";
+import CustomMarkdownRenderer from "../UI/CustomMarkdown";
 
 const ChatInterface = () => {
     const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -587,26 +588,18 @@ const ChatInterface = () => {
                     }
                     else {
                         setChatStream((prev) => {
-                            const newChatStream = prev + event.data;
+                            var newChatStream;
+                            try{
+                                newChatStream = prev + JSON.parse(event.data);
+                            }
+                            catch(e) {
+                                newChatStream = prev + event.data;
+                            }
                             updateComponentResponse(activeUid, newChatStream);
                             scrollToBottom();
                             return newChatStream;
                         });
                     }
-                    // responseParser(
-                    //     event.data,
-                    //     setIsStreaming,
-                    //     setIsCompleted,
-                    //     updateEnResponse,
-                    //     updateEnQuery,
-                    //     setChatStream,
-                    //     updateComponentResponse,
-                    //     cUid,
-                    //     resolve,
-                    //     isDark,
-                    //     SpinningLoader,
-                    //     scrollToBottom,
-                    // )
                 }
 
                 eventSource.onerror = () => {
@@ -762,13 +755,19 @@ const ChatInterface = () => {
                                 {index === (components.length - 1) ?
                                     <div className={`chat-response ${generationState === "init" ? "loading" : ""} ${isDark ? "dark" : ""}`}>
                                         <p style={{ fontSize: `${fontSize}px` }}>
-                                            {masterParser(item.content[0].response.res_content, isDark)}
+                                            {/* <Markdown> */}
+                                                <CustomMarkdownRenderer content={item.content[0].response.res_content} />
+                                                {/* {item.content[0].response.res_content} */}
+                                            {/* </Markdown> */}
                                         </p>
                                     </div>
                                     :
                                     <div className={`chat-response ${isDark ? "dark" : ""}`}>
-                                        <p>
-                                            {item.content[0].en_show ? masterParser(item.content[0].response.en_response, isDark) : masterParser(item.content[0].response.res_content, isDark)}
+                                        <p style={{ fontSize: `${fontSize}px` }}>
+                                            {/* <Markdown> */}
+                                                {/* {item.content[0].response.res_content} */}
+                                                <CustomMarkdownRenderer content={item.content[0].response.res_content} />
+                                            {/* </Markdown> */}
                                         </p>
                                     </div>
                                 }

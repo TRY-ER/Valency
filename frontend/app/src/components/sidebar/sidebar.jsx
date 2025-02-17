@@ -3,6 +3,8 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { FiDroplet } from 'react-icons/fi';  // Example icon
 import { FaBars, FaArrowRight, FaArrowLeft } from 'react-icons/fa';  // Collapsible button icon
 import menuContent from '../../contents/menuContent';
+import { motion } from 'framer-motion';
+import { fadeInLeftVariants, fadeInStatic } from '../animations/framerAnim';
 import './sidebar.css';
 
 const constructAllPaths = (item) => {
@@ -14,10 +16,10 @@ const constructAllPaths = (item) => {
                 allPaths.push(`/${item.subElements[i].link}`);
                 if (item.subElements[i].subElements) {
                     item.subElements[i].subElements.map((subSubItem) => {
-                        if (subSubItem.link == ""){
+                        if (subSubItem.link == "") {
                             return allPaths.push(`/${item.subElements[i].link}/${item.subElements[i].link}`);
                         }
-                        else{
+                        else {
                             return allPaths.push(`/${item.subElements[i].link}/${item.subElements[i].link}/${subSubItem.link}`);
                         }
                     })
@@ -33,19 +35,19 @@ const constructAllPaths = (item) => {
         //     })
         // }
         if (item.subElements) {
-            var pre = ""; 
+            var pre = "";
             for (let i = 0; i < item.subElements.length; i++) {
-                if (item.subElements[i].link !== ""){
+                if (item.subElements[i].link !== "") {
                     allPaths.push(`/${item.link}/${item.subElements[i].link}`);
                     pre = `/${item.link}/${item.subElements[i].link}`
                 }
-                else{
+                else {
                     pre = `/${item.link}`
                 }
                 if (item.subElements[i].subElements) {
                     // console.log("sub elemems >>", item.subElements[i].subElements);
                     item.subElements[i].subElements.map((subSubItem) => {
-                        if (subSubItem.link !== ""){
+                        if (subSubItem.link !== "") {
                             allPaths.push(`${pre}/${subSubItem.link}`);
                         }
                     })
@@ -69,23 +71,41 @@ const Sidebar = ({ }) => {
 
     return (
         <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
-            <div className={`logo ${isCollapsed ? 'collapsed' : ''}`}>
+            <motion.div
+                variants={fadeInStatic}
+                initial="hidden"
+                animate="visible"
+                className={`logo ${isCollapsed ? 'collapsed' : ''}`}>
                 {/* Placeholder for Logo */}
                 <img src="/images/valency_logo_light_600x600.png" alt="Logo" />
-            </div>
+            </motion.div>
             {
                 isCollapsed ? <>
-                    <FaArrowRight color={"white"} className={`toggle-btn ${isCollapsed ? 'collapsed' : ''}`} onClick={toggleSidebar} />
+                    <motion.div
+                        variants={fadeInStatic}
+                        initial="hidden"
+                        animate="visible"
+                        className='temp-arrow-sec'
+                    >
+                        <FaArrowRight color={"white"} className={`toggle-btn ${isCollapsed ? 'collapsed' : ''}`} onClick={toggleSidebar} />
+                    </motion.div>
                 </>
                     :
                     <>
-                        <FaArrowLeft color={"white"} className={`toggle-btn ${isCollapsed ? 'collapsed' : ''}`} onClick={toggleSidebar} />
+                        <motion.div
+                            variants={fadeInStatic}
+                            initial="hidden"
+                            animate="visible"
+                            className='temp-arrow-sec'
+                        >
+                            <FaArrowLeft color={"white"} className={`toggle-btn ${isCollapsed ? 'collapsed' : ''}`} onClick={toggleSidebar} />
+                        </motion.div>
                     </>
             }
 
             <div className={`sidebar-menu-container ${isCollapsed ? 'collapsed' : ''}`}>
                 {
-                    menuContent.map((item) => {
+                    menuContent.map((item, index) => {
                         const allNestPaths = constructAllPaths(item);
                         return <NavLink key={item.id}
                             //   to={`/${item.link}`} 
@@ -98,14 +118,24 @@ const Sidebar = ({ }) => {
                                     : "sidebar-menu-item"
                             }
                         >
-                            <div className={`sidebar-menu-content ${isCollapsed ? 'collapsed' : ''}`}>
+                            <motion.div
+                                variants={fadeInLeftVariants}
+                                initial="hidden"
+                                animate="visible"
+                                custom={index}
+                                className={`sidebar-menu-content ${isCollapsed ? 'collapsed' : ''}`}>
                                 <img src={item.iconPath} alt="Icon" />
                                 {
                                     isCollapsed ? null : <>
-                                        <h2>{item.title}</h2>
+                                        <motion.h2
+                                            variants={fadeInLeftVariants}
+                                            initial="hidden"
+                                            animate="visible"
+                                            custom={index}
+                                        >{item.title}</motion.h2>
                                     </>
                                 }
-                            </div>
+                            </motion.div>
                         </NavLink>
                     })
                 }

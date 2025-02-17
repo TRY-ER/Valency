@@ -5,13 +5,20 @@ import MolInputBox from "../../../components/UI/InputBox/InputBox";
 import InfoBox from "../../../components/UI/InfoBox/InfoBox";
 import TwoDViewer from "../../../components/UI/TwoDViewer/TwoDViewer";
 import ThreeDViewer from "../../../components/UI/ThreeDViewer/ThreeDViewer";
+import { motion } from "framer-motion";
+import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";
+
 
 const ProtEComponent = () => {
     const [activeMol, setActiveMol] = useState("");
     const [isValidMol, setIsValidMol] = useState(false);
 
     return <>
-        <div className="explore-container">
+        <motion.div 
+            initial="hidden"
+            animate="visible"
+            variants={fadeInUpVariantStatic} 
+        className="explore-container">
             <div className="explorer-row-1">
                 <MolInputBox 
                     activeMol={activeMol}
@@ -27,7 +34,7 @@ const ProtEComponent = () => {
                 <InfoBox activeMol={activeMol} isValidMol={isValidMol} infoType={"PROT"}/>
                 <ThreeDViewer activeMol={activeMol} isValidMol={isValidMol} setIsValidMol={setIsValidMol} visType={"PROT"}/>
             </div>
-        </div>
+        </motion.div>
     </>
 }
 

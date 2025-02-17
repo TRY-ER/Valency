@@ -1,22 +1,22 @@
 import logo from './logo.svg';
 import './App.css';
-import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { useLocation, Outlet } from 'react-router-dom';
+import React, { createContext } from 'react';
 import ReRoutes from './routes';
 import Sidebar from './components/sidebar/sidebar';
-import menuContent from './contents/menuContent';
+import { MasterToolProvider } from './contexts/MasterToolContexts';
 
 function App() {
   return (
-    <div className="App">
-      <div className="sidebar-content">
-        <Sidebar />
+    <MasterToolProvider>
+      <div className="App">
+        <div className="sidebar-content">
+          <Sidebar />
+        </div>
+        <div className="side-content">
+          <ReRoutes />
+        </div>
       </div>
-      <div className="side-content">
-        <ReRoutes />
-      </div>
-    </div>
+    </MasterToolProvider>
   );
 }
 

@@ -1,8 +1,14 @@
 import React from "react";
+import { motion } from "framer-motion";
+import { fadeInRightVariantStatic } from "../../../components/animations/framerAnim";
 
 const MoEDocs = () => {
   return (
-    <>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={fadeInRightVariantStatic}
+    >
       <p className="doc-header">MoE Documentation</p>
       <p className="doc-paragraph">
         Contrary to popular belief, Lorem Ipsum is not simply random text. It
@@ -18,7 +24,7 @@ const MoEDocs = () => {
         Ipsum, "Lorem ipsum dolor sit amet..", comes from a line in section
         1.10.32.
       </p>
-    </>
+    </motion.div>
   );
 };
 

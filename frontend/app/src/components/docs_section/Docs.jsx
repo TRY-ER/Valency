@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import GlassyContainer from '../glassy_container/gc';
 import "./Docs.css";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa";
+import { motion, view } from 'framer-motion';
+import { fadeInRightVariantStatic } from '../animations/framerAnim';
 
 const DocsContainer = ({ docElem }) => {
     const [isExpanded, setIsExpanded] = useState(false);
@@ -16,38 +18,45 @@ const DocsContainer = ({ docElem }) => {
         const contentHeight = contentRef.current?.scrollHeight; // Get the full height of the content
         const viewportHeight = window.innerHeight * 0.5; // 50vh of the viewport
 
+        console.log("content height >>", contentHeight);
+        console.log("viewport height >>", viewportHeight);
+
         // Show the button only if the content height is greater than 50vh
         if (contentHeight > viewportHeight) {
             setShowButton(true);
         } else {
             setShowButton(false);
         }
-    }, []);
+    }, [docElem]);
 
     return (
         <>
-        <GlassyContainer expandable={true}>
-            <div
-                ref={contentRef}
-                className={`doc-container ${isExpanded ? 'expanded' : 'collapsed'}`}
-            >
-               {docElem} 
-            </div>
+            {/* <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={fadeInRightVariantStatic}> */}
+                <GlassyContainer expandable={true}>
+                    <div
+                        ref={contentRef}
+                        className={`doc-container ${isExpanded ? 'expanded' : 'collapsed'}`}
+                    >
+                        {docElem}
+                    </div>
 
-            {/* Only show the button if content is more than 50vh */}
-            <div className="doc-drop-img">
-                {showButton && (
-                <>
-                    {isExpanded ? 
-                        <FaArrowUp onClick={toggleExpand}/> : <FaArrowDown onClick={toggleExpand}/>
-                    }
-                </>
-                )}
-            </div>
-            
-        </GlassyContainer>
+                    {/* Only show the button if content is more than 50vh */}
+                    <div className="doc-drop-img">
+                        {showButton && (
+                            <>
+                                {isExpanded ?
+                                    <FaArrowUp onClick={toggleExpand} /> : <FaArrowDown onClick={toggleExpand} />
+                                }
+                            </>
+                        )}
+                    </div>
 
-        <style jsx>{`
+                </GlassyContainer>
+
+                <style jsx>{`
             .doc-container::after {
                 content: '';
                 position: absolute;
@@ -61,6 +70,7 @@ const DocsContainer = ({ docElem }) => {
                 transition: opacity 0.3s ease;
             }
         `}</style>
+            {/* </motion.div> */}
         </>
     );
 };

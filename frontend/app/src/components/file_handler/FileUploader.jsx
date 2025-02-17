@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import './FileUploader.css';
 import GlassyContainer from '../glassy_container/gc';
 import InterButtons from '../buttons/InterButtons';
+import { motion } from 'framer-motion';
+import { fadeInUpVariantStatic } from '../animations/framerAnim';
 
 export default function FileUploader({ status, setRawFile, onStartProcess }) {
     const [lines, setLines] = useState([]);
@@ -39,7 +41,11 @@ export default function FileUploader({ status, setRawFile, onStartProcess }) {
     }
 
     return (
-        <div className="file-upload-section">
+        <motion.div 
+            variants={fadeInUpVariantStatic}
+            initial="hidden"
+            animate="visible" 
+        className="file-upload-section">
             <GlassyContainer>
                 <div className="file-uploader-container">
                     <div className="file-input">
@@ -73,6 +79,6 @@ export default function FileUploader({ status, setRawFile, onStartProcess }) {
 
                 </div>
             </GlassyContainer>
-        </div>
+        </motion.div>
     );
 }

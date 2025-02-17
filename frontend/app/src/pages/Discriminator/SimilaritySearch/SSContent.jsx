@@ -9,6 +9,8 @@ import GenNumSelector from "../../../components/UI/genNumSelector/genNumSelector
 import NumValidSelector from "../../../components/UI/numValidSelector/numValidSelector";
 import SimilarityCardContainer from "../../../components/UI/similarityCardContainer/SimilarityCardContainer";
 import { discriminate_endpoints } from "../../../endpoints/endpoints";
+import { motion } from "framer-motion";
+import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";
 
 const SSContent = ({ inputType = "MOL" }) => {
     const [generatedData, setGeneratedData] = useState([]);
@@ -68,7 +70,11 @@ const SSContent = ({ inputType = "MOL" }) => {
     
     return (
         <>
-            <div className="generator-container">
+            <motion.div 
+                initial="hidden"
+                animate="visible"
+                variants={fadeInUpVariantStatic} 
+            className="generator-container">
                 <div className="generator-row-1">
                     <NumValidSelector
                         status={status}
@@ -89,7 +95,7 @@ const SSContent = ({ inputType = "MOL" }) => {
                 <div className="generator-row-2">
                     <SimilarityCardContainer data={generatedData} status={status} />
                 </div>
-            </div>
+            </motion.div>
         </>
     );
 };

@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import './genNumSelector.css';
 import GlassyContainer from '../../glassy_container/gc';
 import InterButtons from '../../buttons/InterButtons';
+import { motion } from 'framer-motion';
+import { fadeInUpVariantStatic } from '../../animations/framerAnim';
 
-export default function GenNumSelector({ status, 
-                                         onStartProcess,
-                                         setGenNum,
-                                         genNum,
-                                         header,
-                                         placeholder }) {
+export default function GenNumSelector({ status,
+    onStartProcess,
+    setGenNum,
+    genNum,
+    header,
+    placeholder }) {
     const labels = {
         "enabled": "Start Process",
         "disabled": "Select a Positive Number to begin",
@@ -22,7 +24,11 @@ export default function GenNumSelector({ status,
     }
 
     return (
-        <div className="gen-num-section">
+        <motion.div
+            variants={fadeInUpVariantStatic}
+            initial="hidden"
+            animate="visible"
+            className="gen-num-section">
             <GlassyContainer>
                 <div className="gen-num-container">
                     <div className="input-container">
@@ -32,7 +38,7 @@ export default function GenNumSelector({ status,
                                 placeholder={placeholder}
                                 value={genNum}
                                 onChange={(e) => setGenNum(e.target.value)}
-                                inputMode='numeric' 
+                                inputMode='numeric'
                             />
                         </div>
                     </div>
@@ -46,6 +52,6 @@ export default function GenNumSelector({ status,
                         : ""}
                 </div>
             </GlassyContainer>
-        </div>
+        </motion.div>
     );
 }

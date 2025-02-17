@@ -8,6 +8,8 @@ import Divider from '../../components/divider';
 import MoEDocs from '../../contents/doc_content/explorer_content/MoEDocs';
 // import { useLocation, useNavigate } from 'react-router-dom';
 import { Routes, Route, useLocation, Outlet, NavLink} from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { fadeInDownVariants } from '../../components/animations/framerAnim';
 
 export default function Generator({
     tabContent,
@@ -51,7 +53,7 @@ export default function Generator({
         <div className="base-page-container">
              <div className="tab-container">
                 {
-                    tabContent.map((tab) => {
+                    tabContent.map((tab, index) => {
                         const allNestPaths = constructNestPath(tab);
                         // console.log("current path >>", location.pathname);
                         // console.log("allNestPaths >>", allNestPaths);
@@ -66,9 +68,14 @@ export default function Generator({
                                         : "tab-link"
                                 }
                             >
-                                <div className={`tab-tag glassy-feel`}>
+                                <motion.div 
+                                initial="hidden"
+                                animate="visible"
+                                variants={fadeInDownVariants}
+                                custom={index}  
+                                className={`tab-tag glassy-feel`}>
                                     <p className="tab-tag-text">{tab.title}</p>
-                                </div>
+                                </motion.div>
                             </NavLink>
                         )
                     })

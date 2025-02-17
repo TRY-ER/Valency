@@ -1,20 +1,8 @@
-// import React from "react";
-// import GlassyContainer from "../glassy_container/gc";
-
-// const FileDownloader = () => {
-//     return (
-//         <div className="file-download-section">
-//             <GlassyContainer>
-//             </GlassyContainer>
-//         </div>
-//     )
-// };
-
-// export default FileDownloader;
-
 import React from "react";
 import "./FileUploader.css"; // or your styling
 import GlassyContainer from "../glassy_container/gc";
+import { motion } from "framer-motion";
+import { fadeInUpVariantStatic } from "../animations/framerAnim";
 
 export default function FileDownloader({ status,
     generatedData,
@@ -43,7 +31,11 @@ export default function FileDownloader({ status,
     };
 
     return (
-        <div className="file-download-section">
+        <motion.div 
+            variants={fadeInUpVariantStatic}
+            initial="hidden"
+            animate="visible" 
+        className="file-download-section">
             <GlassyContainer expandable={expandable}>
                 <div className="file-download-inner-container">
                     <div className="console-container">
@@ -80,6 +72,6 @@ export default function FileDownloader({ status,
                     }
                 </div>
             </GlassyContainer>
-        </div>
+        </motion.div>
     );
 }

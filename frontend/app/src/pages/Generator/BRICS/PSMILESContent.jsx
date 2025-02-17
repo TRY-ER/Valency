@@ -5,6 +5,7 @@ import FileDownloader from "../../../components/file_handler/FileDownloader";
 import { call_endpoint_async, call_eventsource } from "../../../endpoints/caller";
 import { generate_endpoints } from "../../../endpoints/endpoints";
 
+
 const BRICSComponent = ({ inputType = "smiles" }) => {
     const [generatedData, setGeneratedData] = useState([]);
     const [total, setTotal] = useState(0);

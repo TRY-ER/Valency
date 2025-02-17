@@ -7,7 +7,9 @@ from engine.chat.llm import GeminiLLM
 from engine.chat.formatter import PromptFormatter
 from get_env_vars import GOOGLE_CLOUD_PROJECT_API_KEY
 from engine.chat.utils import postproces_response_for_stream
-
+from utils.chat_utils import format_tool_config_to_prompt
+from app.prompts.instruction import instructions
+import json
 
 router = APIRouter()
 
@@ -31,11 +33,12 @@ def event_generator(query: str, config: Dict[str, Any]):
                     model_name=model_name,
                     formatter=PromptFormatter(),
                     persist=False)
-    print("history >>", llm.history)
-    text_responses = llm.stream_respond(query)
+    instructions["Tools"]  = format_tool_config_to_prompt(TOOL_CONFIG)
+    text_responses = llm.stream_respond(query, instruction_dict=instructions)   
     for t in text_responses:
-        t = postproces_response_for_stream(t)
-        yield f"data: {t}\n\n"
+        # t = postproces_response_for_stream(t)
+        print("data >>", json.dumps(t))
+        yield f"data: {json.dumps(t)}\n\n"
     yield f"data: <|end|>\n\n"
 
 @router.post("/init")
@@ -65,5 +68,6 @@ def set_config(data: dict):
     """
     A POST endpoint to save the tool config in memory.
     """
-    TOOL_CONFIG = (data["data"])
+    global TOOL_CONFIG
+    TOOL_CONFIG = data["data"]
     return {"status": "success"}

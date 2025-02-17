@@ -1,10 +1,13 @@
 import MoEDocs from "../doc_content/explorer_content/MoEDocs";
 import ProDocs from "../doc_content/explorer_content/ProDocs";
 import PolyDocs from "../doc_content/explorer_content/PolyDocs";
+import DocRenderer from "../doc_content/DocRenderer";
 
 import MolEComponent from "../../pages/Explorer/MolExplorer/MolExplorer";
 import ProtEComponent from "../../pages/Explorer/ProtExplorer/ProtExplorer";
 import PolyEComponent from "../../pages/Explorer/PolyExplorer/PolyExplorer";
+
+
 
 
 const ExplorerTabContent = [
@@ -18,7 +21,7 @@ const ExplorerTabContent = [
                      Molecular Weight, Heavy Atoms Count, H Bond Doner Count, H Bond Acceptor Count, Rotatale Bonds Count,
                      Topological Polar Surface Area (TPSA), and Number of rings`,
         component: <MolEComponent />,
-        docs: <MoEDocs />,
+        docs: <DocRenderer filePath="/markdown_repo/MoleculeExplorer.md"/>,
     },
     {
         id: 2,
