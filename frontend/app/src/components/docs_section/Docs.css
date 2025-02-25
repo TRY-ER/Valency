@@ -16,7 +16,7 @@
 }
 
 .doc-container.collapsed {
-    max-height: 50vh;
+    /* max-height: 50vh; */
     /* Limit height when collapsed */
 }
 

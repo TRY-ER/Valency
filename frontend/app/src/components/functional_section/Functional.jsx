@@ -2,19 +2,17 @@ import React from 'react';
 import "./Functional.css";
 import DocsContainer from '../docs_section/Docs';
 import FunctionContainer from '../function_container/FunctionContainer';
-import { motion } from 'framer-motion';
-import { fadeInRightVariantStatic } from '../animations/framerAnim';
 
-const FunctionalSection = ({ docElem, funcElem, customClassName=null }) => {
+const FunctionalSection = ({ docElem, funcElem, customClassName = null }) => {
     return (
         <div className={`${customClassName ? customClassName : "functional-container"}`}>
             <div className="functional-item">
                 <FunctionContainer functionalComponents={funcElem} />
             </div>
             {
-                docElem && <div 
-                className="functional-doc">
-                    <DocsContainer docElem={docElem} />
+                docElem && <div
+                    className="functional-doc">
+                        <DocsContainer docElem={docElem} />
                 </div>
             }
         </div>

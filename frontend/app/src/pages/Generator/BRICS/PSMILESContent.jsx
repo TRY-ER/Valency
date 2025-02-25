@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ProgressSection from "../../../components/progress_section/ProgressSection";
 import FileUploader from "../../../components/file_handler/FileUploader";
 import FileDownloader from "../../../components/file_handler/FileDownloader";
@@ -134,7 +134,7 @@ const BRICSComponent = ({ inputType = "smiles" }) => {
                         setStatus("completed");
                         
                     }
-                    else if (data.type == "error") {
+                    else if (data.type === "error") {
                         setProcessSteps((prev) => {
                             const newSteps = [...prev];
                             const pendingIndex = newSteps.findIndex(step => step.status === "pending");

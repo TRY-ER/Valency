@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "./MolExplorer.css";
 
 import MolInputBox from "../../../components/UI/InputBox/InputBox";

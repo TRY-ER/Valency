@@ -1,7 +1,6 @@
-import PSMILESComponent from "../../pages/Generator/BRICS/PSMILESContent";
-import ProDocs from "../doc_content/explorer_content/ProDocs";
 import BRICSComponent from "../../pages/Generator/BRICS/PSMILESContent";
 import LSTMComponent from "../../pages/Generator/LSTM/LSTMContent";
+import DocRenderer from "../doc_content/DocRenderer";
 
 const BRICSGeneratorTabContents = [
     {
@@ -16,7 +15,7 @@ const BRICSGeneratorTabContents = [
                       the output panel shows the steps details as well as completed steps and the molecules generated. This tool is specifically useful when you have
                       a set of molecules and you want to generate more molecules based on the given set.`,
         component: <BRICSComponent key="smiles" inputType="smiles"/>, 
-        docs: <ProDocs />,
+        docs: <DocRenderer filePath="/markdown_repo/BRICSSMILES.md"/>,
     },
     {
         id: 2,
@@ -30,7 +29,7 @@ const BRICSGeneratorTabContents = [
                       the output panel shows the steps details as well as completed steps and the psmiles generated upon completed. This tool is specifically useful when you have
                       a set of polymers and you want to generate more polymers based on the given set.`,
         component: <BRICSComponent key="psmiles" inputType="psmiles"/>, 
-        docs: <ProDocs />,
+        docs: <DocRenderer filePath="/markdown_repo/BRICSPSMILES.md"/>,
     }
 ];
 
@@ -46,7 +45,7 @@ const LSTMGeneratorTabContents = [
                       consists of a output panel, download button and the reset button. the output panel shows the steps details as well as completed steps and the psmiles generated upon completed.`,
         component: <LSTMComponent key="psmiles" />, 
         includeDocs: true, 
-        docs: <ProDocs />,
+        docs: <DocRenderer filePath="/markdown_repo/LSTMPSMILES.md"/>,
     },
     {
         id: 2,
@@ -58,7 +57,7 @@ const LSTMGeneratorTabContents = [
                       of genertions recieved. The second section contains the input setup with a input box to take the number of generations. The third section is the output section that
                       consists of a output panel, download button and the reset button. the output panel shows the steps details as well as completed steps and the psmiles generated upon completed.`,
         component: <LSTMComponent inputType="wdg" key="wdg" />,
-        docs: <ProDocs />,
+        docs: <DocRenderer filePath="/markdown_repo/LSTMWDG.md"/>,
     }
 ];
 

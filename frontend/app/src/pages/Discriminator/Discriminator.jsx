@@ -1,14 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './Discriminator.css';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import GlassyContainer from '../../components/glassy_container/gc';
-import TabContainer from '../../components/tab_section/TabSection';
-import DiscriminatorTabContents from '../../contents/tag_content/DiscriminatorTags';
-import FunctionalSection from '../../components/functional_section/Functional';
+import { Outlet, useLocation} from 'react-router-dom';
 import Divider from '../../components/divider';
-import MoEDocs from '../../contents/doc_content/explorer_content/MoEDocs';
-import ExploreTabContents from '../../contents/tag_content/ExploreTags';
-import { Routes, Route, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { fadeInDownVariants } from '../../components/animations/framerAnim';
 

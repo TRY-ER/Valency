@@ -68,7 +68,10 @@ class BRICSGenerator(Generator):
         smiles_list = self.replace_wildcards_with_vatoms(smiles_list)
     decomposed_list = self._BRICS_decompose(smiles_list)
     built_atoms_w_vatoms = self._BRICS_build(decomposed_list)
-    filtered_mols= self.filter_candidates(built_atoms_w_vatoms)
+    if is_polymer:
+      filtered_mols= self.filter_candidates(built_atoms_w_vatoms)
+    else:
+      filtered_mols = built_atoms_w_vatoms
     if self.verbose:
       print(f"[+] total {len(filtered_mols)} are created in the process !")
     if is_polymer:

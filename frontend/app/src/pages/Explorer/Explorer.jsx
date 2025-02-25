@@ -1,14 +1,9 @@
 // setup react component
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import './Explorer.css';
-import { Routes, useLocation, useNavigate, Route, Outlet, NavLink } from 'react-router-dom';
-import GlassyContainer from '../../components/glassy_container/gc';
-import TabContainer from '../../components/tab_section/TabSection';
-import ExploreTabContent from '../../contents/tag_content/ExploreTags';
-import FunctionalSection from '../../components/functional_section/Functional';
+import { Outlet, NavLink } from 'react-router-dom';
 import Divider from '../../components/divider';
-import MoEDocs from '../../contents/doc_content/explorer_content/MoEDocs';
 import { motion } from 'framer-motion';
 import { fadeInDownVariants } from '../../components/animations/framerAnim'; 
 

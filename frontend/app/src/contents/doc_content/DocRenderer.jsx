@@ -9,15 +9,14 @@ const DocRenderer = ({ filePath }) => {
     const [docContent, setDocContent] = useState("");
 
     useEffect(() => {
-        console.log('docContent:', docContent)
-        console.log('filePath:', filePath)
+        // console.log('docContent:', docContent)
+        // console.log('filePath:', filePath)
     }, [docContent])
 
     useEffect(() => {
         fetch(filePath)
             .then((res) => res.text())
             .then((text) => {
-                console.log("text >>", text)
                 setDocContent(text);
             })
             .catch((err) => console.error("Error loading markdown:", err));
@@ -28,7 +27,8 @@ const DocRenderer = ({ filePath }) => {
             initial="hidden"
             animate="visible"
             variants={fadeInRightVariantStatic}
-        >
+            className="doc-renderer-container"
+        > 
             <div className="doc-renderer-wrapper">
                 <ReactMarkdown>{docContent}</ReactMarkdown>
             </div>

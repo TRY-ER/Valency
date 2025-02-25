@@ -1,6 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-import ProgressSection from "../../../components/progress_section/ProgressSection";
-import FileUploader from "../../../components/file_handler/FileUploader";
+import React, {  useRef, useState } from "react";
 import FileDownloader from "../../../components/file_handler/FileDownloader";
 import { call_endpoint_async, call_eventsource } from "../../../endpoints/caller";
 import { generate_endpoints } from "../../../endpoints/endpoints";
@@ -63,7 +61,7 @@ const LSTMComponent = ({ inputType = "psmiles" }) => {
                                 {currentNumRef.current + 1}:  {data.data}
                             </p>]);
                         }
-                        else if (currentNumRef.current == 6){
+                        else if (currentNumRef.current === 6){
                             setConsoleData(prevData => [...prevData, <p className="console-normal">
                                 ...
                             </p>]);

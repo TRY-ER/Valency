@@ -1,8 +1,4 @@
-import MoEDocs from "../doc_content/explorer_content/MoEDocs";
-import ProDocs from "../doc_content/explorer_content/ProDocs";
-import PolyDocs from "../doc_content/explorer_content/PolyDocs";
 import DocRenderer from "../doc_content/DocRenderer";
-
 import MolEComponent from "../../pages/Explorer/MolExplorer/MolExplorer";
 import ProtEComponent from "../../pages/Explorer/ProtExplorer/ProtExplorer";
 import PolyEComponent from "../../pages/Explorer/PolyExplorer/PolyExplorer";
@@ -33,7 +29,7 @@ const ExplorerTabContent = [
                      Experiment Method,Molecular Weight (kDa),Deposited Model Count,Polymer entity count,Polymer monomer count,
                      Structural Features,Release Date,Resolution`,
         component: <ProtEComponent />,
-        docs: <ProDocs />,
+        docs: <DocRenderer filePath="/markdown_repo/ProteinExplorer.md"/>,
     },
     {
         id: 3,
@@ -44,7 +40,7 @@ const ExplorerTabContent = [
                       of the PSMILES, Monomer Molcular Weight, Number of rings in the Monomer, and the corresponding open bond
                       indexes to indicate wher the potential bonds can be formed to connect with the next monomer.`,
         component: <PolyEComponent />,
-        docs: <PolyDocs />,
+        docs: <DocRenderer filePath="/markdown_repo/PolymerExplorer.md"/>,
     }
 ]
 

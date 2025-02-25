@@ -19,7 +19,7 @@
 .functional-doc{
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
     width: 20vw;
+    margin-bottom: 20px;
+    overflow-y: auto;
 }
-

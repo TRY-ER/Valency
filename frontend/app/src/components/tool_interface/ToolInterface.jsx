@@ -1,10 +1,7 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import "./ToolInterface.css";
-import menuContent from "../../contents/menuContent";
 import GlassyContainer from "../glassy_container/gc";
 import { MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowUp } from "react-icons/md";
-import { chat_endpoint } from "../../endpoints/endpoints";
-import { call_endpoint_async } from "../../endpoints/caller";
 import { MasterToolContext } from "../../contexts/MasterToolContexts";
 import { motion } from "framer-motion";
 import { fadeInRightVariants } from "../animations/framerAnim";

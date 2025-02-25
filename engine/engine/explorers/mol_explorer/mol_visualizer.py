@@ -12,7 +12,7 @@ class MolVisualizer(Visulizer):
 
     def get_image(self, source_str: str, size: tuple = (600, 600)):
         mol = Chem.MolFromSmiles(source_str)
-        mol = Chem.AddHs(mol)
+        # mol = Chem.AddHs(mol)
         if not mol:
             return None
         img = Draw.MolToImage(mol, size=(600, 600))

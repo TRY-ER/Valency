@@ -1,9 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import TabContainer from '../../../components/tab_section/TabSection';
-import FunctionalSection from '../../../components/functional_section/Functional';
+import React  from 'react';
 import Divider from '../../../components/divider';
-import { BRICSGeneratorTabContents } from '../../../contents/tag_content/NestGeneratorTags';
-import { useLocation, useNavigate, NavLink, Outlet } from 'react-router-dom';
+import { useLocation, NavLink, Outlet } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { fadeInDownVariants } from '../../../components/animations/framerAnim';
 import "./Generator.css";
@@ -41,7 +38,7 @@ export default function BRICSGenerator({
                         return (
                            <NavLink
                                 key={tab.id}
-                                to={ tab.link == "" ? `/${basePath}` : `/${basePath}/${tab.link}`}
+                                to={ tab.link === "" ? `/${basePath}` : `/${basePath}/${tab.link}`}
                                 // className={({ isActive }) => `tab-link ${isActive ? "active" : ""}`}
                                 className={() =>{
                                     if (location.pathname === `/${basePath}` && tab.link === ""){

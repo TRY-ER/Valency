@@ -1,8 +1,5 @@
-import PSMILESComponent from "../../pages/Generator/BRICS/PSMILESContent";
-import ProDocs from "../doc_content/explorer_content/ProDocs";
-import BRICSComponent from "../../pages/Generator/BRICS/PSMILESContent";
 import SSContent from "../../pages/Discriminator/SimilaritySearch/SSContent";
-import { desc } from "framer-motion/client";
+import DocRenderer from "../doc_content/DocRenderer";
 
 const SimilaritySearchTabContents = [
     {
@@ -15,7 +12,7 @@ const SimilaritySearchTabContents = [
                       the similarity distance from the query SMILES. The results can be downloadable in a text file
                       as well as can be copied to the clipboard.`,
         component: <SSContent key="smiles" inputType={"MOL"} />, 
-        docs: <ProDocs />,
+        docs: <DocRenderer filePath="/markdown_repo/MoleculeSimilaritySearch.md"/>,
     },
     {
         id: 2,
@@ -27,7 +24,7 @@ const SimilaritySearchTabContents = [
                       the similarity distance from the query PSMILES.The results can be downloadable in a text file
                       as well as can be copied to the clipboard.`,
         component:  <SSContent key="psmiles" inputType={"POLY"} />,
-        docs: <ProDocs />,
+        docs: <DocRenderer filePath="/markdown_repo/PolymerSimilaritySearch.md"/>,
     },
     {
         id: 3,
@@ -39,7 +36,7 @@ const SimilaritySearchTabContents = [
                       and similarity score. The results can be downloadable in a text file as well as can be 
                       copied to the clipboard.`,
         component:  <SSContent key="pdb" inputType={"PROT"} />,
-        docs: <ProDocs />,
+        docs: <DocRenderer filePath="/markdown_repo/ProteinSimilaritySearch.md"/>,
     }
 ]; 
 
