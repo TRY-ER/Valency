@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { EventSourcePolyfill } from 'event-source-polyfill';
-import { data } from 'react-router-dom';
 
 const call_endpoint_async = async (data, payload) => {
     if (data.method === 'post') {

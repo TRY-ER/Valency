@@ -1,12 +1,6 @@
-import MoEDocs from "../doc_content/explorer_content/MoEDocs";
-import ProDocs from "../doc_content/explorer_content/ProDocs";
-import PolyDocs from "../doc_content/explorer_content/PolyDocs";
-
-import ProtEComponent from "../../pages/Explorer/ProtExplorer/ProtExplorer";
 import BRICSGenerator from "../../pages/Generator/BRICS/BRICSGenerator";
 import LSTMGenerator from "../../pages/Generator/LSTM/LSTMGenerator";
 import { BRICSGeneratorTabContents, LSTMGeneratorTabContents } from "./NestGeneratorTags";
-import { desc } from "framer-motion/client";
 
 const GeneratorTabContents = [
     {

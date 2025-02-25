@@ -1,9 +1,7 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import "./ProtExplorer.css";
-
 import MolInputBox from "../../../components/UI/InputBox/InputBox";
 import InfoBox from "../../../components/UI/InfoBox/InfoBox";
-import TwoDViewer from "../../../components/UI/TwoDViewer/TwoDViewer";
 import ThreeDViewer from "../../../components/UI/ThreeDViewer/ThreeDViewer";
 import { motion } from "framer-motion";
 import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";

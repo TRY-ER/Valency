@@ -1,9 +1,5 @@
-import MoEDocs from "../doc_content/explorer_content/MoEDocs";
-import ProDocs from "../doc_content/explorer_content/ProDocs";
-import PolyDocs from "../doc_content/explorer_content/PolyDocs";
 import SSComponent from "../../pages/Discriminator/SimilaritySearch/SSearch";
 import { SimilaritySearchTabContents } from "./NestDiscriminatorTags";
-import { desc } from "framer-motion/client";
 
 const DiscriminatorTabContents = [
     {

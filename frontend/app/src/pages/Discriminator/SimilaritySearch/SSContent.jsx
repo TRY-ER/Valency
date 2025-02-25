@@ -1,11 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-import ProgressSection from "../../../components/progress_section/ProgressSection";
-import FileUploader from "../../../components/file_handler/FileUploader";
-import FileDownloader from "../../../components/file_handler/FileDownloader";
-import { call_endpoint_async, call_eventsource } from "../../../endpoints/caller";
-import { generate_endpoints } from "../../../endpoints/endpoints";
-import ProgressLoader from "../../../components/progress_loader/ProgressLoader";
-import GenNumSelector from "../../../components/UI/genNumSelector/genNumSelector";
+import React, { useEffect, useState } from "react";
+import { call_endpoint_async } from "../../../endpoints/caller";
 import NumValidSelector from "../../../components/UI/numValidSelector/numValidSelector";
 import SimilarityCardContainer from "../../../components/UI/similarityCardContainer/SimilarityCardContainer";
 import { discriminate_endpoints } from "../../../endpoints/endpoints";
@@ -79,7 +73,7 @@ const SSContent = ({ inputType = "MOL" }) => {
                     <NumValidSelector
                         status={status}
                         onStartProcess={handleStartProcess}
-                        numheader={"Number of Generations (1 - 30)"}
+                        numheader={"Number of Candidates Required (1 - 30)"}
                         setGenNum={setMaxNum}
                         genNum={maxNum}
                         numplaceholder={"Type Number of Generations"}

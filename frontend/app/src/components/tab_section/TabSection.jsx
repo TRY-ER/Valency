@@ -1,7 +1,6 @@
 import { React } from 'react';
 import "./TabSection.css";
-import { NavLink, useNavigate } from 'react-router-dom';
-import { isCancel } from 'axios';
+import { NavLink} from 'react-router-dom';
 
 const TabContainer = ({ tabDetails, basePath = "" }) => {
     

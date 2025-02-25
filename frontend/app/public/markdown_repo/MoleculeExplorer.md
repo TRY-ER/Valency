@@ -1,16 +1,20 @@
-# Molecule Explorer Component
+# Molecule Explorer Documentation 
+---
 
 ## Overview
+---
 
 The **Molecule Explorer** tool allows users to input a SMILES string (Simplified Molecular Input Line Entry System) representing a chemical molecule and provides an interactive interface for visualizing its 2D structure. In addition, the component displays key molecular properties in an information panel.
 
-## Features
 
+## Features
+---
 - **SMILES Input**: The tool accepts a SMILES string as input, which is used to generate a 2D representation of the molecule.
 - **2D Molecular Visualization**: A 2D image of the molecule is rendered, showcasing its chemical structure.
 - **Information Panel**: Displays additional molecular properties and metrics.
 
 ### Molecular Properties Displayed
+---
 
 1. **Molecular Formula**: The chemical formula of the molecule.
 2. **Molecular Weight**: The total molecular weight of the compound.
@@ -22,6 +26,18 @@ The **Molecule Explorer** tool allows users to input a SMILES string (Simplified
 8. **Number of Rings**: The total number of ring structures present in the molecule.
 
 ## Usage
+---
 
 The `Molecule Explorer` component can be used by passing a SMILES string to the interface. Once the SMILES is inputted, the tool will generate a 2D chemical representation and populate the information panel with the molecular properties listed above.
 
+
+## Example
+---
+
+You can pass a SMILES string like so:
+
+```
+CCO
+```
+
+Here, `"CCO"` is the SMILES string for ethanol.

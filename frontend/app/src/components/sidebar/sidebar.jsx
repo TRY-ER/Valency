@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
-import { FiDroplet } from 'react-icons/fi';  // Example icon
-import { FaBars, FaArrowRight, FaArrowLeft } from 'react-icons/fa';  // Collapsible button icon
+import { NavLink, useLocation } from 'react-router-dom';
 import menuContent from '../../contents/menuContent';
 import { motion } from 'framer-motion';
 import { fadeInLeftVariants, fadeInStatic } from '../animations/framerAnim';
 import './sidebar.css';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 
 const constructAllPaths = (item) => {
     let allPaths = [];
-    if (item.link == "") {
+    if (item.link === "") {
         allPaths.push("/");
         if (item.subElements) {
             for (let i = 0; i < item.subElements.length; i++) {
                 allPaths.push(`/${item.subElements[i].link}`);
                 if (item.subElements[i].subElements) {
                     item.subElements[i].subElements.map((subSubItem) => {
-                        if (subSubItem.link == "") {
+                        if (subSubItem.link === "") {
                             return allPaths.push(`/${item.subElements[i].link}/${item.subElements[i].link}`);
                         }
                         else {

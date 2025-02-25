@@ -74,6 +74,26 @@ async def upload_smiles(file: UploadFile = File(...)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+@router.post("/brics/psmiles/upload")
+async def upload_psmiles(file: UploadFile = File(...)):
+    try:
+        content = file.file.read().decode("utf-8").splitlines()
+        file.file.close()
+        
+        # Generate unique ID
+        file_id = str(uuid.uuid4())
+        
+        # Store content
+        file_storage[file_id] = content
+        
+        return JSONResponse({
+            "status": "success",
+            "file_id": file_id,
+            "line_count": len(content)
+        })
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
 
 @router.post("/lstm/set")
 async def set_generation_psmiles(data: dict):

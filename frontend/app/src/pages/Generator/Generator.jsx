@@ -1,13 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React  from 'react';
 import './Generator.css';
-import GlassyContainer from '../../components/glassy_container/gc';
-import TabContainer from '../../components/tab_section/TabSection';
-import FunctionalSection from '../../components/functional_section/Functional';
-import GeneratorTabContents from '../../contents/tag_content/GeneratorTags';
 import Divider from '../../components/divider';
-import MoEDocs from '../../contents/doc_content/explorer_content/MoEDocs';
 // import { useLocation, useNavigate } from 'react-router-dom';
-import { Routes, Route, useLocation, Outlet, NavLink} from 'react-router-dom';
+import { useLocation, Outlet, NavLink} from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { fadeInDownVariants } from '../../components/animations/framerAnim';
 

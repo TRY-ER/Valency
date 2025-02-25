@@ -1,0 +1,25 @@
+FROM python:3.10-slim
+
+# Set working directory
+WORKDIR /app
+
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Copy backend requirements and install dependencies
+COPY backend/req.txt .
+RUN pip install -r req.txt
+
+# Copy the engine package so it can be installed in editable mode
+COPY engine/ ./engine/
+RUN pip install -r ./engine/req.txt
+RUN pip install -e ./engine/
+
+# Copy the rest of the backend source code
+COPY backend/ ./backend/
+
+# Expose port 8000 for FastAPI
+EXPOSE 8000
+
+# Run the FastAPI app using uvicorn
+CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8000"]

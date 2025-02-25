@@ -110,3 +110,31 @@
   height: 100vh;
   overflow: hidden;
 }
+
+.tab-container{
+  display:flex;
+  flex-direction: row;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.tab-tag{
+  padding: 5px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.tab-link.active .tab-tag{
+  background-color: var(--color-success)!important;
+}
+
+.tab-link{
+  text-decoration: none;
+  color: var(--color-text-primary);
+}
+
+.tab-tag-text{
+  margin: 0;
+  padding: 0;
+  color: var(--color-text-primary);
+}

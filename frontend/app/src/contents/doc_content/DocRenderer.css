@@ -1,4 +1,57 @@
-.doc-renderer-wrapper{
-    display: block;
-    width: 100%;
+@import "../../App.css";
+
+.doc-renderer-container {
+    display: flex;
+    flex-direction: column;
+    height: auto;
+}
+
+.doc-renderer-wrapper h1{
+    font-size: 22px;
+    text-align: left;
+}
+.doc-renderer-wrapper h2,
+.doc-renderer-wrapper h3,
+.doc-renderer-wrapper h4,
+.doc-renderer-wrapper h5,
+.doc-renderer-wrapper h6 {
+    font-size: 20px;
+    font-weight: 500;
+    margin: 20px 0;
+    text-align: left;
+}
+
+
+.doc-renderer-wrapper ul,
+.doc-renderer-wrapper li,
+.doc-renderer-wrapper ol {
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+
+.doc-renderer-wrapper p{
+    text-align: justify;
+    margin-bottom: 5px;
+}
+
+.doc-renderer-wrapper pre {
+    background-color: var(--color-bg-primary);
+    border-radius: 5px;
+    text-align: left;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    padding: 2px;
+}
+
+.doc-renderer-wrapper code{
+    background-color: var(--color-bg-primary);
+    border-radius: 5px;
+    padding: 2px;
+    text-align: left;
+}
+.doc-renderer-wrapper a{
+    color: rgb(193, 193, 255);
+    text-decoration: none;
+    font-weight: 600;
 }

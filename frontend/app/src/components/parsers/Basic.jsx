@@ -42,7 +42,7 @@ const responseParser = (
         // read json object from final_query
         const tag_json = JSON.parse(tag_value);
         const loadingHTMLString = getHTMLString(<SpinningLoader isDark={isDark} />);
-        if (tag_json.status == "loading") {
+        if (tag_json.status === "loading") {
             setChatStream((prev) => {
                 const newChatStream = prev + `<div className="int-tag pending ${isDark ? "dark" : ""}" ><h1>${tag_json.title}</h1>${loadingHTMLString}</div>`;
                 updateComponentResponse(cUid, newChatStream);

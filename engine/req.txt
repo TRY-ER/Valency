@@ -9,3 +9,5 @@ google-cloud-aiplatform
 google-cloud-storage
 sentence-transformers
 pandas
+chromadb
+torch
