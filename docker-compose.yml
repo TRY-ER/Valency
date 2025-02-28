@@ -12,10 +12,10 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ./frontend/app
       dockerfile: DockerFile
     container_name: frontend_service
     ports:
-      - "3000:3000"
+      - "3567:3567"
     environment:
       - NODE_ENV=production
