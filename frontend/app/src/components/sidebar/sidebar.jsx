@@ -4,7 +4,7 @@ import menuContent from '../../contents/menuContent';
 import { motion } from 'framer-motion';
 import { fadeInLeftVariants, fadeInStatic } from '../animations/framerAnim';
 import './sidebar.css';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 
 const constructAllPaths = (item) => {
     let allPaths = [];
@@ -28,11 +28,6 @@ const constructAllPaths = (item) => {
     }
     else {
         allPaths.push(`/${item.link}`);
-        // if (item.subElements) {
-        //     item.subElements.map((subItem) => {
-        //         allPaths.push(`/${item.link}/${subItem.link}`);
-        //     })
-        // }
         if (item.subElements) {
             var pre = "";
             for (let i = 0; i < item.subElements.length; i++) {
@@ -44,7 +39,6 @@ const constructAllPaths = (item) => {
                     pre = `/${item.link}`
                 }
                 if (item.subElements[i].subElements) {
-                    // console.log("sub elemems >>", item.subElements[i].subElements);
                     item.subElements[i].subElements.map((subSubItem) => {
                         if (subSubItem.link !== "") {
                             allPaths.push(`${pre}/${subSubItem.link}`);
@@ -54,8 +48,6 @@ const constructAllPaths = (item) => {
             }
         }
     }
-
-    // console.log("all paths >>", allPaths);
 
     return allPaths;
 }
@@ -70,6 +62,9 @@ const Sidebar = ({ }) => {
 
     return (
         <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+            <div className={`toggle-button-container ${isCollapsed ? 'collapsed' : ''}`} onClick={toggleSidebar}>
+                {isCollapsed ? <FaAngleRight className="toggle-btn-icon" /> : <FaAngleLeft className="toggle-btn-icon" />}
+            </div>
             <motion.div
                 variants={fadeInStatic}
                 initial="hidden"
@@ -78,39 +73,13 @@ const Sidebar = ({ }) => {
                 {/* Placeholder for Logo */}
                 <img src="/images/valency_logo_light_600x600.png" alt="Logo" />
             </motion.div>
-            {
-                isCollapsed ? <>
-                    <motion.div
-                        variants={fadeInStatic}
-                        initial="hidden"
-                        animate="visible"
-                        className='temp-arrow-sec'
-                    >
-                        <FaArrowRight color={"white"} className={`toggle-btn ${isCollapsed ? 'collapsed' : ''}`} onClick={toggleSidebar} />
-                    </motion.div>
-                </>
-                    :
-                    <>
-                        <motion.div
-                            variants={fadeInStatic}
-                            initial="hidden"
-                            animate="visible"
-                            className='temp-arrow-sec'
-                        >
-                            <FaArrowLeft color={"white"} className={`toggle-btn ${isCollapsed ? 'collapsed' : ''}`} onClick={toggleSidebar} />
-                        </motion.div>
-                    </>
-            }
 
             <div className={`sidebar-menu-container ${isCollapsed ? 'collapsed' : ''}`}>
                 {
                     menuContent.map((item, index) => {
                         const allNestPaths = constructAllPaths(item);
                         return <NavLink key={item.id}
-                            //   to={`/${item.link}`} 
                             to={item.link === "" ? "/" : `/${item.link}`}
-                            // onClick={() => setActiveMenu(item.id)} 
-                            // className={({ isActive }) => `sidebar-menu-item ${isActive ? 'active' : ''}`}
                             className={() =>
                                 allNestPaths.includes(location.pathname)
                                     ? "sidebar-menu-item active"
@@ -123,16 +92,18 @@ const Sidebar = ({ }) => {
                                 animate="visible"
                                 custom={index}
                                 className={`sidebar-menu-content ${isCollapsed ? 'collapsed' : ''}`}>
-                                <img src={item.iconPath} alt="Icon" />
+                                <span className='sidebar-icon'>{item.icon}</span>
                                 {
-                                    isCollapsed ? null : <>
+                                    isCollapsed ? (
+                                        <span className="sidebar-tooltip">{item.title}</span>
+                                    ) : (
                                         <motion.h2
                                             variants={fadeInLeftVariants}
                                             initial="hidden"
                                             animate="visible"
                                             custom={index}
                                         >{item.title}</motion.h2>
-                                    </>
+                                    )
                                 }
                             </motion.div>
                         </NavLink>
