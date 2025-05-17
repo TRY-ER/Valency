@@ -4,30 +4,39 @@
     width: 250px;
     transition: width 0.3s ease;
     background-color: var(--color-bg-primary);
-    height: 99vh;
-    overflow-y: hidden;
-    /* position: fixed; */
+    overflow-y: auto; /* Allow vertical scroll for long menu when expanded */
+    /* overflow-x: hidden; */ /* Removed to allow tooltip visibility */
     display: flex;
     flex-direction: column;
-    align-items: left !important;
-    padding: 20px 0 20px 20px;
-    border-radius: 0 15px 15px 0;
+    align-items: flex-start; /* Changed from left !important */
+    padding: 20px 0 20px 20px; /* Right padding is 0 to allow active item to touch edge */
+    border-radius: 15px 0 0 15px; /* top-left, top-right, bottom-right, bottom-left - Corrected for open tab effect */
+    position: relative; /* Crucial for positioning the absolute toggle button */
+    box-sizing: border-box; /* Added for consistent layout */
 }
 
 .sidebar.collapsed {
     width: 60px;
     align-items: center !important;
+    padding: 20px 0; /* Adjusted padding for centering content in collapsed state */
+    overflow: visible !important; /* Allow tooltips to overflow */
+    /* box-sizing: border-box; is inherited */
 }
 
 .logo {
-    margin-right: 20px;
     margin-bottom: 20px;
     display: flex;
-    justify-content: left !important;
+    justify-content: left !important; /* This aligns the img to the left of the .logo container */
+    padding-left: 10px; /* Indents the logo image to align with menu item text */
+    box-sizing: border-box; /* Ensures padding is included in width calculation */
+    width: 100%; /* Makes the .logo container take full available width */
 }
 
 .logo.collapsed {
     justify-content: center !important;
+    padding-left: 0; /* Override padding-left for centered alignment in collapsed state */
+    /* box-sizing: border-box; is inherited */
+    /* width: 100%; is inherited */
 }
 
 .logo img, .sidebar-menu-container img {
@@ -36,22 +45,55 @@
     height: 40px;
 }
 
+.sidebar-icon { /* New style for sidebar icons */
+    font-size: 24px; /* Increased icon size */
+    color: white; /* Default color for inactive icons */
+    display: flex; /* Helps in aligning the icon if needed */
+    align-items: center; /* Helps in aligning the icon if needed */
+}
+
+/* Styles for the new toggle button container and icon */
+.toggle-button-container {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    cursor: pointer;
+    z-index: 100; /* Ensure it's above other elements */
+    display: flex; /* Added for robust icon centering */
+    align-items: center; /* Added for robust icon centering */
+    justify-content: center; /* Added for robust icon centering */
+}
+
+.toggle-button-container.collapsed {
+    position: static; /* Reset position for collapsed state */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 10px 0; /* Add some padding */
+    margin-bottom: 10px; /* Space before the logo */
+}
+
+.toggle-btn-icon {
+    font-size: 24px;
+    color: white;
+}
+
 .toggle-btn {
     cursor: pointer;
     font-size: 24px;
 }
 
-.toggle-btn.collapsed {
-}
-
 .sidebar-menu-container {
     display: flex;
     flex-direction: column;
-    align-items: left !important;
+    align-items: stretch; /* Make NavLink children stretch to full width */
+    width: 100%; /* Ensure container itself uses full available width */
 }
 
 .sidebar-menu-item{
     text-decoration: none;
+    display: block; /* Ensure NavLink takes full width */
 }
 
 .sidebar-menu-content{
@@ -65,6 +107,8 @@
     padding-left: 10px;
     border-radius: 15px 0 0 15px;
     gap: 5px;
+    box-sizing: border-box; /* Added for consistent layout */
+    width: 100%; /* Ensure it takes full width of its stretched NavLink parent */
 }
 
 .sidebar-menu-content:hover{
@@ -75,19 +119,54 @@
     background-color: var(--color-bg-secondary);
 }
 
+.sidebar-menu-item.active .sidebar-menu-content .sidebar-icon,
+.sidebar-menu-content:hover .sidebar-icon {
+    color: var(--color-success); /* Green color for active/hovered icons */
+}
+
 .sidebar-menu-content.collapsed{
     justify-content: center !important;
     padding-left: 0 !important;
-    padding-right: 20px !important;
+    padding-right: 0 !important; /* Ensured no right padding for true centering */
+    position: relative; /* Needed for absolute positioning of the tooltip */
 }
 
-.sidebar-menu-content h1, h2, h3, h4, h5, h6 {
-    color: white;
+.sidebar-tooltip {
+    visibility: hidden; /* Hidden by default */
+    width: max-content;
+    background-color: var(--color-success); /* Changed to theme green */
+    color: var(--color-text-primary);
+    text-align: center;
+    border-radius: 10px; /* Increased border radius */
+    padding: 5px 10px;
+    position: absolute;
+    z-index: 101; /* Ensure it's above other elements, including the toggle button if it overlaps */
+    left: 110%; /* Position to the right of the icon */
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0;
+    transition: opacity 0.3s, visibility 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.sidebar-menu-content.collapsed:hover .sidebar-tooltip {
+    visibility: visible; /* Show on hover */
+    opacity: 1;
+}
+
+.sidebar-menu-content h2 { /* Changed from h1, h2, h3, h4, h5, h6 to just h2 as per sidebar.jsx */
+    color: white; /* Default color for inactive menu text */
     font-size: 16px;
     margin-left: 10px;
+    font-weight: normal; /* Added to reduce font weight */
 }
 
-.sidebar-menu-container.collapsed {
+/* Adjust icon and text color on active/hover */
+.sidebar-menu-item.active .sidebar-menu-content .sidebar-icon,
+.sidebar-menu-content:hover .sidebar-icon,
+.sidebar-menu-item.active .sidebar-menu-content h2,
+.sidebar-menu-content:hover h2 {
+    color: var(--color-success); /* Green color for active/hovered icons and text */
 }
 
 .temp-arrow-sec{
