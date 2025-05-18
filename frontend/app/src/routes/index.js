@@ -21,6 +21,8 @@ import LoginOTP from '../pages/Auth/LoginOTP.tsx';
 import RequestOtpEmail from '../pages/Auth/RequestOtpEmail.tsx';
 import MFAVerification from '../pages/Auth/MFAVerification.tsx';
 import NotFoundRedirect from '../components/Auth/NotFoundRedirect.tsx'; // Import the new component
+import Profile from '../pages/Profile/Profile'; // Added
+import Settings from '../pages/Settings/Settings'; // Added
 
 // Protected Layout
 import ProtectedLayout from '../components/layout/ProtectedLayout';
@@ -105,6 +107,8 @@ function ReRoutes() {
                         ))
                     }
                     {/* Add other top-level protected routes here if not in menuContent */}
+                    <Route path="/profile" element={<Profile />} /> {/* Added */}
+                    <Route path="/settings" element={<Settings />} /> {/* Added */}
                 </Route>
             </Route>
 

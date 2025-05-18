@@ -1,0 +1,84 @@
+.custom-theme-dropdown {
+  position: relative;
+  width: 200px; /* Or a width that suits your design */
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  border: 1px solid var(--c-light-border); /* Use themed variable */
+}
+
+.custom-theme-dropdown.glassy-feel {
+  background-color: var(--glassy-color); /* Use themed variable */
+  box-shadow: 0 4px 30px var(--shadow-color); /* Use themed variable */
+}
+
+/* .custom-theme-dropdown.dark {
+} */
+
+/* .custom-theme-dropdown.dark .dropdown-selected {
+} */
+
+/* .custom-theme-dropdown.dark .dropdown-options {
+} */
+
+/* .custom-theme-dropdown.dark .dropdown-options li {
+} */
+
+/* .custom-theme-dropdown.dark .dropdown-options li:hover,
+.custom-theme-dropdown.dark .dropdown-options li.selected {
+} */
+
+/* This rule might be too general if .selected class is used elsewhere with different meaning */
+.custom-theme-dropdown.dark .dropdown-options li.selected {
+  background-color: var(--color-success); /* Or a dark-theme friendly highlight */
+  color: var(--color-text-primary); /* Adjusted for better contrast on success bg in dark */
+}
+
+.dropdown-selected {
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* Ensure it takes full width of its parent */
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  color: var(--color-text-primary); /* Use themed variable */
+  background-color: var(--color-bg-secondary); /* Added for consistency */
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: var(--color-bg-primary); /* Use themed variable */
+  border: 1px solid var(--c-light-border); /* Use themed variable */
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  color: var(--color-text-primary); /* Use themed variable for text */
+}
+
+.dropdown-options li {
+  padding: 10px 15px;
+  /* color: var(--color-text-primary); */ /* Inherited from .dropdown-options */
+}
+
+.dropdown-options li:hover {
+  background-color: var(--c-deep-light); /* Use themed variable */
+  /* color: var(--color-text-primary); /* Ensure text color contrasts with hover bg */
+}
+
+.dropdown-options li.selected {
+  background-color: var(--color-success); /* Use themed variable */
+  color: white; /* Text on success background */
+}
+
+/* Ensure SVGs also adapt to theme */
+.dropdown-selected svg {
+  fill: var(--color-text-primary);
+}

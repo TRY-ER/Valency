@@ -3,33 +3,62 @@
 @tailwind utilities;
 
 :root {
-  /* Core Theme Colors from App.css */
+  /* Light Theme (Default) */
+  --color-bg-primary: white;
+  --color-bg-secondary: rgb(240, 240, 240);
+  --color-text-primary: black;
+  --color-text-secondary: rgb(55, 55, 55);
+  --color-success: rgb(4, 120, 4);
+  --color-alert: rgb(204, 0, 0);
+  --glassy-color: rgba(0, 0, 0, 0.05);
+  --shadow-color: transparent; /* Shadow removed for light theme */
+  --c-light-border: rgb(220, 220, 220);
+  --c-deep-dark: black; /* For text/elements needing to be dark on light bg */
+  --c-deep-light: rgb(180, 180, 180); /* For secondary elements/borders on light bg */
+  --c-lite: white; /* For backgrounds/elements needing to be very light */
+  --glassy-outline-color: var(--c-light-border); /* Outline for glassy elements in light theme */
+
+  /* Scrollbar Colors - Light Theme */
+  --scrollbar-track-color: rgb(230, 230, 230);
+  --scrollbar-thumb-color: rgb(180, 180, 180);
+  --scrollbar-thumb-hover-color: rgb(150, 150, 150);
+
+  /* Accent Colors */
+  --color-accent: var(--color-success);
+  --color-accent-light: rgb(10, 200, 10);
+  --color-accent-dark: rgb(0, 150, 0);
+
+  /* Button Gradient Colors (Light Mode) */
+  --color-gradient-start: var(--color-accent-light);
+  --color-gradient-end: var(--color-accent);
+  --color-gradient-hover-start: var(--color-accent);
+  --color-gradient-hover-end: var(--color-accent-dark);
+}
+
+html.dark {
+  /* Dark Theme */
   --color-bg-primary: black;
   --color-bg-secondary: rgb(36, 36, 36);
   --color-text-primary: white;
   --color-text-secondary: rgb(179, 179, 179);
   --color-success: rgb(5, 173, 5);
   --color-alert: red;
-  --glassy-color: rgba(255, 255, 255, 0.2);
+  --glassy-color: rgba(255, 255, 255, 0.1);
+  --shadow-color: rgba(0, 0, 0, 0.2); /* Shadow remains for dark theme */
+  --c-light-border: rgb(70, 70, 70);
+  --c-deep-dark: white; /* For text/elements needing to be light on dark bg */
+  --c-deep-light: rgb(100, 100, 100); /* For secondary elements/borders on dark bg */
+  --c-lite: rgb(50, 50, 50); /* For backgrounds/elements somewhat light on dark bg */
+  --glassy-outline-color: transparent; /* No outline for glassy elements in dark theme */
 
-  /* Accent Colors (Green-based for buttons) */
-  --color-accent: var(--color-success); /* rgb(5, 173, 5) */
-  --color-accent-light: rgb(10, 200, 10); /* Lighter green */
-  --color-accent-dark: rgb(0, 150, 0);   /* Darker green */
+  /* Scrollbar Colors - Dark Theme */
+  --scrollbar-track-color: rgb(50, 50, 50);
+  --scrollbar-thumb-color: rgb(100, 100, 100);
+  --scrollbar-thumb-hover-color: rgb(130, 130, 130);
 
-  /* Button Gradient Colors (Light Mode) */
-  --color-gradient-start: var(--color-accent-light);
-  --color-gradient-end: var(--color-accent);
-  
-  /* Button Hover Gradient Colors (Light Mode) */
-  --color-gradient-hover-start: var(--color-accent);
-  --color-gradient-hover-end: var(--color-accent-dark);
-
-  /* Button Gradient Colors (Dark Mode - can be same or adjusted) */
+  /* Button Gradient Colors (Dark Mode - these can be adjusted if needed) */
   --color-gradient-start-dark: var(--color-accent-light);
   --color-gradient-end-dark: var(--color-accent);
-
-  /* Button Hover Gradient Colors (Dark Mode - can be same or adjusted) */
   --color-gradient-hover-start-dark: var(--color-accent);
   --color-gradient-hover-end-dark: var(--color-accent-dark);
 }
@@ -41,8 +70,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--color-bg-primary); /* Apply global background */
-  color: var(--color-text-primary); /* Apply global text color */
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 code {

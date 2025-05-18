@@ -4,7 +4,7 @@ import menuContent from '../../contents/menuContent';
 import { motion } from 'framer-motion';
 import { fadeInLeftVariants, fadeInStatic } from '../animations/framerAnim';
 import './sidebar.css';
-import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+import { FaAngleLeft, FaAngleRight, FaUserCircle, FaCog } from 'react-icons/fa';
 
 const constructAllPaths = (item) => {
     let allPaths = [];
@@ -109,6 +109,28 @@ const Sidebar = ({ }) => {
                         </NavLink>
                     })
                 }
+            </div>
+
+            {/* Added bottom navigation icons */}
+            <div className={`sidebar-bottom-nav ${isCollapsed ? 'collapsed' : ''}`}>
+                <NavLink
+                    to="/profile"
+                    className={({ isActive }) => isActive ? "sidebar-bottom-nav-item active" : "sidebar-bottom-nav-item"}
+                    title="Profile"
+                >
+                    <span className='sidebar-icon'><FaUserCircle /></span>
+                    {!isCollapsed && <span className="sidebar-bottom-nav-text">Profile</span>}
+                    {isCollapsed && <span className="sidebar-tooltip">Profile</span>}
+                </NavLink>
+                <NavLink
+                    to="/settings"
+                    className={({ isActive }) => isActive ? "sidebar-bottom-nav-item active" : "sidebar-bottom-nav-item"}
+                    title="Settings"
+                >
+                    <span className='sidebar-icon'><FaCog /></span>
+                    {!isCollapsed && <span className="sidebar-bottom-nav-text">Settings</span>}
+                    {isCollapsed && <span className="sidebar-tooltip">Settings</span>}
+                </NavLink>
             </div>
         </div>
     );
