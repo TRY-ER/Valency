@@ -17,22 +17,22 @@
     height: 30px;
     border: none;
     outline: none;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: var(--glassy-color); /* MODIFIED */
     transition: background-color 0.2s ease;
-    color: white;
+    color: var(--color-text-primary); /* MODIFIED */
     font-size: 16px;
     font-weight: 600;
 }
 
 .input-box::placeholder{
-    color: white;
+    color: var(--color-text-secondary); /* MODIFIED */
     font-weight: 400;
 }
 
 .input-box:focus{
     border: none;
     outline: none;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: var(--glassy-color); /* MODIFIED - consider a slightly different glassy color for focus if available or needed */
 }
 
 .input-section{
@@ -48,14 +48,14 @@
 }
 
 .input-status.success{
-    color: rgb(58, 255, 58);
+    color: var(--color-success); /* MODIFIED */
 }
 
 .input-status.fail{
-    color: rgb(255, 57, 57);
+    color: var(--color-alert); /* MODIFIED */
 }
 
 .input-status.empty{
-    color: rgba(255, 255, 255, 0.2);
+    color: var(--glassy-color); /* MODIFIED */
 }
 

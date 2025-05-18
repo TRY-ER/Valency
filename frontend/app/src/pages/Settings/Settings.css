@@ -1,0 +1,60 @@
+.appearance-section {
+  margin-top: 20px;
+  padding: 25px; /* Slightly increased padding */
+  border: 1px solid var(--c-deep-light);
+  border-radius: 12px; /* Slightly more rounded corners */
+  max-width: 550px; /* Increased max-width */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.appearance-section.glassy-feel {
+  background-color: var(--glassy-color);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+.appearance-section h2 {
+  margin-top: 0;
+  margin-bottom: 20px; /* Increased bottom margin */
+  color: var(--color-text-primary);
+  text-align: center; /* Center the Appearance title */
+}
+
+.appearance-section div {
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Vertically align items */
+  justify-content: space-between; /* Space out label and dropdown */
+}
+
+.appearance-section label {
+  color: var(--color-text-secondary);
+  font-size: 1.1rem; /* Slightly larger label */
+  margin-right: 20px; /* Added margin for explicit spacing */
+}
+
+/* Remove default select styling as we use CustomThemeDropdown now */
+/*
+.appearance-section select {
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--c-deep-light);
+  background-color: var(--glassy-color);
+  color: var(--color-text-primary);
+}
+
+.appearance-section select option {
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+.appearance-section select:focus {
+  outline: none;
+  border-color: var(--color-success);
+}
+*/
+
+.base-page-container > h1 {
+  color: var(--color-text-primary);
+  text-align: center; /* Center the main Settings title */
+  margin-bottom: 30px; /* Add some space below the main title */
+}

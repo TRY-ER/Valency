@@ -1,11 +1,11 @@
 .glassy-container {
   backdrop-filter: blur(10px);
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: var(--glassy-color); /* Use themed variable */
   border-radius: 15px;
   margin: 10px;
   padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--glassy-outline-color); /* Use themed variable */
+  box-shadow: 0 4px 30px var(--shadow-color); /* Use themed variable */
 }
 
 /* Disabled (grayscale) */
@@ -64,6 +64,7 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  backdrop-filter: blur(10px); /* ADDED */
   display: flex;
   justify-content: center;
   align-items: center;

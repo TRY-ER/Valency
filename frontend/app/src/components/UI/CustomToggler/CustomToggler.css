@@ -9,51 +9,51 @@
 
 .toggler-label {
     margin-bottom: 10px;
+    color: var(--color-text-primary); /* Use themed variable */
 }
 
 .toggler-slider {
     width: 50px;
     height: 23px;
-    border: solid 2px var(--c-deep-light);
+    border: solid 2px var(--c-light-border); /* Use themed variable */
     border-radius: 30px;
     cursor: pointer;
     position: relative;
+    background-color: var(--color-bg-secondary); /* Themed background for the slider track */
 }
 
-.toggler-slider.enabled.dark {
-    background-color: var(--c-deep-light);
+/* Removed redundant .dark class for background as html.dark will handle variable changes */
+.toggler-slider.enabled {
+    background-color: var(--color-success); /* Use themed variable for enabled state */
+    border-color: var(--color-success); /* Match border to background when enabled */
 }
 
-.toggler-slider.enabled.dark {
-    background-color: var(--c-lite);
-}
-
-.toggler-slider.disabled.dark {
-    border: solid 2px var(--c-lite);
-}
+/* .toggler-slider.disabled {
+} */
 
 .toggler-thumb {
     width: 20px;
     height: 20px;
-    background-color: var(--c-deep-light);
+    background-color: var(--c-deep-light); /* Use themed variable, this will change with theme */
     border-radius: 50%;
     position: absolute;
-    transition: transform 0.3s;
-    border: solid 2px black;
+    transition: transform 0.3s, background-color 0.3s ease; /* Added background-color transition */
+    border: solid 2px var(--color-bg-primary); /* Border to match the primary background, creating a 'cutout' look */
 }
 
 .toggler-thumb.enabled {
-    transform: translateX(30px);
-    background-color: var(--c-deep-dark);
+    transform: translateX(27px); /* Adjusted for 2px border on slider + 2px border on thumb */
+    background-color: white; /* Thumb color when enabled (on success background) */
+    border-color: var(--color-success); /* Match border to background when enabled */
 }
 
-.toggler-thumb.disabled.dark {
-    background-color: var(--c-lite);
-}
+/* .toggler-thumb.disabled {
+} */
 
 .toggle-instruction-text {
     padding-top: 4px;
     font-size: 0.8rem;
+    color: var(--color-text-secondary); /* Use themed variable */
 }
 
-/* dark theme setup */
+/* Removed dark theme setup as variables are handled by html.dark in index.css */

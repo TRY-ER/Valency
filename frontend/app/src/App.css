@@ -1,36 +1,13 @@
-*{
+* {
   transition: all 0.3s ease;
 }
 
-
-:root {
-  --color-bg-primary: black;
-  --color-bg-secondary: rgb(36, 36, 36);
-  --color-text-primary: white;
-  --color-text-secondary: rgb(179, 179, 179);
-  --color-success: rgb(5, 173, 5);
-  --color-alert: red;
-  --c-deep-dark: #ffffff;
-  --c-deep-light: rgb(132, 132, 132);
-  --c-deep-black: rgb(32, 32, 32);
-  --c-deep-trans: #000f3b90;
-  --c-bright: #eec230;
-  --c-lite: rgb(246, 246, 246); 
-  --c-deep-second: #004254;
-  --c-light-border: black;
-  --c-shadow-back-light: rgb(132, 132, 132);
-  /* --f-family: Rubik, Ariel; */
-  --f-size-title: 2rem;
-  --f-size-mid: 1.2rem;
-  --f-size-para: 0.6rem;
-  --glassy-color: rgba(255, 255, 255, 0.2);
-}
-
+/* Removed :root variable definitions as they are now in index.css */
 
 .App {
   text-align: center;
-  background-color: var(--color-bg-secondary);
-  color: var(--color-text-primary);
+  background-color: var(--color-bg-secondary); /* Uses themed variable */
+  color: var(--color-text-primary); /* Uses themed variable */
   width: 100vw;
   height: 100vh;
   overflow: hidden;
@@ -38,18 +15,19 @@
   flex-direction: row;
 }
 
-.base-page-container{
+.base-page-container {
   display: flex;
   flex-direction: column;
-  padding: 40px 40px 0px 40px; /* Re-instated padding */
+  padding: 40px 40px 0px 40px;
   overflow: hidden;
   height: 100vh;
-  box-sizing: border-box; /* Added for correct height calculation with padding */
+  box-sizing: border-box;
 }
 
+/* Updated scrollbar styles to use CSS variables */
 .base-page-container {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
+  scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color);
 }
 
 .base-page-container::-webkit-scrollbar {
@@ -58,28 +36,30 @@
 }
 
 .base-page-container::-webkit-scrollbar-track {
-  background-color: var(--color-bg-secondary);
+  background-color: var(--scrollbar-track-color);
   border-radius: 8px;
 }
 
 .base-page-container::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: var(--scrollbar-thumb-color);
   border-radius: 5px;
 }
 
 .base-page-container::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: var(--scrollbar-thumb-hover-color);
   border-radius: 5px;
 }
 
-.glassy-feel{
-  background-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+.glassy-feel {
+  background-color: var(--glassy-color); /* Uses themed variable */
+  box-shadow: 0 4px 30px var(--shadow-color); /* Uses themed variable */
+  border: 1px solid var(--glassy-outline-color); /* Added themed outline */
 }
 
-*{
+/* Updated global scrollbar styles to use CSS variables */
+* {
   scrollbar-width: thin; /* For Firefox */
-  scrollbar-color: rgba(255, 255, 255, 0.4) transparent; /* For Firefox */
+  scrollbar-color: var(--scrollbar-thumb-color) var(--scrollbar-track-color); /* For Firefox */
 }
 
 *::-webkit-scrollbar {
@@ -88,55 +68,59 @@
 }
 
 *::-webkit-scrollbar-track {
-  background-color: var(--color-bg-secondary);
+  background-color: var(--scrollbar-track-color);
   border-radius: 8px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(255, 255, 255, 0.4);
+  background-color: var(--scrollbar-thumb-color);
   border-radius: 5px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255, 255, 255, 0.6);
+  background-color: var(--scrollbar-thumb-hover-color);
   border-radius: 5px;
 }
 
-.sidebar-content{
+.sidebar-content {
   display: flex;
   height: 100vh;
 }
 
-.side-content{
+.side-content {
   flex: 1;
   height: 100vh;
   overflow: hidden;
 }
 
-.tab-container{
-  display:flex;
+.tab-container {
+  display: flex;
   flex-direction: row;
   gap: 20px;
   overflow-y: auto;
+  /* Removed background-color from here, should be handled by Explorer.css or parent element */
 }
 
-.tab-tag{
+.tab-tag {
   padding: 5px 10px;
   border-radius: 10px;
   cursor: pointer;
+  /* background-color will be set by .glassy-feel or specific tab styles in Explorer.css */
 }
 
-.tab-link.active .tab-tag{
-  background-color: var(--color-success)!important;
+.tab-link.active .tab-tag {
+  background-color: var(--color-success) !important;
 }
 
-.tab-link{
+.tab-link {
   text-decoration: none;
   color: var(--color-text-primary);
 }
 
-.tab-tag-text{
+.tab-tag-text {
   margin: 0;
   padding: 0;
   color: var(--color-text-primary);
 }
+
+/* Rule for active tab text color is now in Explorer.css */
