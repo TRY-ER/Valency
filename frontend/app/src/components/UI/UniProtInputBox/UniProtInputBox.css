@@ -1,0 +1,73 @@
+.uniprot-input-box-container {
+    display: flex; /* Added to match MolInputBox's .input-container */
+    flex-direction: column; /* Added */
+    align-items: flex-start; /* Added */
+    /* Removed GlassyContainer-like styles: padding, margin, background, border, box-shadow, specific border-radius */
+    width: 100%; /* Ensure it takes full width within its parent */
+}
+
+.uniprot-input-box-header {
+    font-size: 1.1em;
+    color: var(--color-text-secondary);
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.uniprot-input-box-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%; /* Ensure wrapper takes full width */
+}
+
+.uniprot-input-box-input {
+    flex-grow: 1;
+    padding: 10px;
+    height: auto;
+    border-radius: 15px;
+    border: none;
+    outline: none;
+    background-color: var(--glassy-color);
+    transition: background-color 0.2s ease;
+    color: var(--color-text-primary);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.uniprot-input-box-input::placeholder {
+    color: var(--color-text-secondary);
+    font-weight: 400;
+}
+
+.uniprot-input-box-input:focus {
+    /* background-color: var(--glassy-color-focus); */
+}
+
+.uniprot-input-box-button {
+    padding: 10px 16px;
+    border-radius: 4px;
+    border: none;
+    background-color: var(--color-success, #28a745);
+    color: #fff;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.uniprot-input-box-button:hover:not(:disabled) {
+    background-color: var(--color-success-dark, #1e7e34);
+}
+
+.uniprot-input-box-button:disabled {
+    background-color: var(--color-disabled, #6c757d);
+    color: var(--color-text-disabled, #ccc);
+    cursor: not-allowed;
+}
+
+.uniprot-input-box-error {
+    color: var(--color-alert, #dc3545);
+    font-size: 0.9em;
+    margin-top: 8px;
+    text-align: left;
+}

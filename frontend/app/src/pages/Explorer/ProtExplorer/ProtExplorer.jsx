@@ -1,39 +1,56 @@
-import React, {useState} from "react";
-import "./ProtExplorer.css";
-import MolInputBox from "../../../components/UI/InputBox/InputBox";
-import InfoBox from "../../../components/UI/InfoBox/InfoBox";
-import ThreeDViewer from "../../../components/UI/ThreeDViewer/ThreeDViewer";
+import React from "react";
 import { motion } from "framer-motion";
 import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";
+import Divider from "../../../components/divider";
+import { useLocation, Outlet, NavLink } from 'react-router-dom';
+import { fadeInDownVariants } from "../../../components/animations/framerAnim";
 
 
-const ProtEComponent = () => {
-    const [activeMol, setActiveMol] = useState("");
-    const [isValidMol, setIsValidMol] = useState(false);
+const ProtEComponent = ({
+    tabContent, basePath = "proe"
+}) => {
+    const location = useLocation();
 
-    return <>
-        <motion.div 
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUpVariantStatic} 
-        className="explore-container">
-            <div className="explorer-row-1">
-                <MolInputBox 
-                    activeMol={activeMol}
-                    setActiveMol={setActiveMol} 
-                    isValidMol={isValidMol}
-                    setIsValidMol={setIsValidMol}
-                    inputType={"PROT"}
-                    placeholder="Try PDB ID: 1MO8"
-                    header="Enter PDB Id Here"
-                />
+    return (
+        <>
+            <div className="tab-container">
+                {
+                    tabContent.map((tab, index) => {
+                        return (
+                           <NavLink
+                                key={tab.id}
+                                to={ tab.link === "" ? `/${basePath}` : `/${basePath}/${tab.link}`}
+                                // className={({ isActive }) => `tab-link ${isActive ? "active" : ""}`}
+                                className={() =>{
+                                    if (location.pathname === `/${basePath}` && tab.link === ""){
+                                        return `tab-link active`
+                                    }
+                                    else if(location.pathname === `/${basePath}/${tab.link}`){
+                                        return `tab-link active`
+                                    }
+                                    else{
+                                        return `tab-link`
+                                    }
+                                }} 
+                            >
+                                <motion.div 
+                                    initial="hidden"
+                                    animate="visible"
+                                    variants={fadeInDownVariants} 
+                                    custom={index}
+                                className={`tab-tag glassy-feel`}>
+                                    <p className="tab-tag-text">{tab.title}</p>
+                                </motion.div>
+                            </NavLink>
+                        )
+                    })
+                }
             </div>
-            <div className="explorer-row-2">
-                <InfoBox activeMol={activeMol} isValidMol={isValidMol} infoType={"PROT"}/>
-                <ThreeDViewer activeMol={activeMol} isValidMol={isValidMol} setIsValidMol={setIsValidMol} visType={"PROT"}/>
-            </div>
-        </motion.div>
-    </>
+            <Divider />
+            <Outlet /> 
+        </>
+    ) 
 }
+
 
 export default ProtEComponent;

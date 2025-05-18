@@ -2,7 +2,8 @@ import DocRenderer from "../doc_content/DocRenderer";
 import MolEComponent from "../../pages/Explorer/MolExplorer/MolExplorer";
 import ProtEComponent from "../../pages/Explorer/ProtExplorer/ProtExplorer";
 import PolyEComponent from "../../pages/Explorer/PolyExplorer/PolyExplorer";
-
+import { ProtExploreTabContents } from "./NestExplorerTags";
+import { sub } from "framer-motion/client";
 
 
 
@@ -28,8 +29,10 @@ const ExplorerTabContent = [
                       whows it's several details consisting Pdb Id, Title,Authors,Journal,Year,Volume,Pages,Doi,Pubmed Id,
                      Experiment Method,Molecular Weight (kDa),Deposited Model Count,Polymer entity count,Polymer monomer count,
                      Structural Features,Release Date,Resolution`,
-        component: <ProtEComponent />,
-        docs: <DocRenderer filePath="/markdown_repo/ProteinExplorer.md"/>,
+        component: <ProtEComponent tabContent={ProtExploreTabContents} basePath="proe"/>,
+        // docs: <DocRenderer filePath="/markdown_repo/ProteinExplorer.md"/>,
+        subElements: ProtExploreTabContents,
+        includeDocs: true,
     },
     {
         id: 3,
