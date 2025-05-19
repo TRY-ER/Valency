@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@rcsb/rcsb-saguaro": "^3.1.7",
     "3dmol": "^2.4.2",
     "axios": "^1.7.9",
     "clipboard-copy": "^4.0.1",
@@ -13,11 +14,11 @@
     "html-react-parser": "^5.2.2",
     "http-server": "^14.1.1",
     "path-browserify": "^1.0.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "react-markdown": "^9.0.3",
-    "react-ngl": "^0.2.3",
     "react-scripts": "5.0.1",
+    "remark-gfm": "^4.0.1",
     "sass": "^1.89.0"
   },
   "scripts": {
@@ -51,7 +52,7 @@
     "postcss": "^8.4.38",
     "process": "^0.11.10",
     "react-app-rewired": "^2.2.1",
-    "react-icons": "^5.4.0",
+    "react-icons": "^5.5.0",
     "react-router-dom": "^7.1.1",
     "stream-browserify": "^3.0.0",
     "tailwindcss": "^3.4.3",

@@ -13,19 +13,19 @@
     justify-content: space-between;
     align-items: center;
     padding: 8px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--c-light-border); /* Use theme variable for border */
 }
 
-.info-label {
+.infobox-container .info-row .info-value {
     font-size: 0.9rem;
-    color: var(--color-text-secondary);
+    color: var(--color-text-secondary); /* Ensure this uses the global theme variable */
     font-weight: 500;
     text-align: left;
 }
 
-.info-value {
+.infobox-container .info-row .info-value {
     font-size: 1rem;
-    color: var(--color-text-primary);
+    color: var(--color-text-primary); /* Ensure this uses the global theme variable */
     font-weight: 600;
     text-align: right;
 }

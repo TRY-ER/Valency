@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"; // Removed useContext
 import "./InputBox.css";
 import { FaCheckDouble } from "react-icons/fa6";
 import { IoWarningOutline } from "react-icons/io5";
@@ -6,6 +6,7 @@ import GlassyContainer from "../../glassy_container/gc";
 
 import { call_endpoint_async } from "../../../endpoints/caller";
 import { endpoints } from "../../../endpoints/endpoints";
+// Removed ThemeContext import
 
 const MolInputBox = ({
     activeMol,
@@ -16,6 +17,8 @@ const MolInputBox = ({
     header = "Enter Molecular SMILES Here",
     placeholder = "Try C for demo"
 }) => {
+    // Removed theme consumption
+
     useEffect(() => {
         // if (inputType !== "PROT") {
             if (activeMol.length > 0) {
@@ -40,7 +43,7 @@ const MolInputBox = ({
     }, [activeMol]);
 
     return <>
-        <GlassyContainer>
+        <GlassyContainer> {/* Reverted className */}
             <div className="input-container">
                 <p className="input-header">{header}</p>
                 <div className="input-section">

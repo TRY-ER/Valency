@@ -1,9 +1,10 @@
-import React, {useState, useEffect, isValidElement} from "react";
+import React, {useState, useEffect} from "react"; // Removed useContext
 import "./TwoDViewer.css";
 
 import GlassyContainer from "../../glassy_container/gc";
 import { call_endpoint_async } from "../../../endpoints/caller";
 import { endpoints } from "../../../endpoints/endpoints";
+// Removed ThemeContext import
 
 const TwoDViewer = ({
     activeMol,
@@ -11,6 +12,8 @@ const TwoDViewer = ({
     visType
 }) => {
     const [imageData, setImageData] = useState(null);
+    // Removed theme consumption
+
     useEffect(() =>{
         if(activeMol.length > 0 && isValidMol){
             const payload = {
@@ -34,7 +37,7 @@ const TwoDViewer = ({
     }, [activeMol, isValidMol])  
 
     return <>
-        <div className="twod-container">
+        <div className="twod-container"> {/* Reverted className */}
             <GlassyContainer expandable={true} className="twod-viewer" mode={activeMol.length > 0 && !isValidMol ? "loading" : "enabled"}>
                 {
                     imageData === null || activeMol.length == 0 ? 
@@ -46,4 +49,4 @@ const TwoDViewer = ({
     </>
 }
 
-export default TwoDViewer; 
+export default TwoDViewer;

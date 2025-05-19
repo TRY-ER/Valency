@@ -38,7 +38,7 @@ const ProtExploreTabContents = [
         link: 'uniprot', // New link for the UniProt tab
         description: `Explore protein structures and information from AlphaFold using a UniProt accession key. Fetches data from the AlphaFold DB API and displays the 3D model, sequence, and other relevant details.`,
         component: <UniProtViewer />,
-        // docs: <DocRenderer filePath="/markdown_repo/UniProtExplorer.md"/>, // Assuming you might create a doc file later
+        docs: <DocRenderer filePath="/markdown_repo/UniProtViewer.md"/>, // Assuming you might create a doc file later
     }
 ]
 

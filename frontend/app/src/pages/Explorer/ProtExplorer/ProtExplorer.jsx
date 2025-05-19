@@ -1,15 +1,16 @@
-import React from "react";
+import React from "react"; // Removed useContext
 import { motion } from "framer-motion";
 import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";
 import Divider from "../../../components/divider";
 import { useLocation, Outlet, NavLink } from 'react-router-dom';
 import { fadeInDownVariants } from "../../../components/animations/framerAnim";
-
+// Removed ThemeContext import
 
 const ProtEComponent = ({
-    tabContent, basePath = "proe"
+    tabContent, basePath = ""
 }) => {
     const location = useLocation();
+    // Removed theme consumption from ThemeContext
 
     return (
         <>
@@ -20,7 +21,6 @@ const ProtEComponent = ({
                            <NavLink
                                 key={tab.id}
                                 to={ tab.link === "" ? `/${basePath}` : `/${basePath}/${tab.link}`}
-                                // className={({ isActive }) => `tab-link ${isActive ? "active" : ""}`}
                                 className={() =>{
                                     if (location.pathname === `/${basePath}` && tab.link === ""){
                                         return `tab-link active`
@@ -38,7 +38,7 @@ const ProtEComponent = ({
                                     animate="visible"
                                     variants={fadeInDownVariants} 
                                     custom={index}
-                                className={`tab-tag glassy-feel`}>
+                                    className="tab-tag glassy-feel"> {/* Reverted className */}
                                     <p className="tab-tag-text">{tab.title}</p>
                                 </motion.div>
                             </NavLink>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; // Removed useContext
 import "./MolExplorer.css";
 
 import MolInputBox from "../../../components/UI/InputBox/InputBox";
@@ -6,17 +6,19 @@ import InfoBox from "../../../components/UI/InfoBox/InfoBox";
 import TwoDViewer from "../../../components/UI/TwoDViewer/TwoDViewer";
 import { motion } from "framer-motion";
 import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";
+// Removed ThemeContext import
 
 const MolEComponent = () => {
     const [activeMol, setActiveMol] = useState("");
     const [isValidMol, setIsValidMol] = useState(false);
+    // Removed theme consumption
 
     return <>
         <motion.div
             initial="hidden"
             animate="visible"
             variants={fadeInUpVariantStatic}
-            className="explore-container">
+            className="explore-container"> {/* Reverted className */}
             <div className="explorer-row-1">
                 <MolInputBox
                     activeMol={activeMol}

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm"; // Import remark-gfm
 import { fadeInRightVariantStatic } from "../../components/animations/framerAnim";
 import "./DocRenderer.css";
 
@@ -30,7 +31,7 @@ const DocRenderer = ({ filePath }) => {
             className="doc-renderer-container"
         > 
             <div className="doc-renderer-wrapper">
-                <ReactMarkdown>{docContent}</ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{docContent}</ReactMarkdown> {/* Add remarkPlugins prop */}
             </div>
         </motion.div>
     );
