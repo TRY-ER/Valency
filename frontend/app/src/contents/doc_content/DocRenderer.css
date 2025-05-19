@@ -23,12 +23,31 @@
 
 
 .doc-renderer-wrapper ul,
-.doc-renderer-wrapper li,
 .doc-renderer-wrapper ol {
+    list-style: initial !important; /* Reset list-style to browser default first */
+    padding-left: 40px !important;   /* Ensures space for markers */
+    margin-top: 10px !important;
+    margin-bottom: 10px !important;
+    text-align: left;
+    list-style-position: outside !important; /* Ensure markers are outside */
+    list-style-image: none !important;    /* Prevents any accidental image bullets */
+}
+
+.doc-renderer-wrapper ul {
+    list-style-type: disc !important;     /* Explicitly set bullet style */
+}
+
+.doc-renderer-wrapper ol {
+    list-style-type: decimal !important;  /* Explicitly set numbering style */
+}
+
+.doc-renderer-wrapper li {
+    display: list-item !important;        /* This is crucial for showing markers */
+    list-style-type: inherit !important;  /* Inherit from ul/ol, should not be 'none' */
+    list-style-position: outside !important; /* Explicitly set for li as well */
     text-align: left;
     margin-bottom: 5px;
 }
-
 
 .doc-renderer-wrapper p{
     text-align: justify;

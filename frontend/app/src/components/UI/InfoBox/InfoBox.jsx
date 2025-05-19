@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect} from "react"; // Removed useContext
 import "./InfoBox.css";
 
 import GlassyContainer from "../../glassy_container/gc";
@@ -11,6 +11,7 @@ const InfoBox = ({
     infoType
 }) => {
     const [infoVal, setInfoVal] = useState(null);
+
     useEffect(() =>{
         if(activeMol.length > 0 && isValidMol){
             const payload = {
@@ -47,7 +48,7 @@ const InfoBox = ({
     };
 
     return <>
-        <div className="infobox-container">
+        <div className="infobox-container"> {/* Reverted className */}
             <GlassyContainer mode={activeMol.length > 0 && !isValidMol ? "loading" : "enabled"}>
                 {renderInfoContent()}
             </GlassyContainer>

@@ -46,3 +46,73 @@
 .exp-2-row-2{
     flex: 3.5;
 }
+
+.file-download-item {
+    text-align: center;
+    margin-right: 20px;
+    transition: transform 0.3s ease;
+}
+
+.file-download-item:hover {
+    transform: translateY(-5px); /* Example hover effect */
+}
+
+.file-download-link {
+    text-decoration: none;
+    color: inherit; /* Inherit color from parent, can be overridden by theme */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.file-download-link:hover .file-name {
+    color: var(--color-success, #28a745); /* Use theme green or fallback to a standard green */
+    font-weight: bold;
+}
+
+.file-icon-placeholder {
+    font-size: 48px; /* Adjust as needed */
+    margin-bottom: 5px;
+    color: var(--color-text-secondary); /* Example: Use a CSS variable for theme icon color */
+}
+
+.file-download-link:hover .file-icon-placeholder {
+    color: var(--color-success, #28a745); /* Use theme green or fallback to a standard green */
+}
+
+.file-name {
+    font-size: 14px; /* Adjust as needed */
+    margin-top: 5px;
+    color: var(--color-text-primary); /* Example: Use a CSS variable for theme text color */
+}
+
+/* Add these to your existing :root or theme definition if not already present */
+/* These are examples, adjust to your actual theme variables */
+:root {
+    --theme-accent-color: #007bff; /* Example accent color */
+    --theme-icon-color: #333;    /* Example icon color */
+    --theme-text-color: #555;    /* Example text color */
+    --theme-green-color: #28a745; /* Added theme green color or ensure it exists */
+}
+
+.explorer-row-4{
+    display: flex;
+    flex-direction: row;
+}
+
+.exp-4-col-1{
+}
+
+.info-row .info-label{
+    font-size: 0.9rem;
+    color: var(--color-text-secondary); /* Ensure this uses the global theme variable */
+    font-weight: 500;
+    text-align: left;
+}
+
+.info-row .info-value{
+    font-size: 0.9rem;
+    color: var(--color-text-primary); /* Ensure this uses the global theme variable */
+    font-weight: 500;
+    text-align: left;
+}

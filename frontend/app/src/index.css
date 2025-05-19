@@ -7,7 +7,7 @@
   --color-bg-primary: white;
   --color-bg-secondary: rgb(240, 240, 240);
   --color-text-primary: black;
-  --color-text-secondary: rgb(55, 55, 55);
+  --color-text-secondary: rgb(41, 41, 41);
   --color-success: rgb(4, 120, 4);
   --color-alert: rgb(204, 0, 0);
   --glassy-color: rgba(0, 0, 0, 0.05);
@@ -37,7 +37,7 @@
 
 html.dark {
   /* Dark Theme */
-  --color-bg-primary: black;
+  --color-bg-primary: rgb(22, 22, 22);
   --color-bg-secondary: rgb(36, 36, 36);
   --color-text-primary: white;
   --color-text-secondary: rgb(179, 179, 179);
