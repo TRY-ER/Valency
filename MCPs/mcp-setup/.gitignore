@@ -1,0 +1,22 @@
+# Environment variables
+.env
+.venv/
+/venv/
+./.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.eggs/
+*.whl
+*.mypy_cache/
+*.pytest_cache/
+*.coverage
+*.cover
+*.hypothesis/
+*.tox/
+*.coverage.*
