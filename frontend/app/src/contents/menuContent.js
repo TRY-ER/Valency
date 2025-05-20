@@ -6,47 +6,82 @@ import ToolInterface from "../components/tool_interface/ToolInterface";
 import GeneratorTabContents from "./tag_content/GeneratorTags";
 import ExplorerTabContent from "./tag_content/ExploreTags";
 import DiscriminatorTabContents from "./tag_content/DiscriminatorTags";
-import { FaCompass, FaBalanceScale, FaFlask, FaComments, FaTools } from 'react-icons/fa';
+import {
+    FaCompass,
+    FaBalanceScale,
+    FaFlask,
+    FaComments,
+    FaTools,
+    FaHome,
+    FaTasks,
+    FaRobot
+} from 'react-icons/fa';
+
+// Placeholder components - consider moving these to their own files
+const HomeComponent = () => <div style={{ padding: '20px' }}><h2>Home Page</h2><p>Welcome to the Drug Discovery Toolkit. This is the central hub for all tools and features.</p></div>;
+const ActivitiesPage = () => <div style={{ padding: '20px' }}><h2>Activities Page</h2><p>This page will be used to manage and track drug discovery activities. Content coming soon.</p></div>;
+const AutomationPage = () => <div style={{ padding: '20px' }}><h2>Automation Page</h2><p>This page will be used for automating drug discovery workflows. Content coming soon.</p></div>;
 
 const menuContent = [
     {
+        id: 0,
+        title: 'Home',
+        icon: <FaHome />,
+        link: '', // Root path
+        description: 'Overview and starting point of the drug discovery toolkit.',
+        component: <HomeComponent />,
+    },
+    {
         id: 1,
-        title: 'Explorers',
+        title: 'Structure Analysis', // Renamed from 'Explorers'
         icon: <FaCompass />,
-        link: '',
-        description: `Explorers are used to explore molecules, proteins, and polymers.
-                      This is the main tool below which there are three more tools consisting
-                      tools specfic to molecules, proteins and polymers`,
-        component: <Explorer tabContent={ExplorerTabContent} />,
+        link: 'explorer', // Changed link from '' to 'explorer'
+        description: `Tools for analyzing the structure of molecules, proteins, and polymers.
+                      This section includes sub-tools specific to molecules, proteins, and polymers.`,
+        component: <Explorer tabContent={ExplorerTabContent} basePath="explorer" />, // Added basePath
         includeDocs: true,
         subElements: ExplorerTabContent
     },
     {
         id: 2,
-        title: 'Discriminators',
+        title: 'Identification', // Renamed from 'Discriminators'
         icon: <FaBalanceScale />,
-        link: 'discriminators',
-        description: `Discriminators tool cosists of tools to discriminate molecules, proteins, and polymers.
-                      But as of now we have similarity search implemented as a sub tool. This sub tool contains
-                      structural similarity search for molecules, proteins, and polymers handled as sub-sub tools.`,
+        link: 'identification', // Changed link from 'discriminators'
+        description: `Tools for identifying and discriminating molecules, proteins, and polymers.
+                      Currently, this includes similarity search functionalities.`,
         includeDocs: true,
-        component: <Discriminator tabContent={DiscriminatorTabContents} basePath="discriminators" />,
+        component: <Discriminator tabContent={DiscriminatorTabContents} basePath="identification" />, // Changed basePath
         subElements: DiscriminatorTabContents
     },
     {
         id: 3,
-        title: 'Generators',
+        title: 'Optimization', // Renamed from 'Generators'
         icon: <FaFlask />,
-        link: 'generators',
-        description: `Generators are used to create hypothetical molecules, polymers (protein generation is not yet implemented).
-                      It has two sub-tools name BRICS and LSTM generators. Both of these tools have sub tools for generation for SMILES
-                      and PSMILES format for molecules and polymers respectively.`,
+        link: 'optimization', // Changed link from 'generators'
+        description: `Tools for generating and optimizing hypothetical molecules and polymers.
+                      It features sub-tools like BRICS and LSTM generators for SMILES and PSMILES formats.`,
         includeDocs: true,
-        component: <Generator tabContent={GeneratorTabContents} basePath="generators" />,
+        component: <Generator tabContent={GeneratorTabContents} basePath="optimization" />, // Changed basePath
         subElements: GeneratorTabContents
     },
     {
         id: 4,
+        title: 'Activities', // New dummy page
+        icon: <FaTasks />,
+        link: 'activities',
+        description: 'Placeholder for managing and tracking drug discovery activities.',
+        component: <ActivitiesPage />
+    },
+    {
+        id: 5,
+        title: 'Automation', // New dummy page
+        icon: <FaRobot />,
+        link: 'automation',
+        description: 'Placeholder for automating drug discovery workflows.',
+        component: <AutomationPage />
+    },
+    {
+        id: 6, // ID shifted from 4
         title: 'Chatbot',
         icon: <FaComments />,
         link: 'chatbot',
@@ -54,7 +89,7 @@ const menuContent = [
         component: <ChatInterface />
     },
     {
-        id: 5,
+        id: 7, // ID shifted from 5
         title: 'Tool Config',
         icon: <FaTools />,
         description: 'Tool Config is used to configure the system.',

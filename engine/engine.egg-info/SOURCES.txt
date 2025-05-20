@@ -6,6 +6,11 @@ engine.egg-info/SOURCES.txt
 engine.egg-info/dependency_links.txt
 engine.egg-info/requires.txt
 engine.egg-info/top_level.txt
+engine/chat/__init__.py
+engine/chat/base.py
+engine/chat/formatter.py
+engine/chat/llm.py
+engine/chat/utils.py
 engine/explorers/__init__.py
 engine/explorers/base.py
 engine/validator/__init__.py

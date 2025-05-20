@@ -20,7 +20,8 @@ export default function Explorer({
                         return (
                             <NavLink
                                 key={tab.id}
-                                to={`${basePath}/${tab.link}`}
+                                to={tab.link}
+                                end={tab.link === ''} // Ensures exact match for the index tab
                                 className={({ isActive }) => `tab-link ${isActive ? "active" : ""}`}
                             >
                                 <motion.div

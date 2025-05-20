@@ -10,7 +10,7 @@ const GeneratorTabContents = [
         description: `Generate molecules using the BRICS algorithm. The BRICS algorithm is a rule-based algorithm that generates molecules based on the given input.
                       The input can be a SMILES string or a PSMILES string. The output will be a set of molecules that are generated based on the input.
                       This tool has two sub-tools for generation for SMILES and PSMILES format for molecules and polymers respectively.`,
-        component: <BRICSGenerator tabContent={BRICSGeneratorTabContents} basePath="generators" />, 
+        component: <BRICSGenerator tabContent={BRICSGeneratorTabContents} basePath="optimization" />, 
         subElements: BRICSGeneratorTabContents,
         includeDocs: true,
         docs: null,
@@ -22,7 +22,7 @@ const GeneratorTabContents = [
         description: `Generate molecules using the LSTM algorithm. The LSTM algorithm is a deep learning algorithm that generates molecules based on the given input.
                       The input can be a SMILES string or a PSMILES string. The output will be a set of molecules that are generated based on the input.
                       This tool has two sub-tools for generation for SMILES and PSMILES format for molecules and polymers respectively.`,
-        component: <LSTMGenerator tabContent={LSTMGeneratorTabContents} basePath="generators/lstm" />, 
+        component: <LSTMGenerator tabContent={LSTMGeneratorTabContents} basePath="optimization/lstm" />, 
         subElements: LSTMGeneratorTabContents,
         includeDocs: true,
         docs: null,

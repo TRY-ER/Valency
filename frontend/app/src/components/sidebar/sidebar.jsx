@@ -6,52 +6,6 @@ import { fadeInLeftVariants, fadeInStatic } from '../animations/framerAnim';
 import './sidebar.css';
 import { FaAngleLeft, FaAngleRight, FaUserCircle, FaCog } from 'react-icons/fa';
 
-const constructAllPaths = (item) => {
-    let allPaths = [];
-    if (item.link === "") {
-        allPaths.push("/");
-        if (item.subElements) {
-            for (let i = 0; i < item.subElements.length; i++) {
-                allPaths.push(`/${item.subElements[i].link}`);
-                if (item.subElements[i].subElements) {
-                    item.subElements[i].subElements.map((subSubItem) => {
-                        if (subSubItem.link === "") {
-                            return allPaths.push(`/${item.subElements[i].link}/${item.subElements[i].link}`);
-                        }
-                        else {
-                            return allPaths.push(`/${item.subElements[i].link}/${item.subElements[i].link}/${subSubItem.link}`);
-                        }
-                    })
-                }
-            }
-        }
-    }
-    else {
-        allPaths.push(`/${item.link}`);
-        if (item.subElements) {
-            var pre = "";
-            for (let i = 0; i < item.subElements.length; i++) {
-                if (item.subElements[i].link !== "") {
-                    allPaths.push(`/${item.link}/${item.subElements[i].link}`);
-                    pre = `/${item.link}/${item.subElements[i].link}`
-                }
-                else {
-                    pre = `/${item.link}`
-                }
-                if (item.subElements[i].subElements) {
-                    item.subElements[i].subElements.map((subSubItem) => {
-                        if (subSubItem.link !== "") {
-                            allPaths.push(`${pre}/${subSubItem.link}`);
-                        }
-                    })
-                }
-            }
-        }
-    }
-
-    return allPaths;
-}
-
 const Sidebar = ({ }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const location = useLocation();
@@ -78,22 +32,12 @@ const Sidebar = ({ }) => {
                 {
                     menuContent.map((item, index) => {
                         const itemPath = item.link === "" ? "/" : `/${item.link}`;
-                        // Assumed explorer base paths. Ideally, this comes from menuContent or a configuration file.
-                        const explorerBaseRoutes = ['/proe', '/mle', '/poly'];
 
                         return <NavLink key={item.id}
                             to={itemPath}
-                            end={itemPath === "/"} // Ensures exact match for root, prefix match for others.
+                            end={itemPath === "/"} // Exact match for root, prefix match for others.
                             className={({ isActive: navLinkIsActive }) => {
-                                let isMenuItemActive = navLinkIsActive; // Default to NavLink's own active state detection
-
-                                // Custom logic for the 'Explorers' menu item
-                                if (item.title === 'Explorers') { // Assuming 'Explorers' is the title in menuContent
-                                    if (explorerBaseRoutes.some(basePath => location.pathname.startsWith(basePath))) {
-                                        isMenuItemActive = true; // Mark 'Explorers' active if current path is one of its sub-routes
-                                    }
-                                }
-                                return isMenuItemActive ? "sidebar-menu-item active" : "sidebar-menu-item";
+                                return navLinkIsActive ? "sidebar-menu-item active" : "sidebar-menu-item";
                             }}
                         >
                             <motion.div
