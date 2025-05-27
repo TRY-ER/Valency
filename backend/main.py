@@ -1,5 +1,5 @@
 from env_utils import set_env_vars
-set_env_vars(".env")
+set_env_vars("./.env")
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import (
@@ -9,8 +9,9 @@ from app.routers import (
     informer,
     generator,
     discriminator,
-    chat
+    chat,
 )
+from app.routers.mcp_adapter_router import all_mcp_routers # Import the list of routers
 import uvicorn
 
 app = FastAPI(title="Chemistry API", description="API for Chemistry", version="0.1.0")
@@ -32,6 +33,10 @@ app.include_router(informer.router, prefix="/inform", tags=["inform"]) # Include
 app.include_router(generator.router, prefix="/generate", tags=["generate"]) # Include the validator router
 app.include_router(discriminator.router, prefix="/discriminator", tags=["discriminate"]) # Include the validator router
 app.include_router(chat.router, prefix="/chat", tags=["chat"]) # Include the validator router
+
+# Include all MCP routers
+for router_item in all_mcp_routers:
+    app.include_router(router_item)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) # Run the app

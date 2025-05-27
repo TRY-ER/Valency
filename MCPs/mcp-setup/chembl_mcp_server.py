@@ -1,9 +1,11 @@
 import os
-from env_loader import load_env_vars # Changed from dotenv to env_loader
+import sys 
+from env_loader import load_env_vars 
 
-load_env_vars() # Load variables from .env file using custom loader
+load_env_vars() 
 
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP # Changed import
+
 from chembl_webresource_client.new_client import new_client
 from chembl_webresource_client.utils import utils as chembl_utils
 import json
@@ -11,7 +13,13 @@ import json
 # Create an MCP server
 chembl_host = os.getenv("CHEMBL_HOST", "0.0.0.0")
 chembl_port = int(os.getenv("CHEMBL_PORT", "8051"))
-mcp = FastMCP("ChEMBL MCP Server", dependencies=["chembl_webresource_client"], host=chembl_host, port=chembl_port)
+
+mcp = FastMCP(
+    "ChEMBL MCP Server", 
+    description="MCP server for querying the ChEMBL database."
+    # Removed dependencies from here, ensure it's installed in the environment if needed by tools
+    # Removed host/port from settings, will be passed to run()
+)
 
 # --- Molecule Tools ---
 
@@ -246,7 +254,7 @@ def find_target_by_gene_name(gene_name: str, only_fields: list[str] | None = Non
 # --- Generic Filter Tools ---
 
 @mcp.tool()
-def get_molecules_by_filter(filters: dict[str, any], only_fields: list[str] | None = None, order_by: list[str] | None = None) -> str:
+def get_molecules_by_filter(filters: dict[str, str], only_fields: list[str] | None = None, order_by: list[str] | None = None) -> str:
     """A flexible tool to retrieve molecules based on a custom set of filter conditions.
     Use this for complex queries not covered by more specific tools.
     Args:
@@ -276,7 +284,7 @@ def get_molecules_by_filter(filters: dict[str, any], only_fields: list[str] | No
         return json.dumps({"error": f"Failed to get molecules by filter: {filters}.", "details": str(e)})
 
 @mcp.tool()
-def get_activities_by_filter(filters: dict[str, any], only_fields: list[str] | None = None, order_by: list[str] | None = None) -> str:
+def get_activities_by_filter(filters: dict[str, str], only_fields: list[str] | None = None, order_by: list[str] | None = None) -> str:
     """A flexible tool to retrieve bioactivity data based on a custom set of filter conditions.
     Use this for complex queries on activity data.
     Args:
@@ -303,7 +311,7 @@ def get_activities_by_filter(filters: dict[str, any], only_fields: list[str] | N
         return json.dumps({"error": f"Failed to get activities by filter: {filters}.", "details": str(e)})
 
 @mcp.tool()
-def get_targets_by_filter(filters: dict[str, any], only_fields: list[str] | None = None, order_by: list[str] | None = None) -> str:
+def get_targets_by_filter(filters: dict[str, str], only_fields: list[str] | None = None, order_by: list[str] | None = None) -> str:
     """A flexible tool to retrieve biological targets based on a custom set of filter conditions.
     Use this for complex queries on target data.
     Args:
@@ -414,20 +422,18 @@ def get_parent_molecule_from_smiles(smiles: str) -> str:
 
 # --- Main execution for direct run or mcp dev ---
 if __name__ == "__main__":
-    # To run this server with the MCP Inspector:
-    # mcp dev chembl_mcp_server.py
-    #
-    # To install it in Claude Desktop:
-    # mcp install chembl_mcp_server.py --name "ChEMBL Tools"
+    print(f"Starting ChEMBL MCP Server...")
+    print(f"Server Name: {mcp.name}")
+    sys.stdout.flush() 
 
-    transport = os.getenv("MCP_TRANSPORT", "stdio")  # Default to stdio, can be overridden by .env or actual env var
-
-    if transport == "stdio":
-        print(f"Running ChEMBL MCP Server with stdio transport")
-        mcp.run(transport="stdio")
-    elif transport == "sse":
-        print(f"Running ChEMBL MCP Server with SSE transport on host {mcp.host}, port {mcp.port}")
-        mcp.run(transport="sse")
-    else:
-        raise ValueError(f"Unknown transport: {transport}")
+    # For stdio transport (if needed for local testing, though fastmcp focuses on web transports)
+    # if os.getenv("MCP_TRANSPORT") == "stdio":
+    #     print(f"Running ChEMBL MCP Server with stdio transport")
+    #     sys.stdout.flush() 
+    #     mcp.run(transport="stdio")
+    # else:
+    # Default to SSE transport with host and port passed directly
+    print(f"Attempting to run ChEMBL MCP Server with FastMCP SSE transport on host {chembl_host}, port {chembl_port}")
+    sys.stdout.flush() 
+    mcp.run(transport="sse", host=chembl_host, port=chembl_port)
 

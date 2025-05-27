@@ -1,23 +1,24 @@
 import os
 import json
 import requests
+import sys 
 from env_loader import load_env_vars
 
 load_env_vars()
 
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP # Changed import
 
 # Create an MCP server
 alphafold_host = os.getenv("ALPHAFOLD_HOST", "0.0.0.0")
-alphafold_port = int(os.getenv("ALPHAFOLD_PORT", "8052")) # Different port from ChEMBL
+alphafold_port = int(os.getenv("ALPHAFOLD_PORT", "8052")) 
 alphafold_api_base_url = os.getenv("ALPHAFOLD_API_BASE_URL", "https://alphafold.ebi.ac.uk/api")
 
 mcp = FastMCP(
-    "AlphaFold MCP Server",
-    dependencies=["requests"],
-    host=alphafold_host,
-    port=alphafold_port,
-    description="MCP server for interacting with the AlphaFold Protein Structure Database API."
+    "AlphaFold MCP Server", # Name of the server
+    description="MCP server for interacting with the AlphaFold Protein Structure Database API.",
+    settings={"host": alphafold_host, "port": alphafold_port} # Configure host and port
+    # The 'dependencies' argument might not be directly supported in jlowin/fastmcp's constructor in the same way.
+    # If needed, refer to jlowin/fastmcp documentation for managing tool dependencies.
 )
 
 # --- AlphaFold API Tools ---
@@ -31,6 +32,7 @@ def get_alphafold_prediction(qualifier: str, sequence_checksum: str | None = Non
     Returns:
         A JSON string containing the AlphaFold models data, or an error message.
     """
+    response = None  # Initialize response
     try:
         url = f"{alphafold_api_base_url}/prediction/{qualifier}"
         params = {}
@@ -53,6 +55,7 @@ def get_uniprot_summary(qualifier: str) -> str:
     Returns:
         A JSON string containing summary details for the UniProt residue range, or an error message.
     """
+    response = None  # Initialize response
     try:
         url = f"{alphafold_api_base_url}/uniprot/summary/{qualifier}.json"
         response = requests.get(url)
@@ -72,6 +75,7 @@ def get_alphafold_annotations(qualifier: str, annotation_type: str) -> str:
     Returns:
         A JSON string containing annotations for the UniProt residue range, or an error message.
     """
+    response = None  # Initialize response
     try:
         url = f"{alphafold_api_base_url}/annotations/{qualifier}"
         params = {"annotation_type": annotation_type}
@@ -85,19 +89,12 @@ def get_alphafold_annotations(qualifier: str, annotation_type: str) -> str:
 
 # --- Main execution for direct run or mcp dev ---
 if __name__ == "__main__":
-    # To run this server with the MCP Inspector:
-    # mcp dev alphafold_mcp_server.py
-    #
-    # To install it in Claude Desktop:
-    # mcp install alphafold_mcp_server.py --name "AlphaFold Tools"
+    print(f"Starting AlphaFold MCP Server...")
+    print(f"Server Name: {mcp.name}")
+    # The host and port for SSE are now passed to mcp.run()
+    print(f"Attempting to run AlphaFold MCP Server with FastMCP SSE transport on host {alphafold_host}, port {alphafold_port}")
+    sys.stdout.flush()
 
-    transport = os.getenv("MCP_TRANSPORT", "stdio")
-
-    if transport == "stdio":
-        print(f"Running AlphaFold MCP Server with stdio transport")
-        mcp.run(transport="stdio")
-    elif transport == "sse":
-        print(f"Running AlphaFold MCP Server with SSE transport on host {mcp.host}, port {mcp.port}")
-        mcp.run(transport="sse")
-    else:
-        raise ValueError(f"Unknown transport: {transport}")
+    # mcp.run() from jlowin/fastmcp will start a FastAPI server.
+    # For SSE, specify transport, host, and port directly.
+    mcp.run(transport="sse", host=alphafold_host, port=alphafold_port)

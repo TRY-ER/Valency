@@ -1,9 +1,11 @@
 import os
-from env_loader import load_env_vars # Changed from dotenv to env_loader
+import sys 
+from env_loader import load_env_vars 
 
-load_env_vars() # Load variables from .env file using custom loader
+load_env_vars() 
 
-from mcp.server.fastmcp import FastMCP
+from fastmcp import FastMCP # Changed import
+
 from rcsbsearchapi.search import (
     TextQuery,
     AttributeQuery,
@@ -13,7 +15,7 @@ from rcsbsearchapi.search import (
     StructMotifQuery,
     StructureMotifResidue,
     Facet,
-    Range as RCSBRange, # Renamed to avoid conflict with any built-in Range
+    Range as RCSBRange, 
     Attr
 )
 from rcsbsearchapi import rcsb_attributes as attrs
@@ -22,7 +24,12 @@ import json
 # Create an MCP server
 rcsb_host = os.getenv("RCSB_HOST", "0.0.0.0")
 rcsb_port = int(os.getenv("RCSB_PORT", "8052"))
-mcp = FastMCP("RCSB PDB MCP Server", description="Provides tools to query the RCSB PDB using rcsbsearchapi.", dependencies=["rcsbsearchapi"], host=rcsb_host, port=rcsb_port)
+mcp = FastMCP(
+    "RCSB PDB MCP Server", 
+    description="Provides tools to query the RCSB PDB using rcsbsearchapi."
+    # Removed dependencies argument
+    # host and port settings are not used here, passed to run() for SSE
+)
 
 # --- Text and Attribute Query Tools ---
 
@@ -44,7 +51,7 @@ def text_search_pdb(query_string: str, return_type: str = "entry", results_verbo
         return json.dumps({"error": f"Failed to perform text search for '{query_string}'.", "details": str(e)})
 
 @mcp.tool()
-def attribute_search_pdb(attribute_path: str, operator: str, value: any, return_type: str = "entry", results_verbosity: str = "compact") -> str:
+def attribute_search_pdb(attribute_path: str, operator: str, value: list, return_type: str = "entry", results_verbosity: str = "compact") -> str:
     """Perform an attribute search in RCSB PDB.
     Args:
         attribute_path: The path of the attribute to query (e.g., "exptl.method", "rcsb_entry_info.resolution_combined").
@@ -366,20 +373,15 @@ def count_query_results(query_type: str, query_params: dict, return_content_type
 
 # --- Main execution for direct run or mcp dev ---
 if __name__ == "__main__":
-    # To run this server with the MCP Inspector:
-    # mcp dev rcsb_pdb_mcp_server.py
-    #
-    # To install it in Claude Desktop:
-    # mcp install rcsb_pdb_mcp_server.py --name "RCSB PDB Tools"
+    # transport = os.getenv("MCP_TRANSPORT", "sse") # No longer needed for direct SSE run
+    print(f"Starting RCSB PDB MCP Server...")
+    print(f"Server Name: {mcp.name}")
+    sys.stdout.flush() 
 
-    transport = os.getenv("MCP_TRANSPORT", "stdio")  # Default to stdio, can be overridden by .env or actual env var
-
-    if transport == "stdio":
-        print(f"Running RCSB PDB MCP Server with stdio transport")
-        mcp.run(transport="stdio")
-    elif transport == "sse":
-        print(f"Running RCSB PDB MCP Server with SSE transport on host {mcp.host}, port {mcp.port}")
-        mcp.run(transport="sse")
-    else:
-        raise ValueError(f"Unknown transport: {transport}")
+    # Default to SSE transport with host and port passed directly
+    print(f"Attempting to run RCSB PDB MCP Server with FastMCP SSE transport on host {rcsb_host}, port {rcsb_port}")
+    sys.stdout.flush() 
+    mcp.run(transport="sse", host=rcsb_host, port=rcsb_port)
+    # else:
+    #     raise ValueError(f"Unknown transport: {transport}. Supported: 'stdio', 'sse'.")
 
