@@ -14,3 +14,4 @@ ADMET_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "admet_instructions.md"
 CHEMBL_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "chembl_instructions.md")
 PUBCHEM_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "pubchem_instructions.md")
 SS_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "similar_search_instructions.md")
+UNIPROT_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "uniprot_instructions.md")
