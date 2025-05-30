@@ -1,3 +1,17 @@
+import sys
+import os
+
+# Add the project root to sys.path to allow importing 'engine'
+# Assuming this file is in backend/app/routers/
+# Adjust the path to go up three levels to the project root (valency/)
+# then into the engine directory.
+project_root_for_engine = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+# Check if 'engine' directory is directly under project_root_for_engine or if valency is the project_root
+# Based on the structure, valency is the root, and engine is a direct child.
+# So, we need to add valency (project_root_for_engine) to sys.path
+if project_root_for_engine not in sys.path:
+    sys.path.insert(0, project_root_for_engine)
+
 from fastapi import APIRouter, HTTPException, Body
 # Removed direct import of fastmcp.client.Client
 # Assuming 'engine' is installed or accessible in PYTHONPATH
@@ -373,6 +387,203 @@ async def pubchem_get_cids_by_xref(tool_args: PubchemGetCidsByXrefArgs = Body(..
 async def pubchem_get_cids_by_mass(tool_args: PubchemGetCidsByMassArgs = Body(...)):
     return await _run_mcp_tool_handler(PUBCHEM_MCP_SERVER_URL, "get_cids_by_mass", tool_args.model_dump(exclude_none=True)) # Pass URL
 
+# --- RXN for Chemistry MCP Server Configuration ---
+RXN_MCP_HOST = os.getenv("RXN_MCP_HOST", "localhost") # Default from rxn_mcp_server.py was 0.0.0.0
+RXN_MCP_PORT = os.getenv("RXN_MCP_PORT", "8057")     # Default from rxn_mcp_server.py
+RXN_MCP_SERVER_URL = f"http://{RXN_MCP_HOST}:{RXN_MCP_PORT}/sse"
+rxn_router = APIRouter(prefix="/mcp/rxn", tags=["RXN for Chemistry MCP Tools"])
+
+# Pydantic Models for RXN tool arguments
+class RxnPredictReactionSmilesArgs(BaseModel):
+    precursors_smiles: str = Field(..., description="SMILES of precursor molecules, separated by a dot (e.g., 'CCO.Cl').")
+
+class RxnGetReactionPredictionResultsArgs(BaseModel):
+    prediction_id: str = Field(..., description="ID of the prediction task.")
+
+class RxnPredictAutomaticRetrosynthesisSmilesArgs(BaseModel):
+    product_smiles: str = Field(..., description="SMILES string of the target molecule.")
+    availability_pricing_threshold: float = Field(0.0, description="Exclude precursors with price higher than this (0.0 means no filtering).")
+    available_smiles_list: Optional[List[str]] = Field(None, description="List of SMILES that are considered available.")
+    exclude_smiles_list: Optional[List[str]] = Field(None, description="List of SMILES to exclude from precursors.")
+    exclude_substructures_smiles_list: Optional[List[str]] = Field(None, description="List of SMILES substructures to exclude from precursors.")
+    fap_value: float = Field(0.6, description="Forward Acceptance Probability threshold (0.0 to 1.0).")
+    max_steps: int = Field(3, description="Maximum number of retrosynthetic steps.")
+    n_beams: int = Field(3, description="Number of beams to use in the search.")
+    reaction_class_priority_list: Optional[List[str]] = Field(None, description="List of reaction classes to prioritize.")
+    project_id: Optional[str] = Field(None, description="Optional ID of the project to associate this prediction with.")
+
+class RxnGetRetrosynthesisPredictionResultsArgs(BaseModel):
+    prediction_id: str = Field(..., description="ID of the retrosynthesis prediction task.")
+    project_id: Optional[str] = Field(None, description="Optional ID of the project this prediction belongs to.")
+
+class RxnPredictReagentsSmilesArgs(BaseModel):
+    starting_material_smiles: str = Field(..., description="SMILES string of the starting material.")
+    product_smiles: str = Field(..., description="SMILES string of the product.")
+    project_id: Optional[str] = Field(None, description="Optional ID of the project to associate this prediction with.")
+
+class RxnGetReagentPredictionResultsArgs(BaseModel):
+    prediction_id: str = Field(..., description="ID of the reagent prediction task.")
+    project_id: Optional[str] = Field(None, description="Optional ID of the project this prediction belongs to.")
+
+class RxnGetAtomMappingForReactionSmilesArgs(BaseModel):
+    reaction_smiles_list: List[str] = Field(..., description="List of reaction SMILES strings (e.g., ['CCO.Cl>>CCCl.O']).")
+
+class RxnTranslateParagraphToActionsArgs(BaseModel):
+    paragraph_text: str = Field(..., description="Text paragraph describing the chemical procedure.")
+
+class RxnDigitizeReactionFromFileIdArgs(BaseModel):
+    file_id: str = Field(..., description="ID of the file uploaded to RXN.")
+    project_id: Optional[str] = Field(None, description="Optional ID of the project to associate this digitization with.")
+
+class RxnUploadFileArgs(BaseModel):
+    server_file_path: str = Field(..., description="Absolute path to the file on the server where the MCP is running.")
+
+class RxnPredictReactionBatchSmilesArgs(BaseModel):
+    precursors_smiles_list: List[str] = Field(..., description="List of precursor SMILES strings for batch prediction.")
+
+class RxnGetReactionBatchPredictionResultsArgs(BaseModel):
+    task_id: str = Field(..., description="ID of the batch prediction task.")
+
+class RxnPredictReactionBatchTopnSmilesArgs(BaseModel):
+    precursors_smiles_lists: List[List[str]] = Field(..., description="List of lists of precursor SMILES for top-N batch prediction.")
+    top_n: int = Field(..., description="Number of top predictions to return for each reaction.")
+
+class RxnGetReactionBatchTopnPredictionResultsArgs(BaseModel):
+    task_id: str = Field(..., description="ID of the batch top-N prediction task.")
+
+class RxnCreateSynthesisFromSequenceArgs(BaseModel):
+    sequence_id: str = Field(..., description="ID of the retrosynthetic sequence.")
+    project_id: Optional[str] = Field(None, description="Optional ID of the project.")
+
+class RxnGetSynthesisNodeIdsArgs(BaseModel):
+    synthesis_id: str = Field(..., description="ID of the synthesis plan.")
+    project_id: Optional[str] = Field(None, description="Optional ID of the project.")
+
+class RxnGetSynthesisNodeReactionSettingsArgs(BaseModel):
+    synthesis_id: str = Field(..., description="ID of the synthesis plan.")
+    node_id: str = Field(..., description="ID of the node within the synthesis plan.")
+    project_id: Optional[str] = Field(None, description="Optional ID of the project.")
+
+class RxnUpdateSynthesisNodeReactionSettingsArgs(BaseModel):
+    synthesis_id: str = Field(..., description="ID of the synthesis plan.")
+    node_id: str = Field(..., description="ID of the node within the synthesis plan.")
+    actions: List[Dict[str, Any]] = Field(..., description="List of action dictionaries defining the procedure.")
+    product_smiles: str = Field(..., description="SMILES string of the product for this reaction step.")
+    project_id: Optional[str] = Field(None, description="Optional ID of the project.")
+
+class RxnCreateProjectArgs(BaseModel):
+    name: str = Field(..., description="Name for the new project.")
+
+class RxnSetCurrentProjectArgs(BaseModel):
+    project_id: str = Field(..., description="ID of the project to set as active.")
+
+# No args for rxn_get_current_project_id
+
+# Explicit RXN tool endpoints
+@rxn_router.post("/predict_reaction_smiles", summary="Predict Reaction from SMILES", description="Predicts the product of a chemical reaction given precursors as SMILES.")
+async def rxn_predict_reaction_smiles(tool_args: RxnPredictReactionSmilesArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "predict_reaction_smiles", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/get_reaction_prediction_results", summary="Get Reaction Prediction Results", description="Retrieves the results of a reaction prediction task.")
+async def rxn_get_reaction_prediction_results(tool_args: RxnGetReactionPredictionResultsArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "get_reaction_prediction_results", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/predict_automatic_retrosynthesis_smiles", summary="Predict Automatic Retrosynthesis from SMILES", description="Predicts possible retrosynthetic routes for a target molecule SMILES.")
+async def rxn_predict_automatic_retrosynthesis_smiles(tool_args: RxnPredictAutomaticRetrosynthesisSmilesArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "predict_automatic_retrosynthesis_smiles", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/get_retrosynthesis_prediction_results", summary="Get Retrosynthesis Prediction Results", description="Retrieves the results of an automatic retrosynthesis prediction task.")
+async def rxn_get_retrosynthesis_prediction_results(tool_args: RxnGetRetrosynthesisPredictionResultsArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "get_retrosynthesis_prediction_results", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/predict_reagents_smiles", summary="Predict Reagents from SMILES", description="Predicts reagents needed to convert a starting material to a product.")
+async def rxn_predict_reagents_smiles(tool_args: RxnPredictReagentsSmilesArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "predict_reagents_smiles", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/get_reagent_prediction_results", summary="Get Reagent Prediction Results", description="Retrieves the results of a reagent prediction task.")
+async def rxn_get_reagent_prediction_results(tool_args: RxnGetReagentPredictionResultsArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "get_reagent_prediction_results", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/get_atom_mapping_for_reaction_smiles", summary="Get Atom Mapping for Reaction SMILES", description="Performs atom mapping for a list of chemical reactions.")
+async def rxn_get_atom_mapping_for_reaction_smiles(tool_args: RxnGetAtomMappingForReactionSmilesArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "get_atom_mapping_for_reaction_smiles", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/translate_paragraph_to_actions", summary="Translate Paragraph to Actions", description="Translates a natural language chemical procedure into machine-readable actions.")
+async def rxn_translate_paragraph_to_actions(tool_args: RxnTranslateParagraphToActionsArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "translate_paragraph_to_actions", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/digitize_reaction_from_file_id", summary="Digitize Reaction from File ID", description="Starts digitization for a reaction scheme from an uploaded file ID.")
+async def rxn_digitize_reaction_from_file_id(tool_args: RxnDigitizeReactionFromFileIdArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "digitize_reaction_from_file_id", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/rxn_upload_file", summary="Upload File to RXN", description="Uploads a file to the RXN server.")
+async def rxn_upload_file(tool_args: RxnUploadFileArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "rxn_upload_file", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/predict_reaction_batch_smiles", summary="Predict Reaction Batch from SMILES", description="Predicts products for a batch of chemical reactions.")
+async def rxn_predict_reaction_batch_smiles(tool_args: RxnPredictReactionBatchSmilesArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "predict_reaction_batch_smiles", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/get_reaction_batch_prediction_results", summary="Get Reaction Batch Prediction Results", description="Retrieves results of a batch reaction prediction task.")
+async def rxn_get_reaction_batch_prediction_results(tool_args: RxnGetReactionBatchPredictionResultsArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "get_reaction_batch_prediction_results", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/predict_reaction_batch_topn_smiles", summary="Predict Reaction Batch Top-N SMILES", description="Predicts top N products for a batch of reactions.")
+async def rxn_predict_reaction_batch_topn_smiles(tool_args: RxnPredictReactionBatchTopnSmilesArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "predict_reaction_batch_topn_smiles", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/get_reaction_batch_topn_prediction_results", summary="Get Reaction Batch Top-N Prediction Results", description="Retrieves results of a batch top-N reaction prediction task.")
+async def rxn_get_reaction_batch_topn_prediction_results(tool_args: RxnGetReactionBatchTopnPredictionResultsArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "get_reaction_batch_topn_prediction_results", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/create_synthesis_from_sequence", summary="Create Synthesis from Sequence", description="Creates an RXN synthesis plan from a retrosynthetic sequence ID.")
+async def rxn_create_synthesis_from_sequence(tool_args: RxnCreateSynthesisFromSequenceArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "create_synthesis_from_sequence", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/get_synthesis_node_ids", summary="Get Synthesis Node IDs", description="Retrieves all node IDs for a given synthesis plan.")
+async def rxn_get_synthesis_node_ids(tool_args: RxnGetSynthesisNodeIdsArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "get_synthesis_node_ids", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/get_synthesis_node_reaction_settings", summary="Get Synthesis Node Reaction Settings", description="Retrieves reaction settings for a specific node in a synthesis plan.")
+async def rxn_get_synthesis_node_reaction_settings(tool_args: RxnGetSynthesisNodeReactionSettingsArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "get_synthesis_node_reaction_settings", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/update_synthesis_node_reaction_settings", summary="Update Synthesis Node Reaction Settings", description="Updates reaction settings for a specific node in a synthesis plan.")
+async def rxn_update_synthesis_node_reaction_settings(tool_args: RxnUpdateSynthesisNodeReactionSettingsArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "update_synthesis_node_reaction_settings", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/rxn_create_project", summary="Create RXN Project", description="Creates a new project in RXN for Chemistry.")
+async def rxn_create_project(tool_args: RxnCreateProjectArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "rxn_create_project", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/rxn_set_current_project", summary="Set Current RXN Project", description="Sets the current active project for the RXN wrapper instance.")
+async def rxn_set_current_project(tool_args: RxnSetCurrentProjectArgs = Body(...)):
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "rxn_set_current_project", tool_args.model_dump(exclude_none=True))
+
+@rxn_router.post("/rxn_get_current_project_id", summary="Get Current RXN Project ID", description="Gets the ID of the currently active project in the RXN wrapper.")
+async def rxn_get_current_project_id(): # No arguments
+    return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "rxn_get_current_project_id", {})
+
+# --- BRICS MCP Server Configuration ---
+BRICS_MCP_HOST = os.getenv("BRICS_MCP_HOST", "localhost") # Default from brics_mcp_server.py was 0.0.0.0
+BRICS_MCP_PORT = os.getenv("BRICS_MCP_PORT", "8058")     # Default from brics_mcp_server.py
+BRICS_MCP_SERVER_URL = f"http://{BRICS_MCP_HOST}:{BRICS_MCP_PORT}/sse"
+brics_router = APIRouter(prefix="/mcp/brics", tags=["BRICS MCP Tools"])
+
+# Pydantic Models for BRICS tool arguments
+class BricsGetCandidatesArgs(BaseModel):
+    smiles_list: List[str] = Field(..., description="A list of SMILES strings.")
+    is_polymer: bool = Field(False, description="A boolean flag indicating if the input SMILES are polymers.")
+
+# Explicit BRICS tool endpoint
+@brics_router.post(
+    "/get_brics_candidates",
+    summary="Get BRICS Candidates",
+    description="Generate molecular candidates from a list of SMILES strings using the BRICS algorithm."
+)
+async def brics_get_brics_candidates(tool_args: BricsGetCandidatesArgs = Body(...)):
+    return await _run_mcp_tool_handler(BRICS_MCP_SERVER_URL, "get_brics_candidates", tool_args.model_dump(exclude_none=True))
+
 # --- List of all routers to be included in the main FastAPI app ---
 # In your main.py or equivalent FastAPI app setup:
 # from .mcp_adapter_router import all_mcp_routers
@@ -515,38 +726,40 @@ async def rcsb_sequence_motif_search(tool_args: RcsbPdbSequenceMotifSearchArgs =
 async def rcsb_structure_similarity_by_entry_id(tool_args: RcsbPdbStructSimilarityEntryIdArgs = Body(...)):
     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "structure_similarity_by_entry_id", tool_args.model_dump(exclude_none=True)) # Pass URL
 
-@rcsb_router.post("/structure_similarity_by_file_url", summary="Structure Similarity by File URL", description="Find structures similar to a structure provided via a URL.")
-async def rcsb_structure_similarity_by_file_url(tool_args: RcsbPdbStructSimilarityFileUrlArgs = Body(...)):
-    return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "structure_similarity_by_file_url", tool_args.model_dump(exclude_none=True)) # Pass URL
+# @rcsb_router.post("/structure_similarity_by_file_url", summary="Structure Similarity by File URL", description="Find structures similar to a structure provided via a URL.")
+# async def rcsb_structure_similarity_by_file_url(tool_args: RcsbPdbStructSimilarityFileUrlArgs = Body(...)):
+#     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "structure_similarity_by_file_url", tool_args.model_dump(exclude_none=True)) # Pass URL
 
 @rcsb_router.post("/structure_motif_search_by_entry_id", summary="Structure Motif Search by Entry ID", description="Search for 3D structural motifs using a PDB entry as reference.")
 async def rcsb_structure_motif_search_by_entry_id(tool_args: RcsbPdbStructMotifEntryIdArgs = Body(...)):
     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "structure_motif_search_by_entry_id", tool_args.model_dump(exclude_none=True)) # Pass URL
 
-@rcsb_router.post("/get_term_facets", summary="Get Term Facets", description="Perform a query and get term-based aggregations (facets).")
-async def rcsb_get_term_facets(tool_args: RcsbPdbGetTermFacetsArgs = Body(...)):
-    return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "get_term_facets", tool_args.model_dump(exclude_none=True)) # Pass URL
+# @rcsb_router.post("/get_term_facets", summary="Get Term Facets", description="Perform a query and get term-based aggregations (facets).")
+# async def rcsb_get_term_facets(tool_args: RcsbPdbGetTermFacetsArgs = Body(...)):
+#     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "get_term_facets", tool_args.model_dump(exclude_none=True)) # Pass URL
 
-@rcsb_router.post("/get_histogram_facets", summary="Get Histogram Facets", description="Perform a query and get histogram-based aggregations for numeric attributes.")
-async def rcsb_get_histogram_facets(tool_args: RcsbPdbGetHistogramFacetsArgs = Body(...)):
-    return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "get_histogram_facets", tool_args.model_dump(exclude_none=True)) # Pass URL
+# @rcsb_router.post("/get_histogram_facets", summary="Get Histogram Facets", description="Perform a query and get histogram-based aggregations for numeric attributes.")
+# async def rcsb_get_histogram_facets(tool_args: RcsbPdbGetHistogramFacetsArgs = Body(...)):
+#     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "get_histogram_facets", tool_args.model_dump(exclude_none=True)) # Pass URL
 
-@rcsb_router.post("/get_date_histogram_facets", summary="Get Date Histogram Facets", description="Perform a query and get date histogram aggregations.")
-async def rcsb_get_date_histogram_facets(tool_args: RcsbPdbGetDateHistogramFacetsArgs = Body(...)):
-    return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "get_date_histogram_facets", tool_args.model_dump(exclude_none=True)) # Pass URL
+# @rcsb_router.post("/get_date_histogram_facets", summary="Get Date Histogram Facets", description="Perform a query and get date histogram aggregations.")
+# async def rcsb_get_date_histogram_facets(tool_args: RcsbPdbGetDateHistogramFacetsArgs = Body(...)):
+#     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "get_date_histogram_facets", tool_args.model_dump(exclude_none=True)) # Pass URL
 
-@rcsb_router.post("/get_cardinality_facet", summary="Get Cardinality Facet", description="Get the count of distinct values for a field.")
-async def rcsb_get_cardinality_facet(tool_args: RcsbPdbGetCardinalityFacetArgs = Body(...)):
-    return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "get_cardinality_facet", tool_args.model_dump(exclude_none=True)) # Pass URL
+# @rcsb_router.post("/get_cardinality_facet", summary="Get Cardinality Facet", description="Get the count of distinct values for a field.")
+# async def rcsb_get_cardinality_facet(tool_args: RcsbPdbGetCardinalityFacetArgs = Body(...)):
+#     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "get_cardinality_facet", tool_args.model_dump(exclude_none=True)) # Pass URL
 
-@rcsb_router.post("/count_query_results", summary="Count Query Results", description="Counts the number of results for a given query.")
-async def rcsb_count_query_results(tool_args: RcsbPdbCountQueryResultsArgs = Body(...)):
-    return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "count_query_results", tool_args.model_dump(exclude_none=True)) # Pass URL
+# @rcsb_router.post("/count_query_results", summary="Count Query Results", description="Counts the number of results for a given query.")
+# async def rcsb_count_query_results(tool_args: RcsbPdbCountQueryResultsArgs = Body(...)):
+#     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "count_query_results", tool_args.model_dump(exclude_none=True)) # Pass URL
 
 all_mcp_routers = [
     admet_router,
     alphafold_router,
     chembl_router,
     pubchem_router,
-    rcsb_router
+    rcsb_router,
+    rxn_router,
+    brics_router
 ]

@@ -1,0 +1,9 @@
+[project]
+name = "custom_utils"
+version = "0.1.0"
+description = "Custom utility functions for the project."
+requires-python = ">=3.10"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

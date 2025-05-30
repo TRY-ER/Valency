@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Add the project root to sys.path to allow importing 'engine'
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
 from env_utils import set_env_vars
 set_env_vars("./.env")
 from fastapi import FastAPI

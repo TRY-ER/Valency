@@ -24,7 +24,7 @@ CHROMADB_SMILES_DB_NAME = os.getenv("CHROMADB_SMILES_DB_NAME", "smiles_data")
 CHROMADB_PSMILES_DB_NAME = os.getenv("CHROMADB_PSMILES_DB_NAME", "psmiles_data")
 
 SIMILARITY_MCP_HOST = os.getenv("SIMILARITY_MCP_HOST", "0.0.0.0")
-SIMILARITY_MCP_PORT = int(os.getenv("SIMILARITY_MCP_PORT", "8057"))
+SIMILARITY_MCP_PORT = int(os.getenv("SIMILARITY_MCP_PORT", "8059"))
 
 ALLOWED_TYPES = ["MOL", "POLY", "PROT"]
 
@@ -253,10 +253,6 @@ def format_smiles_search_results_replicated(results: Dict[str, Any], input_type:
     
     num_results = min(len(metadatas_list), len(distances_list), k)
 
-    # Use a single instance of visualizers
-    mol_viz = MolVisualizer()
-    poly_viz = PolymerVisualizer()
-
     for i in range(num_results):
         metadata = metadatas_list[i]
         distance = distances_list[i]
@@ -267,18 +263,18 @@ def format_smiles_search_results_replicated(results: Dict[str, Any], input_type:
         if not identifier_smiles:
             continue
 
-        image_data = None
-        # Using the new visualizer classes
-        if input_type == "MOL":
-            image_data = mol_viz.visualize(identifier_smiles, size=(300,300)) # Example size
-        elif input_type == "POLY":
-            image_data = poly_viz.visualize(identifier_smiles, size=(300,300)) # Example size
+        # image_data = None
+        # # Using the new visualizer classes
+        # if input_type == "MOL":
+        #     image_data = mol_viz.visualize(identifier_smiles, size=(300,300)) # Example size
+        # elif input_type == "POLY":
+        #     image_data = poly_viz.visualize(identifier_smiles, size=(300,300)) # Example size
         
         # Directly create dicts instead of SearchResultItem instances for MCP tool output
         formatted_items.append({
             "identifier": identifier_smiles,
             "score": 1.0 - distance,
-            "image": image_data
+            # "image": image_data
         })
     return formatted_items
 
@@ -352,11 +348,11 @@ def perform_similarity_search(input_type: str, data: str, k: int) -> str:
                     pdb_id = r_item.get("identifier")
                     if not pdb_id:
                         continue
-                    image_data = get_protein_image_replicated(pdb_id)
+                    # image_data = get_protein_image_replicated(pdb_id)
                     returnable_items.append({
                         "identifier": pdb_id,
                         "score": r_item.get("score", 0.0),
-                        "image": image_data
+                        # "image": image_data
                     })
             response_dict = {"status": "success", "data": returnable_items}
 

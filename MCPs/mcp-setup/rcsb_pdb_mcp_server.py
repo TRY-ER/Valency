@@ -1,11 +1,9 @@
 import os
-import sys 
-from env_loader import load_env_vars 
+from env_loader import load_env_vars # Changed from dotenv to env_loader
 
-load_env_vars() 
+load_env_vars() # Load variables from .env file using custom loader
 
 from fastmcp import FastMCP # Changed import
-
 from rcsbsearchapi.search import (
     TextQuery,
     AttributeQuery,
@@ -15,43 +13,143 @@ from rcsbsearchapi.search import (
     StructMotifQuery,
     StructureMotifResidue,
     Facet,
-    Range as RCSBRange, 
+    Range as RCSBRange, # Renamed to avoid conflict with any built-in Range
     Attr
 )
 from rcsbsearchapi import rcsb_attributes as attrs
 import json
+import sys # Added import
+
+# Attempt to import pypdb for the new tool
+try:
+    from pypdb import get_info as get_pdb_info_pypdb # Renamed to avoid conflict
+    PYPDB_AVAILABLE = True
+except ImportError:
+    PYPDB_AVAILABLE = False
+    print("Warning: pypdb not found. Protein information retrieval tool (get_protein_details_by_id_pypdb) will not be available.")
+    # Define a dummy get_pdb_info_pypdb if pypdb is not available
+    def get_pdb_info_pypdb(pdb_id: str, url_root: str = 'https://data.rcsb.org/rest/v1/co'): return None
 
 # Create an MCP server
 rcsb_host = os.getenv("RCSB_HOST", "0.0.0.0")
 rcsb_port = int(os.getenv("RCSB_PORT", "8052"))
-mcp = FastMCP(
-    "RCSB PDB MCP Server", 
-    description="Provides tools to query the RCSB PDB using rcsbsearchapi."
-    # Removed dependencies argument
-    # host and port settings are not used here, passed to run() for SSE
-)
+# Removed dependencies, host, and port from constructor
+mcp = FastMCP("RCSB PDB MCP Server", description="Provides tools to query the RCSB PDB using rcsbsearchapi and pypdb for detailed protein information.")
 
 # --- Text and Attribute Query Tools ---
 
 @mcp.tool()
-def text_search_pdb(query_string: str, return_type: str = "entry", results_verbosity: str = "compact") -> str:
+def text_search_pdb(query_string: str, return_type: str = "entry", results_verbosity: str = "compact", max_results: int = 10) -> str:
     """Perform a text search in RCSB PDB.
     Args:
         query_string: The text to search for (e.g., "hemoglobin").
         return_type: The type of identifiers to return (e.g., "entry", "polymer_entity", "assembly"). Default is "entry".
         results_verbosity: "compact" (IDs only), "minimal" (IDs and scores), "verbose" (all metadata). Default "compact".
+        max_results: Maximum number of results to return. Default is 10.
     Returns:
         A JSON string with a list of entry IDs or dictionaries with metadata based on verbosity.
+    
+    Example Response Schema:
+    for "compact" results_verbosity:
+    {'data': ['2PGH',
+        '3PEL',
+        '3GOU',
+        '6IHX',
+        '1G08',
+        '1G09',
+        '1G0A',
+        '2QSP',
+        '5C6E',
+        '3CIU']
+    }
+
+    for "minimal" results_verbosity:
+    {'data': [{'identifier': '2PGH', 'score': 1.0},
+            {'identifier': '3PEL', 'score': 0.9995626684955836},
+            {'identifier': '3GOU', 'score': 0.9989625551654878},
+            {'identifier': '6IHX', 'score': 0.9984230028463676},
+            {'identifier': '1G08', 'score': 0.9978712997511598},
+            {'identifier': '1G09', 'score': 0.9978712997511598},
+            {'identifier': '1G0A', 'score': 0.9978712997511598},
+            {'identifier': '2QSP', 'score': 0.9978712997511598},
+            {'identifier': '5C6E', 'score': 0.9978712997511598},
+            {'identifier': '3CIU', 'score': 0.9973749501914616}
+    ]}
+
+    for "verbose" results_verbosity:
+    {'data': [{'identifier': '2PGH',
+    'score': 1.0,
+    'services': [{'service_type': 'full_text',
+        'nodes': [{'node_id': 0,
+        'original_score': 10.369708,
+        'norm_score': 1.0}]}]},
+    {'identifier': '3PEL',
+    'score': 0.9995626684955836,
+    'services': [{'service_type': 'full_text',
+        'nodes': [{'node_id': 0,
+        'original_score': 10.365173,
+        'norm_score': 0.9995626684955836}]}]},
+    {'identifier': '3GOU',
+    'score': 0.9989625551654878,
+    'services': [{'service_type': 'full_text',
+        'nodes': [{'node_id': 0,
+        'original_score': 10.35895,
+        'norm_score': 0.9989625551654878}]}]},
+    {'identifier': '6IHX',
+    'score': 0.9984230028463676,
+    'services': [{'service_type': 'full_text',
+        'nodes': [{'node_id': 0,
+        'original_score': 10.353355,
+        'norm_score': 0.9984230028463676}]}]},
+    {'identifier': '1G08',
+    'score': 0.9978712997511598,
+    'services': [{'service_type': 'full_text',
+        'nodes': [{'node_id': 0,
+        'original_score': 10.347634,
+        'norm_score': 0.9978712997511598}]}]},
+    {'identifier': '1G09',
+    'score': 0.9978712997511598,
+    'services': [{'service_type': 'full_text',
+        'nodes': [{'node_id': 0,
+        'original_score': 10.347634,
+        'norm_score': 0.9978712997511598}]}]},
+    {'identifier': '1G0A',
+    'score': 0.9978712997511598,
+    'services': [{'service_type': 'full_text',
+        'nodes': [{'node_id': 0,
+        'original_score': 10.347634,
+        'norm_score': 0.9978712997511598}]}]},
+    {'identifier': '2QSP',
+    'score': 0.9978712997511598,
+    'services': [{'service_type': 'full_text',
+        'nodes': [{'node_id': 0,
+        'original_score': 10.347634,
+        'norm_score': 0.9978712997511598}]}]},
+    {'identifier': '5C6E',
+    'score': 0.9978712997511598,
+    'services': [{'service_type': 'full_text',
+        'nodes': [{'node_id': 0,
+        'original_score': 10.347634,
+        'norm_score': 0.9978712997511598}]}]},
+    {'identifier': '3CIU',
+    'score': 0.9973749501914616,
+    'services': [{'service_type': 'full_text',
+        'nodes': [{'node_id': 0,
+        'original_score': 10.342487,
+        'norm_score': 0.9973749501914616}]}]}]}
     """
     try:
         query = TextQuery(query_string)
         results = list(query(return_type=return_type, results_verbosity=results_verbosity))
+        if len(results) > max_results:
+            print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")
+            results = results[:max_results]
         return json.dumps({"data": results})
     except Exception as e:
         return json.dumps({"error": f"Failed to perform text search for '{query_string}'.", "details": str(e)})
 
 @mcp.tool()
-def attribute_search_pdb(attribute_path: str, operator: str, value: list, return_type: str = "entry", results_verbosity: str = "compact") -> str:
+def attribute_search_pdb(attribute_path: str, operator: str, value: list, return_type: str = "entry", results_verbosity: str = "compact", max_results: int = 10) -> str:
     """Perform an attribute search in RCSB PDB.
     Args:
         attribute_path: The path of the attribute to query (e.g., "exptl.method", "rcsb_entry_info.resolution_combined").
@@ -59,18 +157,22 @@ def attribute_search_pdb(attribute_path: str, operator: str, value: list, return
         value: The value to compare against. For "in" operator, this should be a list.
         return_type: The type of identifiers to return. Default is "entry".
         results_verbosity: "compact", "minimal", or "verbose". Default "compact".
+        max_results: Maximum number of results to return. Default is 10.
     Returns:
         A JSON string with a list of entry IDs or dictionaries with metadata.
     """
     try:
         query = AttributeQuery(attribute_path, operator, value)
         results = list(query(return_type=return_type, results_verbosity=results_verbosity))
+        if len(results) > max_results:
+            print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")
+            results = results[:max_results]
         return json.dumps({"data": results})
     except Exception as e:
         return json.dumps({"error": f"Failed attribute search for {attribute_path} {operator} {value}.", "details": str(e)})
 
 @mcp.tool()
-def combined_text_and_attribute_search(text_query_string: str, attribute_filters: list[dict], logical_operator: str = "and", return_type: str = "entry", results_verbosity: str = "compact") -> str:
+def combined_text_and_attribute_search(text_query_string: str, attribute_filters: list[dict], logical_operator: str = "and", return_type: str = "entry", results_verbosity: str = "compact", max_results: int = 10) -> str:
     """Combines a text query with multiple attribute queries.
     Args:
         text_query_string: The main text query.
@@ -79,6 +181,7 @@ def combined_text_and_attribute_search(text_query_string: str, attribute_filters
         logical_operator: How to combine the text query and attribute filters ("and" or "or"). Default "and".
         return_type: The type of identifiers to return. Default is "entry".
         results_verbosity: "compact", "minimal", or "verbose". Default "compact".
+        max_results: Maximum number of results to return. Default is 10.
     Returns:
         A JSON string with a list of entry IDs or dictionaries with metadata.
     """
@@ -105,6 +208,9 @@ def combined_text_and_attribute_search(text_query_string: str, attribute_filters
                 return json.dumps({"error": "Invalid logical_operator. Must be 'and' or 'or'.", "details": f"Received: {logical_operator}"})
                 
         results = list(final_query(return_type=return_type, results_verbosity=results_verbosity))
+        if len(results) > max_results:
+            print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")
+            results = results[:max_results]
         return json.dumps({"data": results})
     except ValueError as ve:
         return json.dumps({"error": str(ve), "details": f"Logical operator was: {logical_operator}"})
@@ -114,7 +220,7 @@ def combined_text_and_attribute_search(text_query_string: str, attribute_filters
 # --- Sequence Query Tools ---
 
 @mcp.tool()
-def sequence_identity_search(sequence: str, identity_cutoff: float = 0.9, e_value_cutoff: float = 1.0, sequence_type: str = "protein", return_type: str = "polymer_entity") -> str:
+def sequence_identity_search(sequence: str, identity_cutoff: float = 0.9, e_value_cutoff: float = 1.0, sequence_type: str = "protein", return_type: str = "polymer_entity", max_results: int = 10) -> str:
     """Find PDB entities with sequence similarity.
     Args:
         sequence: The protein, DNA, or RNA sequence string.
@@ -122,30 +228,38 @@ def sequence_identity_search(sequence: str, identity_cutoff: float = 0.9, e_valu
         e_value_cutoff: Maximum E-value for the match. Default 1.0.
         sequence_type: Type of sequence ("protein", "dna", "rna"). Default "protein".
         return_type: The type of identifiers to return. Default "polymer_entity".
+        max_results: Maximum number of results to return. Default is 10.
     Returns:
         A JSON string with a list of polymer entity IDs.
     """
     try:
         query = SequenceQuery(sequence, e_value_cutoff=e_value_cutoff, identity_cutoff=identity_cutoff, sequence_type=sequence_type)
         results = list(query(return_type=return_type))
+        if len(results) > max_results:
+            print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")
+            results = results[:max_results]
         return json.dumps({"data": results})
     except Exception as e:
         return json.dumps({"error": "Failed sequence identity search.", "details": str(e)})
 
 @mcp.tool()
-def sequence_motif_search(motif_pattern: str, pattern_type: str = "prosite", sequence_type: str = "protein", return_type: str = "polymer_entity") -> str:
+def sequence_motif_search(motif_pattern: str, pattern_type: str = "prosite", sequence_type: str = "protein", return_type: str = "polymer_entity", max_results: int = 10) -> str:
     """Search for sequences containing a specific motif.
     Args:
         motif_pattern: The motif pattern (e.g., "C-x(2,4)-C-x(3)-[LIVMFYWC]-x(8)-H-x(3,5)-H." for PROSITE).
         pattern_type: Type of pattern ("prosite", "regex", "simple"). Default "prosite".
         sequence_type: Type of sequence ("protein", "dna", "rna"). Default "protein".
         return_type: The type of identifiers to return. Default "polymer_entity".
+        max_results: Maximum number of results to return. Default is 10.
     Returns:
         A JSON string with a list of polymer entity IDs.
     """
     try:
         query = SeqMotifQuery(motif_pattern, pattern_type=pattern_type, sequence_type=sequence_type)
         results = list(query(return_type=return_type))
+        if len(results) > max_results:
+            print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")
+            results = results[:max_results]
         return json.dumps({"data": results})
     except Exception as e:
         return json.dumps({"error": "Failed sequence motif search.", "details": str(e)})
@@ -153,7 +267,7 @@ def sequence_motif_search(motif_pattern: str, pattern_type: str = "prosite", seq
 # --- Structure Similarity Tools ---
 
 @mcp.tool()
-def structure_similarity_by_entry_id(entry_id: str, assembly_id: str = "1", operator: str = "strict_shape_match", target_search_space: str = "assembly", return_type: str = "assembly") -> str:
+def structure_similarity_by_entry_id(entry_id: str, assembly_id: str = "1", operator: str = "strict_shape_match", target_search_space: str = "assembly", return_type: str = "assembly", max_results: int = 10) -> str:
     """Find structures similar to a given PDB entry.
     Args:
         entry_id: The PDB ID of the query structure (e.g., "4HHB").
@@ -161,6 +275,7 @@ def structure_similarity_by_entry_id(entry_id: str, assembly_id: str = "1", oper
         operator: Similarity operator ("strict_shape_match" or "relaxed_shape_match"). Default "strict_shape_match".
         target_search_space: What to compare against ("assembly" or "polymer_entity_instance"). Default "assembly".
         return_type: The type of identifiers to return. Default "assembly".
+        max_results: Maximum number of results to return. Default is 10.
     Returns:
         A JSON string with a list of assembly or polymer_entity_instance IDs.
     """
@@ -174,12 +289,15 @@ def structure_similarity_by_entry_id(entry_id: str, assembly_id: str = "1", oper
             target_search_space=target_search_space
         )
         results = list(query(return_type=return_type))
+        if len(results) > max_results:
+            print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")
+            results = results[:max_results]
         return json.dumps({"data": results})
     except Exception as e:
         return json.dumps({"error": f"Failed structure similarity search for entry ID {entry_id}.", "details": str(e)})
 
 @mcp.tool()
-def structure_similarity_by_file_url(file_url: str, file_format: str, operator: str = "strict_shape_match", target_search_space: str = "assembly", return_type: str = "assembly") -> str:
+def structure_similarity_by_file_url(file_url: str, file_format: str, operator: str = "strict_shape_match", target_search_space: str = "assembly", return_type: str = "assembly", max_results: int = 10) -> str:
     """Find structures similar to a structure provided via a URL.
     Args:
         file_url: URL to the structure file (e.g., "https://files.rcsb.org/view/4HHB.cif").
@@ -187,6 +305,7 @@ def structure_similarity_by_file_url(file_url: str, file_format: str, operator: 
         operator: Similarity operator. Default "strict_shape_match".
         target_search_space: What to compare against. Default "assembly".
         return_type: The type of identifiers to return. Default "assembly".
+        max_results: Maximum number of results to return. Default is 10.
     Returns:
         A JSON string with a list of assembly or polymer_entity_instance IDs.
     """
@@ -199,6 +318,9 @@ def structure_similarity_by_file_url(file_url: str, file_format: str, operator: 
             target_search_space=target_search_space
         )
         results = list(query(return_type=return_type))
+        if len(results) > max_results:
+            print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")
+            results = results[:max_results]
         return json.dumps({"data": results})
     except Exception as e:
         return json.dumps({"error": f"Failed structure similarity search for file URL {file_url}.", "details": str(e)})
@@ -211,7 +333,7 @@ def structure_similarity_by_file_url(file_url: str, file_format: str, operator: 
 # as it's not straightforward in a typical MCP server context without more infrastructure.
 
 @mcp.tool()
-def structure_motif_search_by_entry_id(entry_id: str, residues: list[dict], backbone_distance_tolerance: int = 1, side_chain_distance_tolerance: int = 1, angle_tolerance: int = 1, rmsd_cutoff: float = 2.0, return_type: str = "polymer_entity") -> str:
+def structure_motif_search_by_entry_id(entry_id: str, residues: list[dict], backbone_distance_tolerance: int = 1, side_chain_distance_tolerance: int = 1, angle_tolerance: int = 1, rmsd_cutoff: float = 2.0, return_type: str = "polymer_entity", max_results: int = 10) -> str:
     """Search for 3D structural motifs using a PDB entry as the reference for the motif.
     Args:
         entry_id: The PDB ID defining the motif (e.g., "2MNR").
@@ -223,6 +345,7 @@ def structure_motif_search_by_entry_id(entry_id: str, residues: list[dict], back
         angle_tolerance: Allowed angle tolerance in multiples of 20 degrees (0-3). Default 1.
         rmsd_cutoff: Threshold above which hits will be filtered by RMSD (>=0). Default 2.0.
         return_type: The type of identifiers to return. Default "polymer_entity".
+        max_results: Maximum number of results to return. Default is 10.
     Returns:
         A JSON string with a list of polymer entity IDs.
     """
@@ -244,144 +367,112 @@ def structure_motif_search_by_entry_id(entry_id: str, residues: list[dict], back
             rmsd_cutoff=rmsd_cutoff
         )
         results = list(query(return_type=return_type))
+        if len(results) > max_results:
+            print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")
+            results = results[:max_results]
         return json.dumps({"data": results})
     except Exception as e:
         return json.dumps({"error": f"Failed structure motif search for entry ID {entry_id}.", "details": str(e)})
 
-# --- Facet/Aggregation Tools ---
+# --- PDB Protein Information Tool (using pypdb) ---
+
+class PDBProteinInfoProvider:
+    def __init__(self, pdb_id: str):
+        self.pdb_id = pdb_id
+
+    def _extract_simplified_pdb_data(self, pdb_data: dict) -> dict:
+        """
+        Extracts significant scientific properties from a complex PDB data dictionary.
+        """
+        if not pdb_data: # Handle case where pdb_data might be None (e.g. pypdb not found or invalid ID)
+            return {"error": f"Could not retrieve data for PDB ID: '{self.pdb_id}'"}
+
+        simplified_data = {}
+        simplified_data['Pdb_Id'] = pdb_data.get('rcsb_id') or pdb_data.get('entry', {}).get('id')
+        simplified_data['Title'] = pdb_data.get('struct', {}).get('title')
+        authors_list = [author['name'] for author in pdb_data.get('audit_author', [])]
+        simplified_data['Authors'] = ', '.join(authors_list) if authors_list else None
+        citation = pdb_data.get('citation', [])
+        if citation:
+            primary_citation = next((c for c in citation if c.get('id') == 'primary'), citation[0])
+            simplified_data['Journal'] = primary_citation.get('rcsb_journal_abbrev') or primary_citation.get('journal_abbrev')
+            simplified_data['Year'] = primary_citation.get('year')
+            simplified_data['Volume'] = primary_citation.get('journal_volume')
+            page_first = primary_citation.get('page_first')
+            page_last = primary_citation.get('page_last')
+            if page_first and page_last:
+                pages = f"{page_first}-{page_last}"
+            elif page_first:
+                pages = page_first
+            else:
+                pages = None
+            simplified_data['Pages'] = pages
+            simplified_data['Doi'] = primary_citation.get('pdbx_database_id_doi')
+            simplified_data['Pubmed_Id'] = primary_citation.get('pdbx_database_id_pub_med')
+        else:
+            simplified_data['Journal'] = None
+            simplified_data['Year'] = None
+            simplified_data['Volume'] = None
+            simplified_data['Pages'] = None
+            simplified_data['Doi'] = None
+            simplified_data['Pubmed_Id'] = None
+        exptl = pdb_data.get('exptl', [])
+        if exptl:
+            simplified_data['Experiment_Method'] = exptl[0].get('method')
+        else:
+            simplified_data['Experiment_Method'] = None
+        simplified_data['Molecular_Weight_(kDa)'] = pdb_data.get('rcsb_entry_info', {}).get('molecular_weight')
+        simplified_data['Deposited_Model_Count'] = pdb_data.get('rcsb_entry_info', {}).get('deposited_model_count')
+        simplified_data['Polymer_entity_count'] = pdb_data.get('rcsb_entry_info', {}).get('polymer_entity_count')
+        simplified_data['Polymer_monomer_count'] = pdb_data.get('rcsb_entry_info', {}).get('deposited_polymer_monomer_count')
+        simplified_data['Structural_Features'] = pdb_data.get('struct_keywords', {}).get('text')
+        release_date = pdb_data.get('rcsb_accession_info', {}).get('initial_release_date', '')
+        if 'T' in release_date:
+            simplified_data['Release_Date'] = release_date.split('T')[0]
+        else:
+            simplified_data['Release_Date'] = release_date
+        resolution = pdb_data.get('rcsb_entry_info', {}).get('resolution_combined', [None])
+        if resolution and resolution[0] is not None:
+            simplified_data['Resolution'] = resolution[0]
+        else:
+            simplified_data['Resolution'] = None
+        return simplified_data
+
+    def get_info(self) -> dict:
+        if not PYPDB_AVAILABLE:
+            return {"error": "pypdb is not installed. Cannot provide protein information."}
+        try:
+            raw_pdb_data = get_pdb_info_pypdb(self.pdb_id) # Use the renamed import
+            if not raw_pdb_data: # Check if pypdb returned None (e.g. invalid PDB ID)
+                 return {"error": f"No data found for PDB ID: '{self.pdb_id}'. It might be an invalid ID."}
+            return self._extract_simplified_pdb_data(raw_pdb_data)
+        except Exception as e:
+            return {"error": f"Failed to retrieve or process PDB data for '{self.pdb_id}': {str(e)}"}
 
 @mcp.tool()
-def get_term_facets(attribute_query_dict: dict, facet_name: str, facet_attribute: str, min_interval_population: int = 1, max_num_intervals: int = 10) -> str:
-    """Perform a query and get term-based aggregations (facets).
-    Args:
-        attribute_query_dict: Dictionary defining the base attribute query (e.g., {"attribute_path": "rcsb_entry_info.structure_determination_methodology", "operator": "exact_match", "value": "experimental"}).
-        facet_name: A descriptive name for this facet (e.g., "Experimental Methods").
-        facet_attribute: The attribute to aggregate on (e.g., "exptl.method").
-        min_interval_population: Minimum count for a bucket to be returned. Default 1.
-        max_num_intervals: Maximum number of buckets to return. Default 10.
-    Returns:
-        A JSON string with a list of dictionaries, each representing a facet bucket.
+def get_protein_details_by_id_pypdb(pdb_id_string: str) -> str:
     """
-    try:
-        base_query = AttributeQuery(attribute_query_dict["attribute_path"], attribute_query_dict["operator"], attribute_query_dict["value"])
-        facet_obj = Facet(name=facet_name, aggregation_type="terms", attribute=facet_attribute, min_interval_population=min_interval_population, max_num_intervals=max_num_intervals)
-        
-        # The .facets attribute is accessed after calling the query object with the facet
-        results = base_query(facets=facet_obj).facets
-        return json.dumps({"data": results})
-    except Exception as e:
-        return json.dumps({"error": "Failed to get term facets.", "details": str(e)})
-
-
-@mcp.tool()
-def get_histogram_facets(attribute_query_dict: dict, facet_name: str, facet_attribute: str, interval: float, min_interval_population: int = 1, return_type: str = "entry") -> str:
-    """Perform a query and get histogram-based aggregations for numeric attributes.
+    Retrieves detailed information about a specific protein from its PDB ID using pypdb.
+    This tool complements the rcsbsearchapi tools by providing a different set of details via pypdb.
     Args:
-        attribute_query_dict: Dictionary for the base attribute query.
-        facet_name: Descriptive name for the facet (e.g., "Formula Weight Distribution").
-        facet_attribute: The numeric attribute for histogram (e.g., "rcsb_polymer_entity.formula_weight").
-        interval: The size of the histogram intervals.
-        min_interval_population: Minimum count for a bucket. Default 1.
-        return_type: Return type for the base query. Default "entry".
+        pdb_id_string: The PDB ID of the protein (e.g., '6M0J', '1TIM').
     Returns:
-        A JSON string with a list of dictionaries, each representing a histogram bucket.
+        A JSON string containing the protein's details, or an error message.
     """
-    try:
-        base_query = AttributeQuery(attribute_query_dict["attribute_path"], attribute_query_dict["operator"], attribute_query_dict["value"])
-        facet_obj = Facet(name=facet_name, aggregation_type="histogram", attribute=facet_attribute, interval=interval, min_interval_population=min_interval_population)
-        results = base_query(return_type=return_type, facets=facet_obj).facets
-        return json.dumps({"data": results})
-    except Exception as e:
-        return json.dumps({"error": "Failed to get histogram facets.", "details": str(e)})
-
-@mcp.tool()
-def get_date_histogram_facets(attribute_query_dict: dict, facet_name: str, facet_attribute: str, interval: str = "year", min_interval_population: int = 1) -> str:
-    """Perform a query and get date histogram aggregations.
-    Args:
-        attribute_query_dict: Dictionary for the base attribute query.
-        facet_name: Descriptive name for the facet (e.g., "Release Dates by Year").
-        facet_attribute: The date attribute for histogram (e.g., "rcsb_accession_info.initial_release_date").
-        interval: Interval for date histogram (must be "year" as per notebook, though API might support others). Default "year".
-        min_interval_population: Minimum count for a bucket. Default 1.
-    Returns:
-        A JSON string with a list of dictionaries, each representing a date histogram bucket.
-    """
-    try:
-        base_query = AttributeQuery(attribute_query_dict["attribute_path"], attribute_query_dict["operator"], attribute_query_dict["value"])
-        facet_obj = Facet(name=facet_name, aggregation_type="date_histogram", attribute=facet_attribute, interval=interval, min_interval_population=min_interval_population)
-        results = base_query(facets=facet_obj).facets
-        return json.dumps({"data": results})
-    except Exception as e:
-        return json.dumps({"error": "Failed to get date histogram facets.", "details": str(e)})
-
-@mcp.tool()
-def get_cardinality_facet(attribute_query_dict: dict, facet_name: str, facet_attribute: str, precision_threshold: int = 40000) -> str:
-    """Get the count of distinct values for a field.
-    Args:
-        attribute_query_dict: Dictionary for the base attribute query.
-        facet_name: Descriptive name for the facet (e.g., "Unique Organism Count").
-        facet_attribute: The attribute for which to count distinct values (e.g., "rcsb_entity_source_organism.ncbi_scientific_name").
-        precision_threshold: Precision threshold for cardinality calculation. Default 40000.
-    Returns:
-        A JSON string containing a single dictionary with the cardinality result.
-    """
-    try:
-        base_query = AttributeQuery(attribute_query_dict["attribute_path"], attribute_query_dict["operator"], attribute_query_dict["value"])
-        facet_obj = Facet(name=facet_name, aggregation_type="cardinality", attribute=facet_attribute, precision_threshold=precision_threshold)
-        results = base_query(facets=facet_obj).facets
-        return json.dumps({"data": results})
-    except Exception as e:
-        return json.dumps({"error": "Failed to get cardinality facet.", "details": str(e)})
+    if not PYPDB_AVAILABLE:
+        return json.dumps({"error": "pypdb backend not available on the server for this tool."})
     
-# --- Utility Tools ---
-
-@mcp.tool()
-def count_query_results(query_type: str, query_params: dict, return_content_type: list[str] | None = None) -> str:
-    """Counts the number of results for a given query.
-    Args:
-        query_type: Type of query ("text", "attribute", "sequence", "seq_motif", "struct_similarity", "struct_motif").
-        query_params: Dictionary of parameters for the specified query type.
-                       For "text": {"query_string": "value"}
-                       For "attribute": {"attribute_path": "path", "operator": "op", "value": "val"}
-                       ... and so on, matching the primary args of other tools.
-        return_content_type: Optional list to specify content types like ["computational", "experimental"].
-    Returns:
-        A JSON string with the number of results.
-    """
-    try:
-        query = None
-        if query_type == "text":
-            query = TextQuery(query_params["query_string"])
-        elif query_type == "attribute":
-            query = AttributeQuery(query_params["attribute_path"], query_params["operator"], query_params["value"])
-        # Add other query types if needed, ensuring params match their constructors
-        else:
-            return json.dumps({"error": f"Unsupported query_type for counting: {query_type}"})
-
-        if return_content_type:
-            count = query(return_counts=True, return_content_type=return_content_type)
-        else:
-            count = query(return_counts=True)
-        return json.dumps({"count": count})
-    except KeyError as ke:
-        return json.dumps({"error": f"Missing parameter for query_type '{query_type}'.", "details": str(ke)})
-    except ValueError as ve:
-        return json.dumps({"error": str(ve), "details": f"Query type was: {query_type}"})
-    except Exception as e:
-        return json.dumps({"error": "Failed to count query results.", "details": str(e)})
-
+    provider = PDBProteinInfoProvider(pdb_id_string)
+    info = provider.get_info()
+    return json.dumps(info)
 
 # --- Main execution for direct run or mcp dev ---
 if __name__ == "__main__":
-    # transport = os.getenv("MCP_TRANSPORT", "sse") # No longer needed for direct SSE run
     print(f"Starting RCSB PDB MCP Server...")
     print(f"Server Name: {mcp.name}")
-    sys.stdout.flush() 
+    sys.stdout.flush()
 
     # Default to SSE transport with host and port passed directly
     print(f"Attempting to run RCSB PDB MCP Server with FastMCP SSE transport on host {rcsb_host}, port {rcsb_port}")
-    sys.stdout.flush() 
+    sys.stdout.flush()
     mcp.run(transport="sse", host=rcsb_host, port=rcsb_port)
-    # else:
-    #     raise ValueError(f"Unknown transport: {transport}. Supported: 'stdio', 'sse'.")
-

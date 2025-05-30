@@ -24,21 +24,65 @@ mcp = FastMCP(
 # --- AlphaFold API Tools ---
 
 @mcp.tool()
-def get_alphafold_prediction(qualifier: str, sequence_checksum: str | None = None) -> str:
+def get_alphafold_prediction(qualifier: str) -> str:
     """Get all AlphaFold models for a UniProt accession.
     Args:
         qualifier: UniProt accession (e.g., 'Q5VSL9').
-        sequence_checksum: Optional CRC64 checksum of the UniProt sequence.
     Returns:
         A JSON string containing the AlphaFold models data, or an error message.
+
+    Example Succesful Returns Schema:
+     [
+        {
+            "entryId": "string",
+            "gene": "string",
+            "sequenceChecksum": "string",
+            "sequenceVersionDate": "string",
+            "uniprotAccession": "string",
+            "uniprotId": "string",
+            "uniprotDescription": "string",
+            "taxId": 0,
+            "organismScientificName": "string",
+            "uniprotStart": 0,
+            "uniprotEnd": 0,
+            "uniprotSequence": "string",
+            "modelCreatedDate": "1941-09-22",
+            "latestVersion": 0,
+            "allVersions": [
+            0
+            ],
+            "bcifUrl": "string",
+            "cifUrl": "string",
+            "pdbUrl": "string",
+            "paeImageUrl": "string",
+            "paeDocUrl": "string",
+            "amAnnotationsUrl": "string",
+            "amAnnotationsHg19Url": "string",
+            "amAnnotationsHg38Url": "string",
+            "isReviewed": true,
+            "isReferenceProteome": true
+        }
+    ]  
+
+    Example Value Error Returns Schema:
+
+    {
+        "detail": [
+            {
+            "loc": [
+                "string",
+                0
+            ],
+            "msg": "string",
+            "type": "string"
+            }
+        ]
+    }
     """
     response = None  # Initialize response
     try:
         url = f"{alphafold_api_base_url}/prediction/{qualifier}"
         params = {}
-        if sequence_checksum:
-            params["sequence_checksum"] = sequence_checksum
-        
         response = requests.get(url, params=params)
         response.raise_for_status()  # Raises an HTTPError for bad responses (4XX or 5XX)
         return json.dumps(response.json())
@@ -54,6 +98,72 @@ def get_uniprot_summary(qualifier: str) -> str:
         qualifier: UniProtKB accession number (AC), entry name (ID), or CRC64 checksum of the UniProt sequence (e.g., 'Q5VSL9').
     Returns:
         A JSON string containing summary details for the UniProt residue range, or an error message.
+
+    Example Successful Returns Schema:
+    {
+        "uniprot_entry": {
+            "ac": "string",
+            "id": "string",
+            "uniprot_checksum": "string",
+            "sequence_length": 0,
+            "segment_start": 0,
+            "segment_end": 0
+        },
+        "structures": [
+            {
+            "summary": {
+                "model_identifier": "string",
+                "model_category": "EXPERIMENTALLY DETERMINED",
+                "model_url": "string",
+                "model_format": "PDB",
+                "model_type": "ATOMIC",
+                "model_page_url": "string",
+                "provider": "string",
+                "number_of_conformers": 0,
+                "ensemble_sample_url": "string",
+                "ensemble_sample_format": "PDB",
+                "created": "string",
+                "sequence_identity": 0,
+                "uniprot_start": 0,
+                "uniprot_end": 0,
+                "coverage": 0,
+                "experimental_method": "ELECTRON CRYSTALLOGRAPHY",
+                "resolution": 0,
+                "confidence_type": "pLDDT",
+                "confidence_version": "string",
+                "confidence_avg_local_score": 0,
+                "oligomeric_state": "MONOMER",
+                "preferred_assembly_id": "string",
+                "entities": [
+                {
+                    "entity_type": "BRANCHED",
+                    "entity_poly_type": "CYCLIC-PSEUDO-PEPTIDE",
+                    "identifier": "string",
+                    "identifier_category": "UNIPROT",
+                    "description": "string",
+                    "chain_ids": [
+                    "string"
+                    ]
+                }
+                ]
+            }
+            }
+        ]
+    }
+
+    Example Value Error Returns Schema:
+    {
+        "detail": [
+            {
+            "loc": [
+                "string",
+                0
+            ],
+            "msg": "string",
+            "type": "string"
+            }
+        ]
+    }
     """
     response = None  # Initialize response
     try:
@@ -74,6 +184,49 @@ def get_alphafold_annotations(qualifier: str, annotation_type: str) -> str:
         annotation_type: Type of annotation (e.g., 'MUTAGEN' for AlphaMissense).
     Returns:
         A JSON string containing annotations for the UniProt residue range, or an error message.
+
+    Example Successful Returns Schema:
+    {
+        "accession": "string",
+        "id": "string",
+        "sequence": "string",
+        "annotation": [
+            {
+            "type": "MUTAGEN",
+            "description": "string",
+            "source_name": "string",
+            "source_url": "string",
+            "evidence": "COMPUTATIONAL/PREDICTED",
+            "residues": [
+                0
+            ],
+            "regions": [
+                {
+                "start": 1,
+                "end": 120,
+                "annotation_value": [
+                    "string"
+                ],
+                "unit": "string"
+                }
+            ]
+            }
+        ]
+    }
+
+    Example Value Error Returns Schema:
+    {
+        "detail": [
+            {
+            "loc": [
+                "string",
+                0
+            ],
+            "msg": "string",
+            "type": "string"
+            }
+       ]
+    }
     """
     response = None  # Initialize response
     try:
