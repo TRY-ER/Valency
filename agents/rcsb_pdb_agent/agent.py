@@ -25,7 +25,7 @@ MCP_PORT = os.getenv("RCSB_PORT", "8052")  # Default to 8058 if not set
 MCP_URL = f"http://{MCP_HOST}:{MCP_PORT}/sse"  # URL for the MCP server
 
 root_agent = Agent(
-    name="RCSBAgent",
+    name="RCSB_PDB_Agent",
     model=GEMINI_MODEL,
     instruction=instructions,
     tools=[

@@ -15,3 +15,6 @@ CHEMBL_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "chembl_instructions.m
 PUBCHEM_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "pubchem_instructions.md")
 SS_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "similar_search_instructions.md")
 UNIPROT_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "uniprot_instructions.md")
+
+# nest agent instructions
+PROTEIN_AGENT_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "protein_agent_instructions.md")

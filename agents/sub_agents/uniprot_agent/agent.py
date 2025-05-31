@@ -30,7 +30,8 @@ root_agent = Agent(
     instruction=instructions,
     tools=[
         MCPToolset(connection_params=SseServerParams(url=MCP_URL))
-    ])
+    ],
+    description="An agent for UniProt protein and gene understanding from UniProt ID or string query",)
 
 # To make this agent runnable, you might want to add something like:
 # if __name__ == '__main__':

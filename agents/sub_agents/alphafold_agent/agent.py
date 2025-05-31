@@ -30,4 +30,5 @@ root_agent = Agent(
     instruction=instructions,
     tools=[
         MCPToolset(connection_params=SseServerParams(url=MCP_URL))
-    ])
+    ],
+    description="An agent for AlphaFold protein structure prediction from UniPROT key",)
