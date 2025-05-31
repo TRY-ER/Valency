@@ -10,7 +10,7 @@ from fastmcp import FastMCP # Changed import
 
 # Create an MCP server
 alphafold_host = os.getenv("ALPHAFOLD_HOST", "0.0.0.0")
-alphafold_port = int(os.getenv("ALPHAFOLD_PORT", "8052")) 
+alphafold_port = int(os.getenv("ALPHAFOLD_PORT", "8056")) 
 alphafold_api_base_url = os.getenv("ALPHAFOLD_API_BASE_URL", "https://alphafold.ebi.ac.uk/api")
 
 mcp = FastMCP(

@@ -14,7 +14,7 @@ from google.adk.agents import Agent
 from dotenv import load_dotenv
 load_dotenv("../.env")
 
-GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-preview-05-20")
 instructions = read_markdown_file(BRICS_INSTRUCTIONS_MD_PATH)
 instructions = f"""{instructions}"""
 

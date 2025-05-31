@@ -2,6 +2,7 @@ from google.adk.agents import LoopAgent, Agent
 from google.adk.tools import ToolContext
 from dotenv import load_dotenv
 load_dotenv("../.env")
+import os
 
 def increment_tool(x: int) -> int:
     """A simple tool that increments a number by 1."""
@@ -12,7 +13,7 @@ def exit_loop(tool_context: ToolContext) -> dict:
     tool_context.actions.escalate = True
     return {}
 
-GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-preview-05-20")
 
 increment_agent_instruction = """
 you always return a number. If you are given an number you increment it by 1 and return the incremented value.
@@ -21,6 +22,7 @@ Never return a string or your thoughts and understandings, always return a numbe
 Always look into the context for the latest incremented value and if current query does not contain any number understand to navigate to the last value and continue the process.
 
 """
+
 from pydantic import BaseModel
 
 increment_agent = Agent(

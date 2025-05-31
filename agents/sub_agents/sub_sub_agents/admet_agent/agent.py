@@ -1,4 +1,5 @@
 from custom_utils.repo.declare import ADMET_INSTRUCTIONS_MD_PATH # Changed import
+from custom_utils import after_tool_output_limit_callback
 import os
 from google.adk.tools.mcp_tool.mcp_toolset import (
     MCPToolset,
@@ -9,9 +10,9 @@ from custom_utils.file_reader import read_markdown_file
 from dotenv import load_dotenv
 
 # Load environment variables from .env file, potentially in parent directory
-load_dotenv("../.env") # Ensure this path is correct for your .env file
+load_dotenv("../../../.env") # Ensure this path is correct for your .env file
 
-GEMINI_MODEL = "gemini-2.0-flash" # Using gemini-1.5-flash as per other agents
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-preview-05-20") # Load from env
 instructions = read_markdown_file(ADMET_INSTRUCTIONS_MD_PATH)
 instructions = f"""{instructions}"""
 
@@ -28,4 +29,6 @@ root_agent = Agent(
     instruction=instructions,
     tools=[
         MCPToolset(connection_params=SseServerParams(url=MCP_URL))
-    ])
+    ],
+    description="Agent for Absorption, Distribution, Metabolism, Excretion, and Toxicity (ADMET) predictions using MCP server",
+    after_tool_callback=after_tool_output_limit_callback)

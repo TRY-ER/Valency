@@ -18,3 +18,8 @@ UNIPROT_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "uniprot_instructions
 
 # nest agent instructions
 PROTEIN_AGENT_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "protein_agent_instructions.md")
+DRUG_AGENT_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "drug_agent_instructions.md")
+DRUG_OPTIMIZATION_INSTRUCTIONS_MD_PATH  = os.path.join(REPO_DIR_PATH, "drug_optimization_instructions.md")
+
+# master agent instructions
+MASTER_AGENT_INSTRUCTIONS_MD_PATH = os.path.join(REPO_DIR_PATH, "master_agent_instructions.md")

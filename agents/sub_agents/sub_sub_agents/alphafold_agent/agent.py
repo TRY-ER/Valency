@@ -1,4 +1,5 @@
 from custom_utils import ALPHAFOLD_INSTRUCTIONS_MD_PATH
+from custom_utils import after_tool_output_limit_callback
 import asyncio
 import os
 from google.adk.tools.mcp_tool.mcp_toolset import (
@@ -12,9 +13,9 @@ from google.adk.agents import LoopAgent
 from custom_utils.file_reader import read_markdown_file
 from google.adk.agents import Agent
 from dotenv import load_dotenv
-load_dotenv("../.env")
+load_dotenv("../../../.env")
 
-GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-preview-05-20")
 instructions = read_markdown_file(ALPHAFOLD_INSTRUCTIONS_MD_PATH)
 instructions = f"""{instructions}"""
 
@@ -31,4 +32,5 @@ root_agent = Agent(
     tools=[
         MCPToolset(connection_params=SseServerParams(url=MCP_URL))
     ],
-    description="An agent for AlphaFold protein structure prediction from UniPROT key",)
+    description="An agent for AlphaFold protein structure prediction from UniPROT key",
+    after_tool_callback=after_tool_output_limit_callback)

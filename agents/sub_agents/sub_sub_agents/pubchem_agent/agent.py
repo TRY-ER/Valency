@@ -1,34 +1,34 @@
-from custom_utils import RCSB_INSTRUCTIONS_MD_PATH
+from custom_utils import PUBCHEM_INSTRUCTIONS_MD_PATH 
+from custom_utils import after_tool_output_limit_callback
 import asyncio
 import os
 from google.adk.tools.mcp_tool.mcp_toolset import (
     MCPToolset,
     SseServerParams
 )
-from google.adk.tools import ToolContext
-from google.adk.agents import LoopAgent
 
 # Assuming 'custom_utils' is in the PYTHONPATH
 from custom_utils.file_reader import read_markdown_file
 from google.adk.agents import Agent
 from dotenv import load_dotenv
-load_dotenv("../.env")
+load_dotenv("../../../.env")
 
-GEMINI_MODEL = "gemini-2.0-flash"
-instructions = read_markdown_file(RCSB_INSTRUCTIONS_MD_PATH)
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-preview-05-20")
+instructions = read_markdown_file(PUBCHEM_INSTRUCTIONS_MD_PATH)
 instructions = f"""{instructions}"""
 
 
 # Default to localhost if not set
-MCP_HOST = os.getenv("RCSB_HOST", "localhost")
-MCP_PORT = os.getenv("RCSB_PORT", "8052")  # Default to 8058 if not set
+MCP_HOST = os.getenv("PUBCHEM_HOST", "localhost")
+MCP_PORT = os.getenv("PUBCHEM_PORT", "8054")  # Default to 8058 if not set
 MCP_URL = f"http://{MCP_HOST}:{MCP_PORT}/sse"  # URL for the MCP server
 
 root_agent = Agent(
-    name="RCSB_PDB_Agent",
+    name="PubchemAgent",
     model=GEMINI_MODEL,
     instruction=instructions,
     tools=[
         MCPToolset(connection_params=SseServerParams(url=MCP_URL))
     ],
-    description="An agent for RCSB PDB protein understanding from string query and PDB ID",  )
+    description="An agent for PubChem chemical database queries",
+    after_tool_callback=after_tool_output_limit_callback)

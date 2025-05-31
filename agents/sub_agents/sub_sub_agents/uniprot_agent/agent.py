@@ -1,4 +1,5 @@
 from custom_utils import  UNIPROT_INSTRUCTIONS_MD_PATH# This will be a new constant
+from custom_utils import after_tool_output_limit_callback
 import os
 from google.adk.tools.mcp_tool.mcp_toolset import (
     MCPToolset,
@@ -10,9 +11,9 @@ from dotenv import load_dotenv
 
 # Load environment variables from a .env file located one level above the current script's directory
 # This is useful if your .env file is in the parent directory of the 'sub_agents' folder
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../../.env"))
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "../../../.env"))
 
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash-latest") # Use a default if not set
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-preview-05-20") # Use a default if not set
 
 instructions = read_markdown_file(UNIPROT_INSTRUCTIONS_MD_PATH)
 instructions = f"""{instructions}"""
@@ -31,7 +32,8 @@ root_agent = Agent(
     tools=[
         MCPToolset(connection_params=SseServerParams(url=MCP_URL))
     ],
-    description="An agent for UniProt protein and gene understanding from UniProt ID or string query",)
+    description="An agent for UniProt protein and gene understanding from UniProt ID or string query",
+    after_tool_callback=after_tool_output_limit_callback)
 
 # To make this agent runnable, you might want to add something like:
 # if __name__ == '__main__':
