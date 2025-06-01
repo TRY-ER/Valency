@@ -834,6 +834,65 @@ const ChatInterface = () => {
         <>
             {/* <GlassyContainer> */}
             <div className="inter-main-container">
+                <div className={`side-pane ${isPanelOpen ? "open" : ""} ${isDark ? "dark" : ""} custom-scrollbar`}>
+                    <div className={`side-option ${isPanelOpen ? "open" : ""} custom-scrollbar`}>
+                        <div className={`top-side-container ${isPanelOpen ? "open" : ""} ${isDark ? "dark" : ""} custom-scrollbar`}>
+                            {isPanelOpen ? <>
+                                <div
+                                // variants={sideIconVariant}
+                                // initial="initial"
+                                // animate="animate"
+                                >
+                                    <img src="/icons/anchor-left-arrow-dark.svg"
+                                        alt="logo"
+                                        // onMouseEnter={(e) => { handleShowTag(e, "Hide Pane") }}
+                                        // onMouseLeave={handleHideTag}
+                                        className={`side-collapser ${isDark ? "dark" : ""}`}
+                                        onClick={handlePanelToggle}
+                                    />
+                                </div>
+                            </> : ""}
+                        </div>
+                        <div className={`side-expand-container ${isPanelOpen ? "open" : ""} custom-scrollbar`}>
+                            <div className="side-icon-container">
+                                <div
+                                // variants={sideIconVariant}
+                                // initial="initial"
+                                // animate="animate"
+                                >
+                                    <img src="/icons/user-picture_dark.svg"
+                                            alt="logo"
+                                            id="side-profile-image"
+                                            // onMouseEnter={(e) => { handleShowTag(e, "Profile", 12) }}
+                                            // onMouseLeave={handleHideTag}
+                                        onClick={showProfile}
+                                        />
+                                </div>
+                                <div
+                                // variants={sideIconVariant}
+                                // initial="initial"
+                                // animate="animate"
+                                >
+                                    <img src="/icons/configuration-with-gear_dark.svg"
+                                        alt="logo"
+                                        className={`side-logo ${isDark ? "dark" : ""}`}
+                                        onClick={showConfig}
+                                    // onMouseEnter={(e) => { handleShowTag(e, "Config", 12) }}
+                                    // onMouseLeave={handleHideTag}
+                                    />
+                                </div>
+                            </div>
+                            <div className={`side-content-container ${isPanelOpen ? "open" : ""} custom-scrollbar`}>
+                                <div className={`side-panel ${isPanelOpen ? "open" : ""} custom-scrollbar`}>
+                                    <div className="panel-content">
+                                        {isPanelOpen && sideContent === "show_config" ? configContainer : ""}
+                                        {isPanelOpen && sideContent === "show_profile" ? profileExpandContent : ""}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div className={`inter-inner-container ${isPanelOpen ? "panel-open" : ""} ${profileExpanded ? "profile-open" : ""} ${isDark ? "dark" : ""}`}
                     style={{ fontSize: `${fontSize}px` }}
                 >

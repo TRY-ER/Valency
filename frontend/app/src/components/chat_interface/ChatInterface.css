@@ -48,7 +48,7 @@
 
 .inter-inner-container {
     margin: 0;
-    padding: 2vh 2vw;
+    padding: 2vh 2vw 2vh 0; /* Changed: Removed left padding */
     display: flex;
     flex-direction: column;
     overflow: hidden;
