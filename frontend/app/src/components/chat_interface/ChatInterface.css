@@ -48,16 +48,15 @@
 
 .inter-inner-container {
     margin: 0;
-    padding: 2vh 2vw 2vh 0; /* Changed: Removed left padding */
     display: flex;
     flex-direction: column;
     overflow: hidden;
     justify-content: space-between;
     flex: 95;
-    backdrop-filter: blur(10px);
-    background-color: rgba(255, 255, 255, 0.2);
+    /* backdrop-filter: blur(10px); Removed for a non-glassy feel */
+    /* background-color: rgba(255, 255, 255, 0.2); Removed for a non-glassy feel */
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Kept existing border */
     border-radius: 15px;
 }
 
@@ -283,6 +282,7 @@
 .chat-container {
     overflow-y: scroll;
     border-radius: 20px;
+    flex:1;
 }
 
 
@@ -343,8 +343,8 @@
     padding: 20px;
     background-color: var(--color-bg-secondary) !important;
     border-radius: 20px 5px 20px 20px;
-    /* font-size: 1.1rem; */
-    max-width: 55vw;
+    font-size: 1.2rem; /* Increased font size */
+    max-width: 65vw; /* Increased max-width */
     background-color: var(--c-lite);
     -webkit-box-shadow: -10px 12px 16px -9px var(--c-shadow-back-light);
     -moz-box-shadow: -10px 12px 16px -9px var(--c-shadow-back-light);
@@ -391,6 +391,16 @@
 
 .chat-container .btn-container.dark button img {
     filter: invert(20%);
+}
+
+.chat-query-btn {
+    font-size: 28px; /* Adjust size as needed */
+    color: var(--color-text-secondary); /* Default color for light theme */
+    transition: color 0.2s ease-in-out;
+}
+
+.query-button-container.dark .chat-query-btn {
+    color: var(--c-lite); /* Color for dark theme */
 }
 
 .response-container {
@@ -601,7 +611,10 @@
     justify-content: center;
     flex-grow: 1;
     flex-wrap: wrap;
-    margin: 0 10vw;
+    margin: 0 15vw;
+    background-color: var(--glassy-color); /* MODIFIED */
+    border: solid 3px var(--c-light-border); /* MODIFIED */
+    border-radius: 20px;
 }
 
 
@@ -611,7 +624,8 @@
     font-size: 20px;
     display: flex;
     flex-direction: row;
-    flex: 90;
+    flex: 80; /* MODIFIED from 90 to 80 to make it less wide */
+    align-items: center; /* ADDED to vertically align textarea and button */
 }
 
 
@@ -620,19 +634,16 @@
     max-height: 50vh;
     width: 100%;
     resize: none;
-    border-radius: 20px;
-    background-color: var(--glassy-color); /* MODIFIED */
-    border: solid 3px var(--c-light-border); /* MODIFIED */
-    padding-top: 10px;
     padding-left: 10px;
+    padding-top: 10px;
     color: var(--color-text-primary); /* ADDED */
+    background: transparent;
 }
 
 
 .query-gen-container .query-text-container.dark textarea {
-    background-color: var(--c-deep-black);
     color: var(--c-lite); /* MODIFIED */
-    border-color: var(--c-deep-light); /* ADDED to ensure dark theme has a distinct border if c-deep-light is different from c-light-border */
+    background: transparent;
 }
 
 
@@ -672,10 +683,11 @@
 
 .query-gen-container .query-button-container {
     display: flex;
-    flex: 10;
+    /* flex: 10; Removed as it's now part of query-text-container */
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
+    margin-left: 10px; /* ADDED to create some space between textarea and button */
 }
 
 .query-button-container button {
@@ -1181,7 +1193,79 @@
     }
 }
 
-.chat-query-btn{
-    font-size: 2.3rem;
-    color: white;
+/* New CSS for suggestion queries */
+.suggestion-queries-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    color: var(--color-text-secondary); /* Use CSS variable */
+}
+
+.suggestion-queries-title {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+    color: var(--color-text-secondary); /* Use CSS variable */
+}
+
+.suggestion-queries-list-wrapper {
+    width: 80%; /* Adjust width as needed */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    padding-bottom: 10px; /* Add some padding for the scrollbar */
+    padding-top: 10px; /* Added vertical padding */
+}
+
+.suggestion-queries-list {
+    display: flex;
+    flex-direction: row; /* Arrange items horizontally */
+    gap: 15px; /* Spacing between suggestion buttons */
+}
+
+.suggestion-query-button {
+    background-color: var(--glassy-color); /* Use CSS variable */
+    border: 1px solid var(--c-light-border); /* Use CSS variable */
+    color: var(--color-text-primary); /* Use CSS variable */
+    padding: 15px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    font-size: 1.1rem;
+    min-width: 15vw;
+    max-width: 200px;
+    white-space: normal;
+    text-align: left;
+}
+
+.suggestion-query-button:hover {
+    background-color: var(--c-deep-light); /* Use CSS variable for hover */
+    border-color: var(--c-light-border); /* Keep or adjust as needed */
+}
+
+.welcome-message {
+    padding: 10px 20px;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    text-align: center;
+    font-size: 1em;
+    border-bottom: 1px solid var(--c-light-border);
+    font-size: 2em; /* Increased text size */
+    text-align: center;
+    margin-bottom: 40px; /* Increased margin for a gap */
+}
+
+.username-gradient {
+    background: linear-gradient(to right, #4CAF50, #81C784, #99f74d); /* Green and Yellow gradient */
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: gradient-animation 5s ease infinite;
+    font-weight: bold; /* Added bold font weight */
+}
+
+@keyframes gradient-animation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }

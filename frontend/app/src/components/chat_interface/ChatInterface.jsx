@@ -19,6 +19,7 @@ import CustomDropdown from "../UI/CustomDropdown/CustomDropdown";
 import GlassyContainer from "../glassy_container/gc";
 import Markdown from "react-markdown";
 import CustomMarkdownRenderer from "../UI/CustomMarkdown";
+import AuthService from "../../services/api/AuthService.ts"; // Added AuthService import
 
 const ChatInterface = () => {
     const [isPanelOpen, setIsPanelOpen] = useState(false);
@@ -38,8 +39,8 @@ const ChatInterface = () => {
     const [serverStreamId, setServerStreamId] = useState(null);
     const [isLoaded, setIsLoaed] = useState(false);
 
-    //ui changes 
-    const [isDark, setIsDark] = useState(false);
+    //ui changes
+    // const [isDark, setIsDark] = useState(false); // REMOVED
     const [fontSize, setFontSize] = useState("14");
 
 
@@ -47,6 +48,8 @@ const ChatInterface = () => {
     const [showTag, setShowTag] = useState(false);
     const [tagText, setTagText] = useState("test");
     const [tagPosition, setTagPosition] = useState({ x: 0, y: 0 });
+
+    const [username, setUsername] = useState(""); // Added state for username
 
     // input config for model
     const [modelConfig, setModelConfig] = useState({
@@ -59,11 +62,18 @@ const ChatInterface = () => {
         setFontSize(e.target.value);
     }
 
-    useEffect(() =>{
-        if (isLoaded){
+    useEffect(() => {
+        if (isLoaded) {
             localStorage.setItem("fontsize", fontSize)
         }
     }, [fontSize])
+
+    useEffect(() => { // Added useEffect to get username
+        const currentUser = AuthService.getUser();
+        if (currentUser && currentUser.username) {
+            setUsername(currentUser.username);
+        }
+    }, [isLoaded]); // Re-run if isLoaded changes, ensuring user data might be available after initial load logic
 
     const sideIconVariant = {
         initial: {
@@ -122,6 +132,21 @@ const ChatInterface = () => {
     const [bottomScroller, setBottomScroller] = useState(false);
     const [activeUid, setActiveUid] = useState("");
 
+    // Define suggestion queries
+    const suggestionQueries = [
+        "Can you provide a detailed explanation of how the BRICSPSMILES tool works and its primary applications in cheminformatics?",
+        "What are the latest advancements in molecule exploration techniques, and how do they compare to traditional methods?",
+        "Tell me about the different types of улыбки (smiles) used in chemical informatics and their specific use cases.",
+        "Explain the concept of Polymer Similarity Search and discuss some of the common algorithms or tools used for this purpose.",
+        "What are the key challenges and future directions in the field of Protein Explorer tools and technologies?",
+        "Describe the process of using the UniProt Viewer for accessing and analyzing protein sequence and functional information.",
+        "How can machine learning models be applied to predict molecular properties, and what are some example use cases?",
+        "Discuss the importance of data visualization in bioinformatics and provide examples of effective visualization techniques.",
+        "What are the ethical considerations when working with large-scale biological datasets and AI in drug discovery?",
+        "Can you explain the role of SMILES strings in representing chemical structures and their advantages over other notations?",
+        "Explore the different databases available for protein structures and how to query them effectively.",
+        "What is the significance of the FASTA format in bioinformatics, and how is it typically used?"
+    ];
 
     // useEffect(() => {
     //     if (chatContainerRef.current && scrollBottomRef.current) {
@@ -589,10 +614,10 @@ const ChatInterface = () => {
                     else {
                         setChatStream((prev) => {
                             var newChatStream;
-                            try{
+                            try {
                                 newChatStream = prev + JSON.parse(event.data);
                             }
-                            catch(e) {
+                            catch (e) {
                                 newChatStream = prev + event.data;
                             }
                             updateComponentResponse(activeUid, newChatStream);
@@ -623,16 +648,13 @@ const ChatInterface = () => {
     const profileExpandContent = (
         <>
             <div
-            // variants={sideIconVariant}
-            // initial="initial"
-            // animate="animate"
             >
-                <div className={`profile-expand-content ${isDark ? "dark" : ""} ${profileExpanded ? "open" : ""}`}>
+                <div className={`profile-expand-content ${profileExpanded ? "open" : ""}`}>
                     <div className="profile-content">
                         <h1>Adjust Font Size</h1>
-                        <div className={`slider-container ${isDark ? "dark" : ""} ${profileExpanded ? "open" : ""}`}>
-                            <input type="range" min="12" max="24" value={fontSize} step="4" onChange={changeFontSize} className={`slider ${isDark ? "dark" : ""} ${profileExpanded ? "open" : ""}`} />
-                            <div className={`slider-labels ${isDark ? "dark" : ""} ${profileExpanded ? "open" : ""}`}>
+                        <div className={`slider-container ${profileExpanded ? "open" : ""}`}>
+                            <input type="range" min="12" max="24" value={fontSize} step="4" onChange={changeFontSize} className={`slider ${profileExpanded ? "open" : ""}`} />
+                            <div className={`slider-labels ${profileExpanded ? "open" : ""}`}>
                                 <span className={fontSize === "12" ? 'slider-active-label' : ''}>Small</span>
                                 <span className={fontSize === "16" ? 'slider-active-label' : ''}>Medium</span>
                                 <span className={fontSize === "20" ? 'slider-active-label' : ''}>Large</span>
@@ -657,18 +679,16 @@ const ChatInterface = () => {
     const configContainer = (
         <>
             <div
-            // variants={sideIconVariant}
-            // initial="initial"
-            // animate="animate"
             >
-                <div className={`config-container ${isDark ? "dark" : ""}`}>
+                <div className={`config-container`}>
                     {/* <h1>Choose Language</h1>
                 <CustomDropdown
                     options={INPUT_OPTIONS_TYPES}
                     configState={modelConfig}
                     configNames={["input_lang", "output_lang"]}
                     setConfig={setModelConfig}
-                    isDark={isDark} /> */}
+                    // isDark={isDark} REMOVED
+                /> */}
                     {/* <h1>Choose Language</h1>
             <CustomDropdown
                 options={INPUT_OPTIONS_TYPES}
@@ -683,11 +703,11 @@ const ChatInterface = () => {
                             configState={modelConfig}
                             configNames={["model_name", "model_code"]}
                             setConfig={setModelConfig}
-                            isDark={isDark}
+                        // isDark={isDark} REMOVED
                         />
                     </div>
                     <br />
-                    <button className={`config-save-button ${isDark ? "dark" : ""}`}
+                    <button className={`config-save-button`}
                         onClick={updateConfig}>SAVE</button>
                 </div>
             </div>
@@ -707,10 +727,10 @@ const ChatInterface = () => {
                         <div className="query-container">
                             {/* <div className={`query-space ${isPanelOpen ? "close" : ""}`}>
                         </div> */}
-                            <div className={`chat-query ${isContentLoading ? "loading" : ""} ${isDark ? "dark" : ""}`}>
+                            <div className={`chat-query ${isContentLoading ? "loading" : ""}`}>
                                 {/* upper buttons */}
 
-                                <div className={`btn-container ${isContentLoading ? "loading" : ""} ${isDark ? "dark" : ""}`}>
+                                <div className={`btn-container ${isContentLoading ? "loading" : ""}`}>
                                     <button className="del-btn"
                                         // onMouseEnter={(e) => { handleShowTag(e, "Delete Query and Response") }}
                                         // onMouseLeave={handleHideTag}
@@ -741,32 +761,32 @@ const ChatInterface = () => {
                                     <img src="/images/valency_logo_light_600x600.png"
                                         alt="logo"
                                         className={`ai-profile-image ${generationState === "init" || generationState === "generating"
-                                            ? "loading" : ""} ${isDark ? "dark" : ""}`}
+                                            ? "loading" : ""}`}
                                     />
                                     :
                                     <img src="/images/valency_logo_light_600x600.png"
                                         alt="logo"
-                                        className={`ai-profile-image ${isDark ? "dark" : ""}`}
+                                        className={`ai-profile-image`}
 
                                     />
                                 }
                             </div>
                             <div className="indiv-response-div">
                                 {index === (components.length - 1) ?
-                                    <div className={`chat-response ${generationState === "init" ? "loading" : ""} ${isDark ? "dark" : ""}`}>
+                                    <div className={`chat-response ${generationState === "init" ? "loading" : ""}`}>
                                         <p style={{ fontSize: `${fontSize}px` }}>
                                             {/* <Markdown> */}
-                                                <CustomMarkdownRenderer content={item.content[0].response.res_content} />
-                                                {/* {item.content[0].response.res_content} */}
+                                            <CustomMarkdownRenderer content={item.content[0].response.res_content} />
+                                            {/* {item.content[0].response.res_content} */}
                                             {/* </Markdown> */}
                                         </p>
                                     </div>
                                     :
-                                    <div className={`chat-response ${isDark ? "dark" : ""}`}>
+                                    <div className={`chat-response`}>
                                         <p style={{ fontSize: `${fontSize}px` }}>
                                             {/* <Markdown> */}
-                                                {/* {item.content[0].response.res_content} */}
-                                                <CustomMarkdownRenderer content={item.content[0].response.res_content} />
+                                            {/* {item.content[0].response.res_content} */}
+                                            <CustomMarkdownRenderer content={item.content[0].response.res_content} />
                                             {/* </Markdown> */}
                                         </p>
                                     </div>
@@ -779,7 +799,7 @@ const ChatInterface = () => {
                                     // initial="initial"
                                     // animate="animate"
                                     >
-                                        <div className={`res-btn-container ${isContentLoading ? "loading" : ""} ${isDark ? "dark" : ""}`}>
+                                        <div className={`res-btn-container ${isContentLoading ? "loading" : ""}`}>
                                             <button className="copy-btn" onClick={() => { handleClipboard(index) }}
                                             // onMouseEnter={(e) => { handleShowTag(e, "Copy Response") }}
                                             // onMouseLeave={handleHideTag}
@@ -834,43 +854,70 @@ const ChatInterface = () => {
         <>
             {/* <GlassyContainer> */}
             <div className="inter-main-container">
-                <div className={`inter-inner-container ${isPanelOpen ? "panel-open" : ""} ${profileExpanded ? "profile-open" : ""} ${isDark ? "dark" : ""}`}
+                <div className={`inter-inner-container ${isPanelOpen ? "panel-open" : ""} ${profileExpanded ? "profile-open" : ""}`}
                     style={{ fontSize: `${fontSize}px` }}
                 >
-
                     <div
                         ref={chatContainerRef}
-                        className={`chat-container ${isPanelOpen ? "panel-open" : ""} ${isDark ? "dark" : ""}`} id="blur-div">
-                        {repeatedChatElements}
+                        className={`chat-container`} id="blur-div">
+                        {components.length === 0 ? (
+                            <motion.div className="suggestion-queries-container"
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.5 }}
+                            >
+                                {username && (
+                                    <motion.div className="welcome-message"
+                                        initial={{ opacity: 0, y: -20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.5, delay: 0.2 }}
+                                    >
+                                        Welcome <span className="username-gradient">{username}</span> to Valency!
+                                    </motion.div>
+                                )}
+                                <motion.div className="suggestion-queries-list-wrapper"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    transition={{ duration: 0.5, delay: 0.4 }}
+                                >
+                                    <div className="suggestion-queries-list">
+                                        {suggestionQueries.map((suggestion, index) => (
+                                            <button
+                                                key={index}
+                                                className="suggestion-query-button"
+                                                onClick={() => {
+                                                    setQuery(suggestion);
+                                                    // Optionally, you can also immediately send the query
+                                                    // generateResponse();
+                                                }}
+                                            >
+                                                {suggestion}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        ) : (
+                            repeatedChatElements
+                        )}
+                        {/* scroll to bottom button */}
                         {/* <div ref={bottomRef} id="bottomRef"></div> */}
                     </div>
-                    <div
-                    // variants={sideIconVariant}
-                    // initial="initial"
-                    // animate="animate"
-                    >
-                        <div className="bottom-container"
 
-
-                        >
-                            <div className="query-gen-container">
-                                <div className={`query-text-container ${isContentLoading ? "loading" : ""} ${isDark ? 'dark' : ""}`}>
-                                    <textarea placeholder="Enter your query here"
-                                        style={{ fontSize: fontSize }}
-                                        disabled={isRecording || generationState === "generating"}
-                                        value={query}
-                                        onChange={(e) => setQuery(e.target.value)}
-                                        className="query-text-object"
-                                        onKeyDown={handleKeyDown}
-                                    />
-                                </div>
-                                <div className={`query-button-container ${isContentLoading ? "loading" : ""} ${isDark ? 'dark' : ""}`}>
-                                    <button onClick={() => generateResponse()} disabled={isRecording && generationState === "generating"}>
-                                        {/* <img src="/icon_second/send-filled.svg" alt="logo"
-                                                onMouseEnter={(e) => { handleShowTag(e, "Generate Resonse") }}
-                                                onMouseLeave={handleHideTag}
-                                            /> */}
-                                        <IoSend className="chat-query-btn" />
+                    <div className="bottom-container" style={{marginBottom: `${components.length === 0 ? "10vh" : "5vh"}`}}>
+                        <div className="query-gen-container">
+                            <div className={`query-text-container ${isContentLoading ? "loading" : ""}`}>
+                                <textarea placeholder="Enter your query here"
+                                    style={{ fontSize: `${fontSize}px` }}
+                                    disabled={isRecording || generationState === "generating"}
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    className="query-text-object"
+                                    onKeyDown={handleKeyDown}
+                                />
+                                <div className={`query-button-container ${isContentLoading ? "loading" : ""}`}>
+                                    <button className="chat-query-btn" onClick={() => generateResponse()} disabled={isRecording && generationState === "generating"}>
+                                        <IoSend className="" />
                                     </button>
                                 </div>
                             </div>
@@ -880,7 +927,7 @@ const ChatInterface = () => {
 
                 {/* <div
                     ref={scrollBottomRef}
-                    className={`bottom-scroller ${isDark ? "dark" : ""}`}
+                    className={`bottom-scroller ${isDark ? "dark" : ""}`} // KEPT isDark here if it's a separate component not affected by html class
                     onClick={scrollToBottom}
                 >
                     <img src="/icons/generate_dark.svg" alt="logo" />
@@ -888,7 +935,7 @@ const ChatInterface = () => {
 
                 {
                     showTag ?
-                        <div className={`info-tag ${isDark ? "dark " : ""}`}
+                        <div className={`info-tag`}
                             style={{ transform: `translate(${tagPosition.x}px, ${tagPosition.y}px)` }}
                         >
                             <h1>{tagText}</h1>
