@@ -1,13 +1,42 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./common.css"
 import CustomMarkdownRenderer from "../CustomMarkdown";
 import ReactMarkdown from "react-markdown";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import remarkGfm from "remark-gfm";
-import { FiTool, FiUser, FiAlertCircle } from "react-icons/fi"; // Import FiAlertCircle
-import { BsCheck2All } from 'react-icons/bs'; // Import BsCheck2All
+import { FiTool, FiUser, FiAlertCircle, FiChevronDown, FiChevronUp } from "react-icons/fi"; // Added chevron icons
+import { BsCheck2All } from 'react-icons/bs';
+import { getToolResponse } from "../../../services/api/agentService"; // Import the getToolResponse function
 
 const FunctionResponse = ({ data }) => {
+    const [expanded, setExpanded] = useState(false);
+    const [toolResponse, setToolResponse] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    // Fetch the tool response when the component mounts or when expanded is toggled to true
+    useEffect(() => {
+        console.log("function call data >>", data)
+        if (expanded && !toolResponse && data.function_response_id) {
+            setLoading(true);
+            setError(null);
+
+            getToolResponse(data.function_response_id)
+                .then(response => {
+                    setToolResponse(response);
+                })
+                .catch(err => {
+                    console.error("Error fetching tool response:", err);
+                    setError("Failed to load the complete tool response");
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
+    }, [expanded, data.id, toolResponse]);
+
+    const toggleExpand = () => setExpanded(!expanded);
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -15,13 +44,69 @@ const FunctionResponse = ({ data }) => {
             transition={{ duration: 0.5 }}
             className="func-tag-container"
         >
-            <div className="func-tag-holder">
-                <div className="func-tag-inner-container">
-                    <p>{data.name}</p>
+            <div className="func-tag-holder" style={{ flexDirection: "column", width: "100%" }}>
+                <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+                    <div className="func-tag-inner-container">
+                        <p>{data.name}</p>
+                    </div>
+                    <div className="func-tag-inner-container">
+                        <p>ID: {data?.function_response_id}</p>
+                    </div>
+                    <div className="tool-icon-container">
+                        <FiTool className="tool-icon" />
+                    </div>
+                    <motion.div 
+                        className="tool-icon-container" 
+                        onClick={toggleExpand} 
+                        style={{ cursor: "pointer", marginLeft: "auto" }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        {expanded ? <FiChevronUp className="tool-icon" /> : <FiChevronDown className="tool-icon" />}
+                    </motion.div>
                 </div>
-                <div className="tool-icon-container">
-                    <FiTool className="tool-icon" />
-                </div>
+
+                <AnimatePresence>
+                {expanded && (
+                    <motion.div 
+                        key="content"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ 
+                            duration: 0.3,
+                            ease: "easeInOut"
+                        }}
+                        style={{ marginTop: "10px", width: "100%", overflow: "hidden" }}
+                    >
+                        {loading && (
+                            <div className="func-tag-inner-container" style={{ width: "100%" }}>
+                                <p>Loading tool response...</p>
+                            </div>
+                        )}
+
+                        {error && (
+                            <div className="func-tag-inner-container" style={{ width: "100%", color: "red" }}>
+                                <p>{error}</p>
+                            </div>
+                        )}
+
+                        {toolResponse && (
+                            <div className="func-tag-inner-container" style={{ width: "100%" }}>
+                                <pre style={{
+                                    fontFamily: 'monospace',
+                                    padding: '1em',
+                                    borderRadius: '3px',
+                                    overflowX: 'auto',
+                                    margin: 0,
+                                }}>
+                                    {JSON.stringify(toolResponse, null, 2)}
+                                </pre>
+                            </div>
+                        )}
+                    </motion.div>
+                )}
+                </AnimatePresence>
             </div>
         </motion.div>
     )
@@ -40,6 +125,7 @@ const FunctionCall = ({ data }) => {
                 <div className="func-tag-inner-container">
                     <p>{data.name}</p>
                 </div>
+
                 <div className="tool-icon-container">
                     <FiTool className="tool-icon" />
                 </div>
@@ -154,7 +240,7 @@ const ErrorDisplay = ({ message, timestamp }) => {
         minute: '2-digit',
         timeZoneName: 'short'
     };
-    
+
     let timeString = '';
     if (timestamp) {
         try {
@@ -167,7 +253,7 @@ const ErrorDisplay = ({ message, timestamp }) => {
     }
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}

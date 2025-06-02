@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Depends, Request, HTTPException, Query
-from fastapi.responses import StreamingResponse # Added for SSE
+from fastapi.responses import StreamingResponse, JSONResponse # Added for SSE and JSON responses
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import json # Added for SSE data formatting
@@ -10,11 +10,12 @@ from google.adk.runners import Runner
 from auth_utils import verify_token
 from master_agent.agent import root_agent as master_agent 
 from run_utils import call_agent_async 
+from custom_utils.mongodb_handler import MongoDBHandler  # Import MongoDB handler
 
 import uvicorn
 import os
 from dotenv import load_dotenv
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 AGENT_APP_NAME = "Master Agent"
 
@@ -27,6 +28,14 @@ async def lifespan(app: FastAPI):
     db_url = os.getenv("DATABASE_URL", "sqlite:///./agent_api_data.db")
     app.state.session_service = DatabaseSessionService(db_url=db_url)
     print(f"Database session service initialized with URL: {db_url}")
+    
+    # Initialize MongoDB connection
+    try:
+        app.state.mongodb_handler = MongoDBHandler()
+        print("MongoDB handler initialized")
+    except Exception as e:
+        print(f"Error initializing MongoDB handler: {str(e)}")
+    
     yield
     # Clean up resources or teardown agents here
     print("Shutting down agent services...")
@@ -94,7 +103,7 @@ async def _event_generator_for_new_session(
         "message": f"New session created for user '{user_name}' (ID: {user_id}). Processing initial query..."
     }
     # json.dumps for session_created_data will be a single line by default.
-    yield f"event: session_created\\ndata: {json.dumps(session_created_data)}\\n\\n"
+    yield f"event: session_created<|split|>data: {json.dumps(session_created_data)}<|sep|>"
 
     runner = Runner(
         agent=agent_module,
@@ -115,6 +124,16 @@ async def _event_generator_for_new_session(
         # Assuming content_part is now a dictionary from run_utils.py
         if isinstance(content_part, dict):
             try:
+                # # Check if this is a tool response with a tool_id
+                # if "content" in content_part and isinstance(content_part["content"], str) and "tool_id:" in content_part["content"]:
+                #     # Extract tool_id if present
+                #     import re
+                #     tool_id_match = re.search(r'tool_id: ([a-zA-Z0-9-]+)', content_part["content"])
+                #     if tool_id_match:
+                #         tool_id = tool_id_match.group(1)
+                #         # Add tool_id to the response payload
+                #         content_part["tool_id"] = tool_id
+                
                 # json.dumps without indent produces a single line
                 json_payload = json.dumps(content_part) 
                 print("Sent Data >>", f"event: agent_message<|split|>data: {json_payload}<|sep|>")
@@ -233,6 +252,16 @@ async def _event_generator_for_session_query(
         
         if isinstance(content_part, dict):
             try:
+                # Check if this is a tool response with a tool_id
+                if "content" in content_part and isinstance(content_part["content"], str) and "tool_id:" in content_part["content"]:
+                    # Extract tool_id if present
+                    import re
+                    tool_id_match = re.search(r'tool_id: ([a-zA-Z0-9-]+)', content_part["content"])
+                    if tool_id_match:
+                        tool_id = tool_id_match.group(1)
+                        # Add tool_id to the response payload
+                        content_part["tool_id"] = tool_id
+                
                 json_payload = json.dumps(content_part)
                 yield f"event: agent_message\\\\ndata: {json_payload}\\\\n\\\\n"
             except TypeError as e:
@@ -263,6 +292,95 @@ async def query_session(
         ),
         media_type="text/event-stream"
     )
+
+
+# Define a Pydantic model for tool response request
+class ToolResponseRequest(BaseModel):
+    tool_id: str = Field(..., description="Unique identifier for the tool response")
+
+
+@app.get("/tool-responses/{tool_id}")
+async def get_tool_response(
+    tool_id: str,
+    request: Request,
+    current_user: dict = Depends(verify_token)
+):
+    """
+    Retrieve a complete tool response by its ID.
+    
+    This endpoint allows retrieving the full, non-truncated tool response that was
+    stored in MongoDB during tool execution.
+    """
+    mongodb_handler = request.app.state.mongodb_handler
+    if not mongodb_handler:
+        raise HTTPException(status_code=500, detail="MongoDB handler not available")
+    
+    # Retrieve the tool response from MongoDB
+    tool_response = mongodb_handler.get_tool_response(tool_id)
+    
+    if not tool_response:
+        raise HTTPException(status_code=404, detail=f"Tool response with ID {tool_id} not found")
+    
+    # Check if the user is authorized to access this tool response
+    # response_user_id = tool_response.get("user_id", "unknown")
+    # current_user_id = current_user.get("id")
+    
+    # if str(response_user_id) != str(current_user_id):
+    #     raise HTTPException(status_code=403, detail="You are not authorized to access this tool response")
+    
+    # Return the complete tool response
+    return JSONResponse(content={
+        "tool_id": tool_id,
+        "tool_name": tool_response.get("tool_name"),
+        "session_id": tool_response.get("session_id"),
+        "created_at": tool_response.get("created_at").isoformat() if tool_response.get("created_at") else None,
+        "response_data": tool_response.get("response_data")
+    })
+
+
+@app.get("/sessions/{session_id}/tool-responses")
+async def get_session_tool_responses(
+    session_id: str,
+    request: Request,
+    current_user: dict = Depends(verify_token)
+):
+    """
+    Retrieve all tool responses for a specific session.
+    
+    This endpoint allows retrieving all tool responses that were stored in MongoDB
+    for a specific session.
+    """
+    # Verify the session exists and belongs to the user
+    session_service: DatabaseSessionService = request.app.state.session_service
+    user_id = current_user.get("id")
+    
+    try:
+        await session_service.get_session(
+            session_id=session_id,
+            app_name=AGENT_APP_NAME,
+            user_id=str(user_id)
+        )
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Session {session_id} not found or does not belong to the current user")
+    
+    # Retrieve tool responses from MongoDB
+    mongodb_handler = request.app.state.mongodb_handler
+    if not mongodb_handler:
+        raise HTTPException(status_code=500, detail="MongoDB handler not available")
+    
+    tool_responses = mongodb_handler.get_tool_responses_by_session(session_id)
+    
+    # Format the responses for JSON serialization
+    formatted_responses = []
+    for response in tool_responses:
+        formatted_responses.append({
+            "tool_id": response.get("tool_id"),
+            "tool_name": response.get("tool_name"),
+            "created_at": response.get("created_at").isoformat() if response.get("created_at") else None,
+            "response_data": response.get("response_data")
+        })
+    
+    return JSONResponse(content={"session_id": session_id, "tool_responses": formatted_responses})
 
 
 if __name__ == "__main__":

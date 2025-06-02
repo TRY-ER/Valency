@@ -384,6 +384,69 @@ export const sendQueryToSession = async (sessionId, queryText, { onAgentMessage,
   }
 };
 
+/**
+ * Retrieves a complete tool response by its ID.
+ * @param {string} toolId - The unique identifier of the tool response to retrieve.
+ * @returns {Promise<object>} A promise that resolves to the complete tool response data.
+ */
+export const getToolResponse = async (toolId) => {
+  if (!toolId) {
+    console.error('getToolResponse: toolId is required');
+    return Promise.reject(new Error('Tool ID is required'));
+  }
+
+  const token = getAuthToken();
+  if (!token) {
+    console.error('No token found for getToolResponse');
+    return Promise.reject(new Error('Authentication token not found'));
+  }
+  
+  try {
+    // Using fetch instead of axios to match the pattern in createUserSession
+    const response = await fetch(`${AGENT_BASE_URL}/tool-responses/${toolId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Error fetching tool response:', response.status, errorData);
+      throw new Error(`HTTP error ${response.status}: ${errorData}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error retrieving tool response:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Retrieves all tool responses for a specific session.
+ * @param {string} sessionId - The unique identifier of the session.
+ * @returns {Promise<object>} A promise that resolves to an object containing all tool responses for the session.
+ */
+export const getSessionToolResponses = async (sessionId) => {
+  if (!sessionId) {
+    console.error('getSessionToolResponses: sessionId is required');
+    return Promise.reject(new Error('Session ID is required'));
+  }
+  
+  try {
+    const response = await agentApiClient.get(`/sessions/${sessionId}/tool-responses`);
+    return response.data;
+  } catch (error) {
+    console.error('Error retrieving session tool responses:', error.response ? error.response.data : error.message);
+    if (error.response && error.response.status === 404) {
+      console.error(`Session with ID ${sessionId} not found or does not belong to the current user`);
+    }
+    throw error;
+  }
+};
+
 // Example of how you might use these functions in a component:
 /*
 import React, { useEffect, useState } from 'react';

@@ -1,6 +1,7 @@
 from google.genai import types # Added for types.FunctionResponse
 # from google.adk import CallToolResult
 import json
+from mcp.types import CallToolResult
 
 # ANSI color codes for terminal output
 class Colors:
@@ -63,14 +64,13 @@ async def process_agent_response(event):
     """Process agent response events and yield structured Python dictionaries or specific strings."""
     # Log basic event info
     print(f"Event ID: {event.id}, Author: {event.author}")
+    function_response_id = None
 
     if event.content and event.content.parts:
         for part in event.content.parts:
             print('part >>', part)
             print('type of part >>', type(part))
             if hasattr(part, "function_call") and part.function_call:
-                # Print tool response information
-                # print(f"  Tool Response: {part.tool_response.output}")
                 function_data = {
                     "name": part.function_call.name,
                     "id": part.function_call.id,
@@ -82,12 +82,13 @@ async def process_agent_response(event):
             
             elif hasattr(part, "function_response") and part.function_response:
                 # Print tool response information
-                # print(f"  Tool Response: {part.tool_response.output}")
                 tool_response = {} 
                 if 'result' in part.function_response.response:
                     result = part.function_response.response['result']
                     # Ensure result is serializable; ADK's FunctionResponse might need conversion
-                    if isinstance(result, types.FunctionResponse): # Assuming types.FunctionResponse is from google.genai
+                    print("result >>", result)
+                    print("result type >>", type(result))
+                    if isinstance(result, CallToolResult): # Assuming types.FunctionResponse is from google.genai
                         if result.isError:
                             tool_response = {
                                 "type": "error",
@@ -105,17 +106,19 @@ async def process_agent_response(event):
                                 "type": "success",
                                 "text_content": tool_contents
                             }
+                        if result.meta and 'id' in result.meta:
+                            function_response_id = result.meta['id']
                     else: # Handle cases where result is not a FunctionResponse object (e.g., already a dict or string)
                         tool_response = {
                             "type": "unknown", # Or try to infer type
                             "text_content": str(result) # Fallback to string representation
                         }
 
-
                 response_data = {
                     "name": part.function_response.name,
                     "id": part.function_response.id,
-                    "response": tool_response 
+                    "response": tool_response,
+                    "function_response_id": function_response_id 
                 }
                 data = { "type": "function_response", "data": response_data}
                 yield data

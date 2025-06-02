@@ -21,4 +21,3 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Security(secu
             raise HTTPException(status_code=e.response.status_code, detail="Could not validate credentials with auth service")
         except httpx.RequestError:
             raise HTTPException(status_code=503, detail="Auth service is unavailable")
-
