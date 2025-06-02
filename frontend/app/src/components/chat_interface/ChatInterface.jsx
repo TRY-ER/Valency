@@ -8,6 +8,7 @@ import { removeHtmlTags, responseParser } from "../../components/parsers/Basic";
 import { motion } from "framer-motion";
 import "./ChatInterface.css";
 import { IoSend } from "react-icons/io5";
+import { FaTrash, FaUserCircle } from "react-icons/fa"; // Added import
 import { chat_endpoint } from "../../endpoints/endpoints";
 import { baseURL } from "../../endpoints/base";
 import { call_endpoint_async, call_eventsource } from "../../endpoints/caller";
@@ -19,25 +20,32 @@ import CustomDropdown from "../UI/CustomDropdown/CustomDropdown";
 import GlassyContainer from "../glassy_container/gc";
 import Markdown from "react-markdown";
 import CustomMarkdownRenderer from "../UI/CustomMarkdown";
+import FlexRenderer from "../UI/FlexRenderer"; // Added FlexRenderer import
 import AuthService from "../../services/api/AuthService.ts"; // Added AuthService import
+import {
+    pingAgent,
+    testAgentEndpoint,
+    createUserSession,
+    listUserSessions,
+    getSessionDetails, // Added
+    sendQueryToSession // Added
+} from '../../services/api/agentService';
 
 const ChatInterface = () => {
-    const [isPanelOpen, setIsPanelOpen] = useState(false);
-    const [profileExpanded, setProfileExpanded] = useState(false);
-    const [chatStream, setChatStream] = useState("");
-    const [chatSummary, setChatSummary] = useState("");
-    const [isStreaming, setIsStreaming] = useState(false);
-    const [isCompleted, setIsCompleted] = useState(false);
+    const [chatStream, setChatStream] = useState(''); // This state might become redundant
+    const [messages, setMessages] = useState([]);
+    const [currentSessionId, setCurrentSessionId] = useState(null);
+    const [sessions, setSessions] = useState([]);
+    const [isLoadingSession, setIsLoadingSession] = useState(false);
     const [generationState, setGenerationState] = useState("default"); // init, complete, default, generating (four value can be given)
     const [isContentLoading, setIsContentLoading] = useState(true);
     const [query, setQuery] = useState("");
     const navigate = useNavigate();
     const bottomRef = useRef(null);
-    const [isRecording, setIsRecording] = useState(false);
-    const [activeSpeaker, setActiveSpeaker] = useState(null);
-    const [sideContent, setSideContent] = useState(null);
-    const [serverStreamId, setServerStreamId] = useState(null);
+    const [serverStreamId, setServerStreamId] = useState(null); // This state might become redundant
     const [isLoaded, setIsLoaed] = useState(false);
+    const [isStreaming, setIsStreaming] = useState(false); // This state might become redundant
+    const [isCompleted, setIsCompleted] = useState(false); // This state might become redundant
 
     //ui changes
     // const [isDark, setIsDark] = useState(false); // REMOVED
@@ -54,13 +62,8 @@ const ChatInterface = () => {
     // input config for model
     const [modelConfig, setModelConfig] = useState({
         "model_name": "Gemini 2 Flash",
-        "model_code": "gemini-2.0-flash-exp",
+        "model_code": "gemini-2.5-flash-exp",
     })
-
-    // change font size 
-    const changeFontSize = (e) => {
-        setFontSize(e.target.value);
-    }
 
     useEffect(() => {
         if (isLoaded) {
@@ -74,38 +77,6 @@ const ChatInterface = () => {
             setUsername(currentUser.username);
         }
     }, [isLoaded]); // Re-run if isLoaded changes, ensuring user data might be available after initial load logic
-
-    const sideIconVariant = {
-        initial: {
-            opacity: 0,
-            y: "2vh", // Icon starts outside the viewport at the bottom
-        },
-        animate: {
-            opacity: 1,
-            y: 0, // Icon slides up to its final position
-            transition: {
-                duration: 0.5,
-                ease: "easeOut",
-            },
-        },
-    };
-
-    const sidePanelVariant = {
-        collapsed: {
-            width: "0%",
-        },
-        expanded: {
-            width: "100%",
-            transition: {
-                duration: 0.5,
-                ease: "easeOut",
-            },
-        },
-    };
-
-    // useEffect(() => {
-    //     console.log("isDark", isDark)
-    // }, [isDark])
 
     const handleShowTag = (e, infoText, horizontalOffset = 5) => {
         setShowTag(true);
@@ -122,10 +93,6 @@ const ChatInterface = () => {
     //states to place the scroll to bottom button
     const chatContainerRef = useRef(null);
     const scrollBottomRef = useRef(null);
-
-    //advance setting show hide
-    const [showAdvanceSetting, setShowAdvanceSetting] = useState(false);
-
 
     // component states 
     const [components, setComponents] = useState([]);
@@ -176,74 +143,6 @@ const ChatInterface = () => {
         }
     }, [bottomScroller, components])
 
-    const updateEnResponse = (uid, newResponse) => {
-        setComponents((prev) => {
-            const new_value = prev.map((component) =>
-                component.uid === uid ?
-                    {
-                        ...component,
-                        content: [{
-                            ...component.content[0],
-                            response: {
-                                ...component.content[0]["response"],
-                                en_response: newResponse
-                            }
-                        }]
-                    } : component
-            )
-            return new_value;
-        }
-        );
-    }
-
-    const updateEnQuery = (uid, newResponse) => {
-        setComponents((prev) => {
-            const new_value = prev.map((component) =>
-                component.uid === uid ?
-                    {
-                        ...component,
-                        content: [{
-                            ...component.content[0], en_query: newResponse
-                        }]
-                    } : component
-            )
-            return new_value;
-        }
-        );
-    }
-
-    const updateConfig = async () => {
-        localStorage.setItem("modelConfig", JSON.stringify(modelConfig));
-    }
-
-    const handlePanelToggle = () => {
-        setIsPanelOpen(!isPanelOpen);
-        setShowTag(false);
-    }
-
-    useEffect(() => {
-        setQuery("");
-    }, [modelConfig])
-
-    //show config content
-    const showConfig = () => {
-        setIsPanelOpen(true);
-        setSideContent("show_config");
-    }
-
-    // show profile content
-    const showProfile = () => {
-        setIsPanelOpen(true);
-        setSideContent("show_profile");
-    }
-
-    const changeQuery = (text_value) => {
-        setQuery(query => {
-            return query + " " + text_value
-        }
-        )
-    }
-
     const handleKeyDown = (e) => {
         // setBottomScroller(true);
         if (e.key === "Enter" && !e.ctrlKey) {
@@ -269,116 +168,6 @@ const ChatInterface = () => {
         }
     }
 
-
-    const handleLike = async (index) => {
-        if (components[index].content[0].response.like === 0 || components[index].content[0].response.like === 1) {
-            // await axios.post(API_BASE + "/chat/handle_like", {
-            //     "user_id": auth?.userName,
-            //     "c_index": index,
-            //     "like_value": 2
-            // }, privateConfig).then((res) => {
-            //     console.log("like_res", res)
-            setComponents((prev) => {
-                const new_value = prev.map((component, id) =>
-                    id === index ?
-                        {
-                            ...component,
-                            content: [{
-                                ...component.content[0], response: {
-                                    ...component.content[0].response,
-                                    like: 2,
-                                }
-                            }]
-                        } : component
-                )
-                return new_value;
-            });
-            // }).catch(err => {
-            //     console.log("error in like data transfer", err)
-            // })
-        }
-        else if (components[index].content[0].response.like === 2) {
-            // await axios.post(API_BASE + "/chat/handle_like", {
-            //     "user_id": auth?.userName,
-            //     "c_index": index,
-            //     "like_value": 0
-            // }, privateConfig).then((res) => {
-            //     console.log("like_res", res)
-            setComponents((prev) => {
-                const new_value = prev.map((component, id) =>
-                    id === index ?
-                        {
-                            ...component,
-                            content: [{
-                                ...component.content[0], response: {
-                                    ...component.content[0].response,
-                                }
-                            }]
-                        } : component
-                )
-                return new_value;
-            });
-            // }).catch(err => {
-            //     console.log("error in like data transfer", err)
-            // })
-
-        }
-    }
-
-
-    const handleDislike = async (index) => {
-        if (components[index].content[0].response.like === 0 || components[index].content[0].response.like === 2) {
-            // await axios.post(API_BASE + "/chat/handle_like", {
-            //     "user_id": auth?.userName,
-            //     "c_index": index,
-            //     "like_value": 1
-            // }, privateConfig).then((res) => {
-            setComponents((prev) => {
-                const new_value = prev.map((component, id) =>
-                    id === index ?
-                        {
-                            ...component,
-                            content: [{
-                                ...component.content[0], response: {
-                                    ...component.content[0].response,
-                                    like: 1,
-                                }
-                            }]
-                        } : component
-                )
-                return new_value;
-            });
-            // }).catch(err => {
-            //     console.log("error in dislike data transfer", err)
-            // });
-        }
-
-        else if (components[index].content[0].response.like === 1) {
-            // await axios.post(API_BASE + "/chat/handle_like", {
-            //     "user_id": auth?.userName,
-            //     "c_index": index,
-            //     "like_value": 0
-            // }, privateConfig).then((res) => {
-            setComponents((prev) => {
-                const new_value = prev.map((component, id) =>
-                    id === index ?
-                        {
-                            ...component,
-                            content: [{
-                                ...component.content[0], response: {
-                                    ...component.content[0].response,
-                                    like: 0,
-                                }
-                            }]
-                        } : component
-                )
-                return new_value;
-            });
-            // }).catch(err => {
-            //     console.log("error in dislike data transfer", err)
-            // });
-        }
-    }
 
     const loadThread = () => {
         // console.log("load thread is triggered")
@@ -425,25 +214,20 @@ const ChatInterface = () => {
 
     const updateComponentResponse = (uid, newResponse) => {
         setComponents((prev) => {
-            // console.log('new chat stream >>', newResponse)
-            // console.log("incoming uid >>", uid)
             const new_value = prev.map((component) =>
                 component.uid === uid ?
                     {
                         ...component,
                         content: [{
-                            ...component.content[0], response: {
+                            ...component.content[0], response: [
                                 ...component.content[0].response,
-                                res_content: newResponse,
-                                like: 0,
-                            }
+                                newResponse
+                            ]
                         }]
                     } : component
-            )
-            // console.log('new value >>', newResponse)
+            );
             return new_value;
-        }
-        );
+        });
     }
 
     const delHandler = (itemIndex) => {
@@ -468,51 +252,85 @@ const ChatInterface = () => {
     }
 
     const generateResponse = async () => {
-        var requestable = "";
-        requestable = query;
-        if (requestable.length == 0) {
+        const currentQuery = query;
+        if (currentQuery.trim().length === 0) {
             alert("Enter some query first to generate response");
+            return;
         }
-        else {
-            setChatStream("");
-            let cUid = uuidv4();
-            let new_comp = {
-                "content": [{
-                    "query": requestable,
-                    "response": {
-                        "res_content": "",
-                        "like": 0,
+
+        setGenerationState("generating");
+        setQuery(""); // Clear input field
+
+        const cUid = uuidv4();
+        const new_comp = {
+            "content": [{
+                "query": currentQuery,
+                "response": []
+            }],
+            "uid": cUid,
+        };
+
+        setComponents(prevComponents => [...prevComponents, new_comp]);
+        setActiveUid(cUid);
+        setBottomScroller(true); // Scroll after adding user query
+
+        try {
+            // Assuming createUserSession is imported and available
+            await createUserSession(
+                { query: currentQuery },
+                {
+                    onSessionCreated: (data) => {
+                        console.log('Session Created:', data);
+                        if (data && data.session_id) {
+                            setCurrentSessionId(data.session_id);
+                        }
                     },
-                }],
-                "uid": cUid,
-            }
-            setComponents([...components, new_comp])
-            setActiveUid(cUid);
-        }
-    }
-
-
-    useEffect(() => {
-        // console.log("active", activeUid);
-        // console.log("updated_component", components)
-
-        const init_response = async () => {
-            const response = await call_endpoint_async(chat_endpoint.init, {
-                query: query,
-                config: {
-                    "model_name": modelConfig["model_code"]
+                    onAgentMessage: (agentMessageData) => {
+                        // Assuming agentMessageData is the string chunk
+                        console.log('agent messages recieved >>', agentMessageData)
+                        updateComponentResponse(cUid, agentMessageData);
+                        setBottomScroller(true); // Scroll as new content arrives
+                    },
+                    onStreamEnd: (streamEndData) => {
+                        console.log('Stream Ended:', streamEndData);
+                        setGenerationState("default");
+                        setActiveUid("");
+                        const now = new Date();
+                        updateComponentResponse(cUid, { type: "complete", data: now.toISOString() }); // Pass ISO string
+                        console.log('Stream completed at:', now);
+                        // Perform any final save or cleanup here if needed
+                        // localStorage.setItem("components", JSON.stringify(components)); // This will be handled by the existing useEffect for components
+                    },
+                    onProcessingError: (error) => {
+                        console.error('Session Processing Error:', error);
+                        const errorMessage = `Error: ${error.message || 'Processing failed'}`;
+                        updateComponentResponse(cUid, { type: "error", data: errorMessage, timestamp: new Date().toISOString() });
+                        setGenerationState("default");
+                        setActiveUid("");
+                    },
+                    onSetupError: (error) => {
+                        console.error('Session Setup Error:', error);
+                        const setupErrorMessage = `Setup Error: ${error.message || 'Setup failed'}`;
+                        updateComponentResponse(cUid, { type: "error", data: setupErrorMessage, timestamp: new Date().toISOString() });
+                        // Update the component with the setup error message
+                        // If accumulatedMessage is empty, just show the error. Otherwise, append.
+                        setGenerationState("default");
+                        setActiveUid("");
+                    }
                 }
-            })
-            if (response.data.status === "success") {
-                setServerStreamId(response.data.id);
-                setGenerationState("init");
-            }
+            );
+        } catch (error) {
+            console.error('Error calling createUserSession:', error);
+            const catchErrorMessage = `Failed to start session: ${error.message || 'Unknown error'}`;
+            updateComponentResponse(cUid, `**${catchErrorMessage}**`);
+            setGenerationState("default");
+            setActiveUid("");
         }
-        if (activeUid !== "") {
-            init_response();
-        }
-        scrollToBottom();
-    }, [activeUid])
+    };
+
+
+    // REMOVED: useEffect hook that called init_response based on activeUid
+    // REMOVED: init_response function
 
     useEffect(() => {
         console.log('modelConfig', modelConfig)
@@ -522,196 +340,15 @@ const ChatInterface = () => {
         if (generationState === 'default' && isLoaded) {
             localStorage.setItem("components", JSON.stringify(components));
         }
-    }, [components])
+    }, [components, isLoaded, generationState]);
 
+    // REMOVED: useEffect hook that called generateResponseStream
+    // REMOVED: generateResponseStream function
+
+    // This useEffect is for debugging and can be kept or removed
     useEffect(() => {
-        if (generationState === "init") {
-            if (serverStreamId) {
-                generateResponseStream(serverStreamId).then(() => {
-                    setGenerationState("complete");
-                }).catch(err => {
-                    console.log("error in generating streams", err)
-                })
-            }
-        }
-        else if (generationState === "complete") {
-            localStorage.setItem("components", JSON.stringify(components));
-            setGenerationState("default")
-            // const save_response = async () => {
-            //     var save_dict = {
-            //         "user_id": auth?.userName,
-            //         "component": {
-            //             "content": [{
-            //                 "query": components[components.length - 1]?.content[0].query,
-            //                 "audio_query": null,
-            //                 "en_query": components[components.length - 1]?.content[0].en_query,
-            //                 "response": components[components.length - 1]?.content[0].response
-            //             }],
-            //             "location": [20, 3, 25.3],
-            //             "uid": activeUid,
-            //             "config": modelConfig
-            //         },
-            //         "summary": chatSummary,
-            //         "component_length": components.length,
-            //         "uid": activeUid
-            //     }
-            //     await axios.post(`${API_BASE}/chat/save_response`, save_dict, privateConfig).then((res) => {
-            //         console.log("save response", res)
-            //         setGenerationState("default")
-            //     }, privateConfig).catch((err) => {
-            //         console.log("error >>", err);
-            //     })
-            // }
-            // save_response();
-        }
-        else if (generationState === "default") {
-            setActiveUid("");
-            setServerStreamId(null);
-        }
-    }
-        , [generationState])
-
-    // useEffect(() => {
-    // if (auth.userName && auth?.localAccessToken) {
-    //     setSideContent("show_profile");
-    //     console.log(auth.user);
-    //     console.log("auth is triggered")
-    //     if (auth?.localAccessToken) {
-    //         console.log("local access is triggered")
-    //         setPrivateConfig(() => {
-    //             console.log("access token", auth?.localAccessToken)
-    //             return {
-    //                 headers: {
-    //                     "Content-Type": "application/json",
-    //                     "Authorization": `Bearer ${auth?.localAccessToken}`,
-    //                 },
-    //             }
-    //         });
-    //     }
-    //     loadThread(auth?.userName, auth?.localAccessToken)
-    // }
-    // }, [auth])
-
-    const generateResponseStream = async (cUid) => {
-        // console.log("gen res is called");
-        return new Promise((resolve) => {
-            if (!isStreaming) {
-                const eventSource = call_eventsource(chat_endpoint.stream, cUid);
-                eventSource.onopen = () => {
-                    setIsStreaming(true);
-                    setIsCompleted(false);
-                    setQuery("");
-                    setGenerationState("generating")
-                }
-                eventSource.onmessage = async (event) => {
-                    // console.log("msg data >>", event.data);
-                    if (event.data === "<|end|>") {
-                        console.log("end token is received")
-                        setIsStreaming(false);
-                        eventSource.close();
-                        resolve();
-                    }
-                    else {
-                        setChatStream((prev) => {
-                            var newChatStream;
-                            try {
-                                newChatStream = prev + JSON.parse(event.data);
-                            }
-                            catch (e) {
-                                newChatStream = prev + event.data;
-                            }
-                            updateComponentResponse(activeUid, newChatStream);
-                            scrollToBottom();
-                            return newChatStream;
-                        });
-                    }
-                }
-
-                eventSource.onerror = () => {
-                    setIsStreaming(false);
-                    eventSource.close();
-                    resolve();
-                }
-                // setIsStreaming(true);
-            }
-            else {
-                setIsStreaming(false);
-                resolve();
-            }
-        })
-    }
-
-    useState(() => {
         console.log("generation state", generationState);
     }, [generationState])
-
-    const profileExpandContent = (
-        <>
-            <div
-            >
-                <div className={`profile-expand-content ${profileExpanded ? "open" : ""}`}>
-                    <div className="profile-content">
-                        <h1>Adjust Font Size</h1>
-                        <div className={`slider-container ${profileExpanded ? "open" : ""}`}>
-                            <input type="range" min="12" max="24" value={fontSize} step="4" onChange={changeFontSize} className={`slider ${profileExpanded ? "open" : ""}`} />
-                            <div className={`slider-labels ${profileExpanded ? "open" : ""}`}>
-                                <span className={fontSize === "12" ? 'slider-active-label' : ''}>Small</span>
-                                <span className={fontSize === "16" ? 'slider-active-label' : ''}>Medium</span>
-                                <span className={fontSize === "20" ? 'slider-active-label' : ''}>Large</span>
-                                <span className={fontSize === "24" ? 'slider-active-label' : ''}>Extra <br />Large</span>
-                            </div>
-                        </div>
-
-                        <br />
-                        <br />
-                        <p style={{ fontSize: `${fontSize}px` }}>This text's font size will adjust.</p>
-                        <br />
-                        <br />
-                        {/* <button onClick={logoutHandler}>Log Out</button> */}
-
-                    </div>
-                </div>
-            </div>
-        </>
-    )
-
-
-    const configContainer = (
-        <>
-            <div
-            >
-                <div className={`config-container`}>
-                    {/* <h1>Choose Language</h1>
-                <CustomDropdown
-                    options={INPUT_OPTIONS_TYPES}
-                    configState={modelConfig}
-                    configNames={["input_lang", "output_lang"]}
-                    setConfig={setModelConfig}
-                    // isDark={isDark} REMOVED
-                /> */}
-                    {/* <h1>Choose Language</h1>
-            <CustomDropdown
-                options={INPUT_OPTIONS_TYPES}
-                configState={modelConfig}
-                configName={"output_lang"}
-                setConfig={setModelConfig} /> */}
-                    <br />
-                    <div>
-                        <h1>Choose Model</h1>
-                        <CustomDropdown
-                            options={MODEL_OPTIONS_TYPES}
-                            configState={modelConfig}
-                            configNames={["model_name", "model_code"]}
-                            setConfig={setModelConfig}
-                        // isDark={isDark} REMOVED
-                        />
-                    </div>
-                    <br />
-                    <button className={`config-save-button`}
-                        onClick={updateConfig}>SAVE</button>
-                </div>
-            </div>
-        </>)
 
     const repeatedChatElements =
         components.map((item, index) => {
@@ -734,18 +371,16 @@ const ChatInterface = () => {
                                     <button className="del-btn"
                                         // onMouseEnter={(e) => { handleShowTag(e, "Delete Query and Response") }}
                                         // onMouseLeave={handleHideTag}
-                                        onClick={() => { delHandler(index) }}><img src="/icons/delete-icon-2.png" /></button>
+                                        onClick={() => { delHandler(index) }}><FaTrash className="chat-delete-icon" /> {/* Replaced img with FaTrash icon */}</button>
                                 </div>
-                                <div>
+                                <div className="query-text-div-container">
                                     <p>
-                                        {item.content[0].en_show ? item.content[0].en_query : item.content[0].query}
+                                        {item.content[0].query}
                                     </p>
                                 </div>
                             </div>
                             <div className="query-profile">
-                                <img src="/icons/user-picture_dark.svg"
-                                    alt="logo"
-                                />
+                                <FaUserCircle className="chat-user-icon" alt="user profile" /> {/* Replaced img with FaUserCircle icon */}
                             </div>
                         </div>
                     </div>
@@ -774,21 +409,13 @@ const ChatInterface = () => {
                             <div className="indiv-response-div">
                                 {index === (components.length - 1) ?
                                     <div className={`chat-response ${generationState === "init" ? "loading" : ""}`}>
-                                        <p style={{ fontSize: `${fontSize}px` }}>
-                                            {/* <Markdown> */}
-                                            <CustomMarkdownRenderer content={item.content[0].response.res_content} />
-                                            {/* {item.content[0].response.res_content} */}
-                                            {/* </Markdown> */}
-                                        </p>
+                                        {/* <CustomMarkdownRenderer content={item.content[0].response} /> */}
+                                        <FlexRenderer items={item.content[0].response} />
                                     </div>
                                     :
                                     <div className={`chat-response`}>
-                                        <p style={{ fontSize: `${fontSize}px` }}>
-                                            {/* <Markdown> */}
-                                            {/* {item.content[0].response.res_content} */}
-                                            <CustomMarkdownRenderer content={item.content[0].response.res_content} />
-                                            {/* </Markdown> */}
-                                        </p>
+                                        {/* <CustomMarkdownRenderer content={item.content[0].response} /> */}
+                                        <FlexRenderer items={item.content[0].response} />
                                     </div>
                                 }
                                 {index === (components.length - 1) && generationState !== "default" ?
@@ -799,48 +426,12 @@ const ChatInterface = () => {
                                     // initial="initial"
                                     // animate="animate"
                                     >
-                                        <div className={`res-btn-container ${isContentLoading ? "loading" : ""}`}>
+                                        {/* <div className={`res-btn-container ${isContentLoading ? "loading" : ""}`}>
                                             <button className="copy-btn" onClick={() => { handleClipboard(index) }}
                                             // onMouseEnter={(e) => { handleShowTag(e, "Copy Response") }}
                                             // onMouseLeave={handleHideTag}
                                             ><img src="/icons/copy to clipboard.png" /></button>
-                                            {item.content[0].response.like === 0 || item.content[0].response.like === 1 ?
-                                                <button
-                                                    className="like-btn"
-                                                    onClick={() => { handleLike(index) }}><img src="/icons/like-unfilled.png"
-                                                    // onMouseEnter={(e) => { handleShowTag(e, "Like Response") }}
-                                                    // onMouseLeave={handleHideTag}
-                                                    /></button>
-                                                :
-                                                ""
-                                            }
-                                            {item.content[0].response.like === 2 ?
-                                                <button className="like-btn"
-                                                    // onMouseEnter={(e) => { handleShowTag(e, "Like Response") }}
-                                                    // onMouseLeave={handleHideTag}
-                                                    onClick={() => { handleLike(index) }}
-                                                ><img src="/icons/like-filled.png" /></button>
-                                                :
-                                                ""
-                                            }
-
-                                            {item.content[0].response.like === 0 || item.content[0].response.like === 2 ?
-                                                <button className="dislike-btn" onClick={() => { handleDislike(index) }}
-                                                // onMouseEnter={(e) => { handleShowTag(e, "Dislike Response") }}
-                                                // onMouseLeave={handleHideTag}
-                                                ><img src="/icons/dislike-unfilled.png" /></button>
-                                                :
-                                                ""
-                                            }
-                                            {item.content[0].response.like === 1 ?
-                                                <button className="dislike-btn" onClick={() => { handleDislike(index) }}
-                                                // onMouseEnter={(e) => { handleShowTag(e, "Dislike Response") }}
-                                                // onMouseLeave={handleHideTag}
-                                                ><img src="/icons/dislike-filled.png" /></button>
-                                                :
-                                                ""
-                                            }
-                                        </div>
+                                        </div> */}
                                     </div>
                                 }
                             </div>
@@ -850,11 +441,12 @@ const ChatInterface = () => {
             </>)
         })
 
+    // Simple UI to display messages
+    // TODO: Enhance this UI significantly
     return (
         <>
-            {/* <GlassyContainer> */}
             <div className="inter-main-container">
-                <div className={`inter-inner-container ${isPanelOpen ? "panel-open" : ""} ${profileExpanded ? "profile-open" : ""}`}
+                <div className={`inter-inner-container`}
                     style={{ fontSize: `${fontSize}px` }}
                 >
                     <div
@@ -872,7 +464,7 @@ const ChatInterface = () => {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ duration: 0.5, delay: 0.2 }}
                                     >
-                                        Welcome <span className="username-gradient">{username}</span> to Valency!
+                                        Hello <span className="username-gradient">{username}</span>, Welcome to Valency!
                                     </motion.div>
                                 )}
                                 <motion.div className="suggestion-queries-list-wrapper"
@@ -904,19 +496,19 @@ const ChatInterface = () => {
                         {/* <div ref={bottomRef} id="bottomRef"></div> */}
                     </div>
 
-                    <div className="bottom-container" style={{marginBottom: `${components.length === 0 ? "10vh" : "5vh"}`}}>
+                    <div className="bottom-container" style={{ marginBottom: `${components.length === 0 ? "10vh" : "5vh"}` }}>
                         <div className="query-gen-container">
                             <div className={`query-text-container ${isContentLoading ? "loading" : ""}`}>
                                 <textarea placeholder="Enter your query here"
                                     style={{ fontSize: `${fontSize}px` }}
-                                    disabled={isRecording || generationState === "generating"}
+                                    disabled={generationState === "generating"}
                                     value={query}
                                     onChange={(e) => setQuery(e.target.value)}
                                     className="query-text-object"
                                     onKeyDown={handleKeyDown}
                                 />
                                 <div className={`query-button-container ${isContentLoading ? "loading" : ""}`}>
-                                    <button className="chat-query-btn" onClick={() => generateResponse()} disabled={isRecording && generationState === "generating"}>
+                                    <button className="chat-query-btn" onClick={() => generateResponse()} disabled={generationState === "generating"}>
                                         <IoSend className="" />
                                     </button>
                                 </div>
@@ -926,12 +518,12 @@ const ChatInterface = () => {
                 </div>
 
                 {/* <div
-                    ref={scrollBottomRef}
-                    className={`bottom-scroller ${isDark ? "dark" : ""}`} // KEPT isDark here if it's a separate component not affected by html class
-                    onClick={scrollToBottom}
-                >
-                    <img src="/icons/generate_dark.svg" alt="logo" />
-                </div> */}
+            ref={scrollBottomRef}
+            className={`bottom-scroller ${isDark ? "dark" : ""}`} // KEPT isDark here if it's a separate component not affected by html class
+            onClick={scrollToBottom}
+        >
+            <img src="/icons/generate_dark.svg" alt="logo" />
+        </div> */}
 
                 {
                     showTag ?
@@ -946,6 +538,6 @@ const ChatInterface = () => {
             </div >
             {/* </GlassyContainer> */}
         </>
-    )
+    );
 }
 export default ChatInterface;

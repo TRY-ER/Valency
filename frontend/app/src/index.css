@@ -33,6 +33,8 @@
   --color-gradient-end: var(--color-accent);
   --color-gradient-hover-start: var(--color-accent);
   --color-gradient-hover-end: var(--color-accent-dark);
+
+  --chat-border-color: rgb(165, 253, 165);
 }
 
 html.dark {
@@ -61,6 +63,8 @@ html.dark {
   --color-gradient-end-dark: var(--color-accent);
   --color-gradient-hover-start-dark: var(--color-accent);
   --color-gradient-hover-end-dark: var(--color-accent-dark);
+
+  --chat-border-color: rgb(3, 134, 3);
 }
 
 body {

@@ -1,0 +1,32 @@
+.func-tag-container {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+.func-tag-container .func-tag-inner-container{
+    padding: 5px 10px;
+    background-color: var(--c-lite);
+    color: var(--text-secondary);
+    width: auto;
+    border-radius: 10px;
+    border: 1px solid var(--chat-border-color);
+}
+
+.func-tag-holder{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.tool-icon{
+  font-size: 1.5rem;
+}
+
+.tool-icon-container{
+  border: 1px solid var(--chat-border-color);
+  margin-left: 10px;
+  padding: 5px 10px;
+  border-radius: 10px;
+  background-color: var(--c-lite);
+}

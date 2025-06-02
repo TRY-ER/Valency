@@ -312,6 +312,12 @@
 
 .chat-container .chat-elem {
     margin: 4vh 2vw;
+    font-weight: 400 !important;
+}
+
+.chat-elem p, ul,li ,ol{
+    font-weight: 400 !important;
+    font-size: 1rem;
 }
 
 .chat-elem.last-load {
@@ -343,7 +349,6 @@
     padding: 20px;
     background-color: var(--color-bg-secondary) !important;
     border-radius: 20px 5px 20px 20px;
-    font-size: 1.2rem; /* Increased font size */
     max-width: 65vw; /* Increased max-width */
     background-color: var(--c-lite);
     -webkit-box-shadow: -10px 12px 16px -9px var(--c-shadow-back-light);
@@ -351,6 +356,15 @@
     box-shadow: -10px 12px 16px -9px var(--c-shadow-back-light);
     line-height: 1.5rem;
     text-align: right;
+}
+
+.query-text-div-container{
+    padding: 5px 10px;
+    background-color: var(--c-lite);
+    color: var(--text-secondary);
+    width: auto;
+    border-radius: 10px;
+    border: 1px solid var(--chat-border-color);
 }
 
 .chat-query.dark {
@@ -382,12 +396,33 @@
     background-color: red !important;
 }
 
+.del-btn {
+    padding:8px;
+    margin: 5px;
+}
+
 
 .chat-query .btn-container button img {
     width: 25px;
     height: auto;
     /* filter: invert(70%); */
 }
+
+/* Added/Modified styles for react-icons */
+.chat-delete-icon, .chat-user-icon {
+    width: 2rem; /* Adjust size as needed */
+    height: auto; /* Adjust size as needed */
+    color: var(--color-text-secondary); /* This variable changes with the theme via index.css */
+    transition: color 0.2s ease-in-out;
+}
+
+.chat-delete-icon{
+    width: 1.5rem; /* Adjust size as needed */
+    height: auto; /* Adjust size as needed */
+    color: var(--color-text-secondary); /* This variable changes with the theme via index.css */
+    transition: color 0.2s ease-in-out;
+}
+/* End of added/modified styles */
 
 .chat-container .btn-container.dark button img {
     filter: invert(20%);
@@ -488,7 +523,7 @@
     padding: 20px;
     background-color: var(--c-deep-disable);
     border-radius: 5px 20px 20px 20px;
-    text-align: justify;
+    text-align: left;
     height: auto;
     font-weight: 300;
 }
