@@ -249,13 +249,25 @@ export const createUserSession = async (
 
 /**
  * Lists sessions for the current user. If sessionId is provided, fetches a specific session.
- * @param {string} [sessionId] - Optional ID of the session to retrieve.
  * @returns {Promise<Object>} The response data from the endpoint.
  */
 export const listUserSessions = async (sessionId) => {
   try {
-    const url = sessionId ? `/sessions?session_id=${sessionId}` : '/sessions';
-    const response = await agentApiClient.get(url);
+    const url = `/sessions`;
+    const token = getAuthToken();
+    if (!token) {
+      console.error('No token found for listUserSessions');
+      return Promise.reject(new Error('Authentication token not found'));
+    }
+    const response = await agentApiClient.get(url,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+      }
+    );
     return response.data;
   } catch (error) {
     console.error('Error listing user sessions:', error.response ? error.response.data : error.message);
@@ -276,7 +288,7 @@ export const getSessionDetails = async (sessionId) => {
     console.error('getSessionDetails: sessionId is required');
     return Promise.reject(new Error('Session ID is required'));
   }
-  const token = localStorage.getItem('valency_token');
+  const token = getAuthToken(); 
   if (!token) {
     console.error('No token found for getSessionDetails');
     return Promise.reject(new Error('Authentication token not found'));
@@ -320,7 +332,8 @@ export const sendQueryToSession = async (sessionId, queryText, { onAgentMessage,
     if (onSetupError) onSetupError(new Error('Session ID and query text are required'));
     return;
   }
-  const token = localStorage.getItem('valency_token');
+  
+  const token = getAuthToken();
   if (!token) {
     console.error('No token found for sendQueryToSession');
     if (onSetupError) onSetupError(new Error('Authentication token not found'));
@@ -336,7 +349,7 @@ export const sendQueryToSession = async (sessionId, queryText, { onAgentMessage,
         'Content-Type': 'application/json',
         'Accept': 'text/event-stream'
       },
-      body: JSON.stringify({ query_text: queryText }),
+      body: JSON.stringify({ query: queryText }), // Changed to match API's SessionCreationRequest format
     });
 
     if (!response.ok) {
@@ -443,6 +456,91 @@ export const getSessionToolResponses = async (sessionId) => {
     if (error.response && error.response.status === 404) {
       console.error(`Session with ID ${sessionId} not found or does not belong to the current user`);
     }
+    throw error;
+  }
+};
+
+/**
+ * Retrieves the event state of a specific session using its ID.
+ * @param {string} sessionId - The unique identifier of the session.
+ * @returns {Promise<object>} A promise that resolves to the session's event state.
+ */
+export const getSessionEventState = async (sessionId) => {
+  if (!sessionId) {
+    console.error('getSessionEventState: sessionId is required');
+    return Promise.reject(new Error('Session ID is required'));
+  }
+
+  const token = getAuthToken();
+  if (!token) {
+    console.error('No token found for getSessionEventState');
+    return Promise.reject(new Error('Authentication token not found'));
+  }
+
+  try {
+    const response = await fetch(`${AGENT_BASE_URL}/sessions/${sessionId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Error fetching session event state:', response.status, errorData);
+      throw new Error(`HTTP error ${response.status}: ${errorData}`);
+    }
+    
+    const data = await response.json();
+    if (data) {
+      // console.log('Retrieved session event state:', data.state);
+      // return data.state;
+    // } else {
+      // console.warn('Session retrieved but no state field found');
+      return data; // Return the full response if state isn't specifically available
+    }
+  } catch (error) {
+    console.error('Error retrieving session event state:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Deletes a specific session using its ID.
+ * @param {string} sessionId - The unique identifier of the session to delete.
+ * @returns {Promise<object>} A promise that resolves to the response data from the deletion.
+ */
+export const deleteSession = async (sessionId) => {
+  if (!sessionId) {
+    console.error('deleteSession: sessionId is required');
+    return Promise.reject(new Error('Session ID is required'));
+  }
+
+  const token = getAuthToken();
+  if (!token) {
+    console.error('No token found for deleteSession');
+    return Promise.reject(new Error('Authentication token not found'));
+  }
+
+  try {
+    const response = await fetch(`${AGENT_BASE_URL}/sessions/${sessionId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Error deleting session:', response.status, errorData);
+      throw new Error(`HTTP error ${response.status}: ${errorData}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting session:', error.message);
     throw error;
   }
 };

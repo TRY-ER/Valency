@@ -11,6 +11,7 @@ from auth_utils import verify_token
 from master_agent.agent import root_agent as master_agent 
 from run_utils import call_agent_async 
 from custom_utils.mongodb_handler import MongoDBHandler  # Import MongoDB handler
+from run_utils import parse_event_list 
 
 import uvicorn
 import os
@@ -115,9 +116,9 @@ async def _event_generator_for_new_session(
         runner, str(user_id), new_session.id, session_creation_req.query
     ):
         if content_part == "<|done|>":
-            print("Query response complete, ending stream.")
+            # print("Query response complete, ending stream.")
             stream_end_data = {"message": "Initial query processing complete."}
-            print("Sent Data >>",f"event: stream_end<|split|>data: {json.dumps(stream_end_data)}<|sep|>")
+            # print("Sent Data >>",f"event: stream_end<|split|>data: {json.dumps(stream_end_data)}<|sep|>")
             yield f"event: stream_end<|split|>data: {json.dumps(stream_end_data)}<|sep|>"
             break
         
@@ -181,7 +182,50 @@ async def list_user_sessions(
         app_name=AGENT_APP_NAME,
         user_id=str(user_id),
     )
-    return existing_sessions
+    
+    session_formatted = []
+
+    for session in existing_sessions.sessions:
+        # Parse the events for each session
+        query_count = 0 
+        function_response_count = 0
+        agent_call_count = 0
+        retrieved_session = await session_service.get_session(
+            session_id=session.id,
+            app_name=AGENT_APP_NAME,
+            user_id=str(user_id)
+        )
+        session_identifier = None
+        for event in retrieved_session.events:
+            if event.content.parts[0].text:
+                query_count += 1
+                if session_identifier is None:
+                    session_identifier = event.content.parts[0].text
+
+            elif event.content.parts[0].function_response:
+                if event.content.parts[0].function_response.name == "transfer_to_agent":
+                    agent_call_count += 1
+                else:
+                    function_response_count += 1
+
+        session_identifier = session_identifier or "No identifier found"
+        # limit the session identifier to  20 characters
+        session_identifier = session_identifier[:20] + "..." if len(session_identifier) > 20 else session_identifier
+        last_update_time = session.last_update_time
+        # the last update time is in seconds as float, convert it to a human-readable format
+        from datetime import datetime
+        last_update_time_str = datetime.fromtimestamp(last_update_time).strftime('%Y-%m-%d %H:%M:%S') if last_update_time else "Unknown"
+        session_formatted.append({
+            "session_id": session.id,
+            "session_identifier": session_identifier,
+            "query_count": query_count,
+            "function_response_count": function_response_count,
+            "agent_call_count": agent_call_count,
+            "last_update_time": last_update_time_str
+        })
+
+    return session_formatted 
+
 
 
 @app.get("/sessions/{session_id}", status_code=200)
@@ -202,7 +246,8 @@ async def get_session_details(
             app_name=AGENT_APP_NAME,
             user_id=str(user_id)
         )
-        return retrieved_session
+        parsed_list = parse_event_list(retrieved_session.events)
+        return parsed_list 
     except Exception as e:
         print(f"Error retrieving session {session_id} for user {user_id}: {e}")
         raise HTTPException(status_code=500, detail="Internal server error while retrieving session.")
@@ -230,9 +275,9 @@ async def _event_generator_for_session_query(
         error_message = f"Failed to retrieve session {session_id} for user {user_id}: {str(e)}"
         print(error_message)
         error_payload = json.dumps({"type": "error", "content": error_message})
-        yield f"event: agent_message\\\\ndata: {error_payload}\\\\n\\\\n"
+        yield f"event: agent_message<|split|>data: {error_payload}<|sep|>"
         stream_end_data = {"message": "Query processing failed due to session error."}
-        yield f"event: stream_end\\\\ndata: {json.dumps(stream_end_data)}\\\\n\\\\n"
+        yield f"event: stream_end<|split|>data: {json.dumps(stream_end_data)}<|sep|>"
         return
 
     runner = Runner(
@@ -247,29 +292,29 @@ async def _event_generator_for_session_query(
         if content_part == "<|done|>":
             print(f"Query response complete for session {session_id}, ending stream.")
             stream_end_data = {"message": "Query processing complete."}
-            yield f"event: stream_end\\\\ndata: {json.dumps(stream_end_data)}\\\\n\\\\n"
+            yield f"event: stream_end<|split|>data: {json.dumps(stream_end_data)}<|sep|>"
             break
         
         if isinstance(content_part, dict):
             try:
-                # Check if this is a tool response with a tool_id
-                if "content" in content_part and isinstance(content_part["content"], str) and "tool_id:" in content_part["content"]:
-                    # Extract tool_id if present
-                    import re
-                    tool_id_match = re.search(r'tool_id: ([a-zA-Z0-9-]+)', content_part["content"])
-                    if tool_id_match:
-                        tool_id = tool_id_match.group(1)
-                        # Add tool_id to the response payload
-                        content_part["tool_id"] = tool_id
+                # # Check if this is a tool response with a tool_id
+                # if "content" in content_part and isinstance(content_part["content"], str) and "tool_id:" in content_part["content"]:
+                #     # Extract tool_id if present
+                #     import re
+                #     tool_id_match = re.search(r'tool_id: ([a-zA-Z0-9-]+)', content_part["content"])
+                #     if tool_id_match:
+                #         tool_id = tool_id_match.group(1)
+                #         # Add tool_id to the response payload
+                #         content_part["tool_id"] = tool_id
                 
                 json_payload = json.dumps(content_part)
-                yield f"event: agent_message\\\\ndata: {json_payload}\\\\n\\\\n"
+                yield f"event: agent_message<|split|>data: {json_payload}<|sep|>"
             except TypeError as e:
                 error_payload = json.dumps({"type": "error", "content": f"Failed to serialize agent message: {str(e)}"})
-                yield f"event: agent_message\\\\ndata: {error_payload}\\\\n\\\\n"
+                yield f"event: agent_message<|split|>data: {error_payload}<|sep|>"
         else:
             unknown_payload = json.dumps({"type": "unknown_string_content", "content": str(content_part)})
-            yield f"event: agent_message\\\\ndata: {unknown_payload}\\\\n\\\\n"
+            yield f"event: agent_message<|split|>data: {unknown_payload}<|sep|>"
 
 
 @app.post("/sessions/{session_id}/query", status_code=200)
@@ -381,6 +426,62 @@ async def get_session_tool_responses(
         })
     
     return JSONResponse(content={"session_id": session_id, "tool_responses": formatted_responses})
+
+
+@app.delete("/sessions/{session_id}", status_code=200)
+async def delete_session(
+    session_id: str,
+    request: Request,
+    current_user: dict = Depends(verify_token)
+):
+    """
+    Delete a session by ID.
+    
+    This endpoint allows users to delete their own sessions.
+    """
+    session_service: DatabaseSessionService = request.app.state.session_service
+    user_id = current_user.get("id")
+
+    if not user_id:
+        raise HTTPException(status_code=400, detail="User ID not found in token")
+
+    try:
+        # First verify the session exists and belongs to the user
+        try:
+            await session_service.get_session(
+                session_id=session_id,
+                app_name=AGENT_APP_NAME,
+                user_id=str(user_id)
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Session {session_id} not found or does not belong to the current user"
+            )
+            
+        # Delete the session
+        await session_service.delete_session(
+            session_id=session_id,
+            app_name=AGENT_APP_NAME,
+            user_id=str(user_id)
+        )
+        
+        # Also delete any associated tool responses from MongoDB if MongoDB handler is available
+        try:
+            mongodb_handler = request.app.state.mongodb_handler
+            if mongodb_handler:
+                mongodb_handler.delete_tool_responses_by_session(session_id)
+        except Exception as e:
+            # Log but don't fail if MongoDB cleanup fails
+            print(f"Warning: Failed to clean up MongoDB tool responses for session {session_id}: {e}")
+        
+        return {"status": "success", "message": f"Session {session_id} deleted successfully"}
+    except HTTPException as he:
+        # Re-raise HTTP exceptions
+        raise he
+    except Exception as e:
+        print(f"Error deleting session {session_id} for user {user_id}: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error while deleting session: {str(e)}")
 
 
 if __name__ == "__main__":

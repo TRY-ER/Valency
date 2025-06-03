@@ -4,7 +4,7 @@ import CustomMarkdownRenderer from "../CustomMarkdown";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import remarkGfm from "remark-gfm";
-import { FiTool, FiUser, FiAlertCircle, FiChevronDown, FiChevronUp } from "react-icons/fi"; // Added chevron icons
+import { FiTool, FiUser, FiAlertCircle, FiChevronDown, FiChevronUp, FiHelpCircle } from "react-icons/fi"; // Added chevron and help icons
 import { BsCheck2All } from 'react-icons/bs';
 import { getToolResponse } from "../../../services/api/agentService"; // Import the getToolResponse function
 
@@ -15,6 +15,7 @@ const FunctionResponse = ({ data }) => {
     const [error, setError] = useState(null);
 
     // Fetch the tool response when the component mounts or when expanded is toggled to true
+    console.log("function call data >>", data)
     useEffect(() => {
         console.log("function call data >>", data)
         if (expanded && !toolResponse && data.function_response_id) {
@@ -46,14 +47,15 @@ const FunctionResponse = ({ data }) => {
         >
             <div className="func-tag-holder" style={{ flexDirection: "column", width: "100%" }}>
                 <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <div className="func-tag-inner-container">
+                    <div className="func-tag-inner-container" style={{marginLeft: "10px"}}>
                         <p>{data.name}</p>
                     </div>
-                    <div className="func-tag-inner-container">
+                    <div className="func-tag-inner-container" style={{marginLeft: "10px"}}>
                         <p>ID: {data?.function_response_id}</p>
                     </div>
                     <div className="tool-icon-container">
                         <FiTool className="tool-icon" />
+                        <BsCheck2All className="tool-icon" style={{ marginLeft: "5px", color: "#2ecc71" }} />
                     </div>
                     <motion.div 
                         className="tool-icon-container" 
@@ -114,6 +116,9 @@ const FunctionResponse = ({ data }) => {
 }
 
 const FunctionCall = ({ data }) => {
+    const [expanded, setExpanded] = useState(false);
+    const toggleExpand = () => setExpanded(!expanded);
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -121,14 +126,56 @@ const FunctionCall = ({ data }) => {
             transition={{ duration: 0.5 }}
             className="func-tag-container"
         >
-            <div className="func-tag-holder">
-                <div className="func-tag-inner-container">
-                    <p>{data.name}</p>
+            <div className="func-tag-holder" style={{ flexDirection: "column", width: "100%" }}>
+                <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
+                    <div className="func-tag-inner-container" style={{marginLeft: "10px"}}>
+                        <p>{data.name}</p>
+                    </div>
+                    <div className="func-tag-inner-container" style={{marginLeft: "10px"}}>
+                        <p>{data.args ? `${Object.keys(data.args).length} arguments` : 'No arguments'}</p>
+                    </div>
+                    <div className="tool-icon-container">
+                        <FiTool className="tool-icon" />
+                        <FiHelpCircle className="tool-icon" style={{ marginLeft: "5px", color: "#2ecc71" }} />
+                    </div>
+                    <motion.div 
+                        className="tool-icon-container" 
+                        onClick={toggleExpand} 
+                        style={{ cursor: "pointer", marginLeft: "auto" }}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                    >
+                        {expanded ? <FiChevronUp className="tool-icon" /> : <FiChevronDown className="tool-icon" />}
+                    </motion.div>
                 </div>
 
-                <div className="tool-icon-container">
-                    <FiTool className="tool-icon" />
-                </div>
+                <AnimatePresence>
+                {expanded && data.args && (
+                    <motion.div 
+                        key="content"
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ 
+                            duration: 0.3,
+                            ease: "easeInOut"
+                        }}
+                        style={{ marginTop: "10px", width: "100%", overflow: "hidden" }}
+                    >
+                        <div className="func-tag-inner-container" style={{ width: "100%" }}>
+                            <pre style={{
+                                fontFamily: 'monospace',
+                                padding: '1em',
+                                borderRadius: '3px',
+                                overflowX: 'auto',
+                                margin: 0,
+                            }}>
+                                {JSON.stringify(data.args, null, 2)}
+                            </pre>
+                        </div>
+                    </motion.div>
+                )}
+                </AnimatePresence>
             </div>
         </motion.div>
     )
@@ -157,10 +204,10 @@ const TextResponse = ({ content }) => {
                         code: ({ inline, className, children, ...props }) => {
                             const style = {
                                 fontFamily: 'monospace',
-                                backgroundColor: 'rgba(211, 211, 211, 0.4)', // Light gray background
+                                backgroundColor: 'rgba(211, 211, 211, 0.2)', // Light gray background
                                 padding: '0.2em 0.4em',
                                 borderRadius: '3px',
-                                color: 'rgb(199, 37, 78)' // A common color for code text
+                                color: 'rgb(69, 199, 37)' // A common color for code text
                             };
                             if (inline) {
                                 return <code style={style} className={className} {...props}>{children}</code>;

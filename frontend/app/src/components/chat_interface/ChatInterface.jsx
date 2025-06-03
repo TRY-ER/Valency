@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, use } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { EventSourcePolyfill } from "event-source-polyfill";
@@ -28,12 +28,14 @@ import {
     createUserSession,
     listUserSessions,
     getSessionDetails, // Added
-    sendQueryToSession // Added
+    sendQueryToSession, // Added
+    getSessionEventState // Added for loading session event state
 } from '../../services/api/agentService';
 
 const ChatInterface = () => {
     const [chatStream, setChatStream] = useState(''); // This state might become redundant
     const [messages, setMessages] = useState([]);
+    const location = useLocation(); // Add this to access URL query parameters
     const [currentSessionId, setCurrentSessionId] = useState(null);
     const [sessions, setSessions] = useState([]);
     const [isLoadingSession, setIsLoadingSession] = useState(false);
@@ -46,6 +48,8 @@ const ChatInterface = () => {
     const [isLoaded, setIsLoaed] = useState(false);
     const [isStreaming, setIsStreaming] = useState(false); // This state might become redundant
     const [isCompleted, setIsCompleted] = useState(false); // This state might become redundant
+    const [isQuaryParamLoaded, setIsQuaryParamLoaded] = useState(false); // This state might become redundant
+
 
     //ui changes
     // const [isDark, setIsDark] = useState(false); // REMOVED
@@ -66,10 +70,23 @@ const ChatInterface = () => {
     })
 
     useEffect(() => {
-        if (isLoaded) {
-            localStorage.setItem("fontsize", fontSize)
+        console.log('current session id >>', currentSessionId);
+    }, [currentSessionId])
+
+    // Added useEffect to check for session_id in URL query parameters
+    useEffect(() => {
+        const queryParams = new URLSearchParams(location.search);
+        const sessionIdFromUrl = queryParams.get('session_id');
+
+        if (sessionIdFromUrl) {
+            console.log('Found session_id in URL:', sessionIdFromUrl);
+            setCurrentSessionId(sessionIdFromUrl);
+            setIsQuaryParamLoaded(true); // Set to true when session_id is found
+        } else {
+            console.log('No session_id found in URL, using default null value');
+            setCurrentSessionId(null);
         }
-    }, [fontSize])
+    }, [location.search]); // Re-run if URL query parameters change
 
     useEffect(() => { // Added useEffect to get username
         const currentUser = AuthService.getUser();
@@ -171,9 +188,49 @@ const ChatInterface = () => {
 
     const loadThread = () => {
         // console.log("load thread is triggered")
-        setComponents(localStorage.getItem("components") ? JSON.parse(localStorage.getItem("components")) : []);
-        setModelConfig(localStorage.getItem("modelConfig") ? JSON.parse(localStorage.getItem("modelConfig")) : modelConfig);
-        setFontSize(localStorage.getItem("fontsize") ? localStorage.getItem("fontsize") : "14");
+        // setComponents(localStorage.getItem("components") ? JSON.parse(localStorage.getItem("components")) : []);
+        // setModelConfig(localStorage.getItem("modelConfig") ? JSON.parse(localStorage.getItem("modelConfig")) : modelConfig);
+        // setFontSize(localStorage.getItem("fontsize") ? localStorage.getItem("fontsize") : "14");
+
+        // If we have a currentSessionId, fetch the session event state
+        if (currentSessionId && isQuaryParamLoaded) {
+            console.log('Fetching session event state for session:', currentSessionId);
+            getSessionEventState(currentSessionId)
+                .then(eventState => {
+                    console.log('Retrieved session event state:', eventState);
+                    
+                    // Check if eventState is an array and has elements
+                    if (Array.isArray(eventState) && eventState.length > 0) {
+                        // Group events by query to create conversation pairs
+                        const conversations = [];
+                        // Process events and organize them into conversation components
+                        for (let i = 0; i < eventState.length; i++) {
+                            const event = eventState[i];
+                            console.log("event >>", event)
+                            if (event) {
+                                const cUid = uuidv4();
+                                conversations.push({
+                                    "content": [event],
+                                    "uid": cUid
+                                });
+                            } 
+                        }
+                        setComponents(conversations);
+                        console.log('Created conversation components from event state:', conversations);
+                    } else {
+                        console.warn('Event state is empty or not an array:', eventState);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching session event state:', error);
+                });
+        } else {
+            console.log('No current session ID available, skipping event state fetch');
+        }
+
+        // Session ID is now only maintained in React state
+        // No need to load from localStorage
+
         // await axios.post(API_BASE + "/chat/load_thread/", {
         //     "user_id": userName
         // }, config)
@@ -205,7 +262,7 @@ const ChatInterface = () => {
 
     useEffect(() => {
         loadThread();
-    }, [])
+    }, [currentSessionId]) // Added currentSessionId as a dependency to reload when it changes
 
     // useEffect(() => {
     //     console.log("components >>", components)
@@ -251,6 +308,10 @@ const ChatInterface = () => {
         delItem(itemIndex);
     }
 
+    useEffect(() => {
+        console.log("components >>", components)
+    }, [components])
+
     const generateResponse = async () => {
         const currentQuery = query;
         if (currentQuery.trim().length === 0) {
@@ -275,54 +336,78 @@ const ChatInterface = () => {
         setBottomScroller(true); // Scroll after adding user query
 
         try {
-            // Assuming createUserSession is imported and available
-            await createUserSession(
-                { query: currentQuery },
-                {
-                    onSessionCreated: (data) => {
-                        console.log('Session Created:', data);
-                        if (data && data.session_id) {
-                            setCurrentSessionId(data.session_id);
-                        }
-                    },
-                    onAgentMessage: (agentMessageData) => {
-                        // Assuming agentMessageData is the string chunk
-                        console.log('agent messages recieved >>', agentMessageData)
-                        updateComponentResponse(cUid, agentMessageData);
-                        setBottomScroller(true); // Scroll as new content arrives
-                    },
-                    onStreamEnd: (streamEndData) => {
-                        console.log('Stream Ended:', streamEndData);
-                        setGenerationState("default");
-                        setActiveUid("");
-                        const now = new Date();
-                        updateComponentResponse(cUid, { type: "complete", data: now.toISOString() }); // Pass ISO string
-                        console.log('Stream completed at:', now);
-                        // Perform any final save or cleanup here if needed
-                        // localStorage.setItem("components", JSON.stringify(components)); // This will be handled by the existing useEffect for components
-                    },
-                    onProcessingError: (error) => {
-                        console.error('Session Processing Error:', error);
-                        const errorMessage = `Error: ${error.message || 'Processing failed'}`;
-                        updateComponentResponse(cUid, { type: "error", data: errorMessage, timestamp: new Date().toISOString() });
-                        setGenerationState("default");
-                        setActiveUid("");
-                    },
-                    onSetupError: (error) => {
-                        console.error('Session Setup Error:', error);
-                        const setupErrorMessage = `Setup Error: ${error.message || 'Setup failed'}`;
-                        updateComponentResponse(cUid, { type: "error", data: setupErrorMessage, timestamp: new Date().toISOString() });
-                        // Update the component with the setup error message
-                        // If accumulatedMessage is empty, just show the error. Otherwise, append.
-                        setGenerationState("default");
-                        setActiveUid("");
-                    }
+            // Define common callbacks for both methods
+            const callbacks = {
+                onAgentMessage: (agentMessageData) => {
+                    // Process the message received from the agent
+                    console.log('agent messages received >>', agentMessageData);
+                    // Make sure to properly format the data before passing it to updateComponentResponse
+                    // The FlexRenderer component expects certain data structures based on type
+                    // if (typeof agentMessageData === 'string') {
+                    //     // If it's a plain string, wrap it as a text type
+                    //     updateComponentResponse(cUid, { type: 'text', content: agentMessageData });
+                    // } else if (agentMessageData.type === 'markdown_text') {
+                    //     // Handle markdown_text type from _processSseStream
+                    //     updateComponentResponse(cUid, { type: 'text', content: agentMessageData.content });
+                    // } else {
+                    //     // Pass other structured data as-is
+                    // }
+                    updateComponentResponse(cUid, agentMessageData);
+                    setBottomScroller(true); // Scroll as new content arrives
+                },
+                onStreamEnd: (streamEndData) => {
+                    console.log('Stream Ended:', streamEndData);
+                    setGenerationState("default");
+                    setActiveUid("");
+                    const now = new Date();
+                    updateComponentResponse(cUid, { type: "complete", data: now.toISOString() }); // Pass ISO string
+                    console.log('Stream completed at:', now);
+                },
+                onProcessingError: (error) => {
+                    console.error('Session Processing Error:', error);
+                    const errorMessage = `Error: ${error.message || 'Processing failed'}`;
+                    updateComponentResponse(cUid, { type: "error", data: errorMessage, timestamp: new Date().toISOString() });
+                    setGenerationState("default");
+                    setActiveUid("");
+                },
+                onSetupError: (error) => {
+                    console.error('Session Setup Error:', error);
+                    const setupErrorMessage = `Setup Error: ${error.message || 'Setup failed'}`;
+                    updateComponentResponse(cUid, { type: "error", data: setupErrorMessage, timestamp: new Date().toISOString() });
+                    setGenerationState("default");
+                    setActiveUid("");
                 }
-            );
+            };
+
+            // If we already have a session, use sendQueryToSession
+            if (currentSessionId) {
+                console.log('Using existing session:', currentSessionId);
+                await sendQueryToSession(
+                    currentSessionId,
+                    currentQuery,
+                    callbacks
+                );
+            } else {
+                // For the first query, create a new session
+                console.log('Creating new session for first query');
+                await createUserSession(
+                    { query: currentQuery },
+                    {
+                        ...callbacks,
+                        onSessionCreated: (data) => {
+                            console.log('Session Created:', data);
+                            if (data && data.session_id) {
+                                setCurrentSessionId(data.session_id);
+                                // updateUrlWithSessionId(data.session_id);
+                            }
+                        }
+                    }
+                );
+            }
         } catch (error) {
-            console.error('Error calling createUserSession:', error);
-            const catchErrorMessage = `Failed to start session: ${error.message || 'Unknown error'}`;
-            updateComponentResponse(cUid, `**${catchErrorMessage}**`);
+            console.error('Error during query processing:', error);
+            const catchErrorMessage = `Failed to process query: ${error.message || 'Unknown error'}`;
+            updateComponentResponse(cUid, { type: "error", data: catchErrorMessage, timestamp: new Date().toISOString() });
             setGenerationState("default");
             setActiveUid("");
         }
@@ -339,6 +424,7 @@ const ChatInterface = () => {
     useEffect(() => {
         if (generationState === 'default' && isLoaded) {
             localStorage.setItem("components", JSON.stringify(components));
+            // Session ID is now only maintained in React state
         }
     }, [components, isLoaded, generationState]);
 
@@ -349,6 +435,16 @@ const ChatInterface = () => {
     useEffect(() => {
         console.log("generation state", generationState);
     }, [generationState])
+
+    // Function to update URL with session ID without triggering a page reload
+    const updateUrlWithSessionId = (sessionId) => {
+        if (sessionId) {
+            const url = new URL(window.location);
+            url.searchParams.set('session_id', sessionId);
+            window.history.pushState({}, '', url);
+            console.log('Updated URL with session ID:', sessionId);
+        }
+    };
 
     const repeatedChatElements =
         components.map((item, index) => {
@@ -367,12 +463,10 @@ const ChatInterface = () => {
                             <div className={`chat-query ${isContentLoading ? "loading" : ""}`}>
                                 {/* upper buttons */}
 
-                                <div className={`btn-container ${isContentLoading ? "loading" : ""}`}>
+                                {/* <div className={`btn-container ${isContentLoading ? "loading" : ""}`}>
                                     <button className="del-btn"
-                                        // onMouseEnter={(e) => { handleShowTag(e, "Delete Query and Response") }}
-                                        // onMouseLeave={handleHideTag}
-                                        onClick={() => { delHandler(index) }}><FaTrash className="chat-delete-icon" /> {/* Replaced img with FaTrash icon */}</button>
-                                </div>
+                                        onClick={() => { delHandler(index) }}><FaTrash className="chat-delete-icon" /></button>
+                                </div> */}
                                 <div className="query-text-div-container">
                                     <p>
                                         {item.content[0].query}
@@ -514,6 +608,12 @@ const ChatInterface = () => {
                                 </div>
                             </div>
                         </div>
+                        {currentSessionId && (
+                            <div className="session-info" style={{marginTop: "20px", color: "gray"}}>
+                                <span>Current Session ID: </span>
+                                <span className="session-id">{currentSessionId}</span>
+                            </div>
+                        )}
                     </div>
                 </div>
 

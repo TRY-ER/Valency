@@ -115,6 +115,28 @@ class MongoDBHandler:
             print(f"Error retrieving tool responses for session: {str(e)}")
             return []
     
+    def delete_tool_responses_by_session(self, session_id: str) -> int:
+        """
+        Delete all tool responses for a specific session.
+        
+        Args:
+            session_id (str): ID of the session to delete responses for
+            
+        Returns:
+            int: Number of documents deleted
+        """
+        if not self._initialized:
+            print("MongoDB connection not initialized")
+            return 0
+            
+        try:
+            result = self.tool_responses.delete_many({"session_id": session_id})
+            print(f"Deleted {result.deleted_count} tool responses for session {session_id}")
+            return result.deleted_count
+        except Exception as e:
+            print(f"Error deleting tool responses for session {session_id}: {str(e)}")
+            return 0
+    
     def generate_tool_id(self) -> str:
         """
         Generate a unique tool ID.

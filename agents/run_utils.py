@@ -68,8 +68,6 @@ async def process_agent_response(event):
 
     if event.content and event.content.parts:
         for part in event.content.parts:
-            print('part >>', part)
-            print('type of part >>', type(part))
             if hasattr(part, "function_call") and part.function_call:
                 function_data = {
                     "name": part.function_call.name,
@@ -193,3 +191,77 @@ async def call_agent_async(runner, user_id, session_id, query):
     # )
 
     # return final_response_text
+
+def parse_event_list(event_list: list) -> list:
+    """
+    Schema required at the frontend
+            [{
+                "query": <query_text>,
+                "response": [<resopnse_events_as_is>, ...]
+            }] 
+    """
+    parsed_events = []
+    user_query = None
+    for i, event in enumerate(event_list):
+        if event.content and event.content.parts:
+            if event.content.role == "user":
+                if event.content.parts[0].text and not event.content.parts[0].text.isspace():
+                    if user_query is not None and "response" in user_query:
+                        if len(user_query["response"]) > 0:
+                            # print("user query added !")
+                            parsed_events.append(user_query)
+                    user_query = {"query": event.content.parts[0].text.strip(), "response": []}
+                for part in event.content.parts:
+                    if hasattr(part, "function_response") and part.function_response:
+                            function_response_id = None
+                            tool_response = {} 
+                            if 'result' in part.function_response.response:
+                                result = part.function_response.response['result']
+                                if isinstance(result, dict):
+                                    if result["isError"]:
+                                        tool_response = {
+                                            "type": "error",
+                                            "text_content": "" # Or some error message from result if available
+                                        }
+                                    else:
+                                        tool_contents = ""
+                                        for r_part in result["content"]:
+                                            if hasattr(r_part, 'text'):
+                                                tool_contents += r_part.text
+                                        tool_response = {
+                                            "type": "success",
+                                            "text_content": tool_contents
+                                        }
+                                    if result["meta"] and 'id' in result["meta"]:
+                                        function_response_id = result["meta"]['id']
+                                else:
+                                    tool_response = {
+                                        "type": "unknown",
+                                        "text_content": str(result) # Fallback to string representation
+                                    }
+                            response_data = {
+                                "name": part.function_response.name,
+                                "id": part.function_response.id,
+                                "response": tool_response,
+                                "function_response_id": function_response_id
+                            }
+                            if user_query is not None:
+                                user_query["response"].append({"type": "function_response", "data": response_data})
+            if event.content.role == "model":
+                if user_query is not None:
+                    # Process the event parts and yield structured data
+                    for part in event.content.parts:
+                        if hasattr(part, "text") and part.text and not part.text.isspace():
+                            # print("text condition in parse event in model response >>", part.text)
+                            user_query["response"].append({"type": "text", "content": part.text.strip()})
+                        elif hasattr(part, "function_call") and part.function_call:
+                            function_data = {
+                                "name": part.function_call.name,
+                                "id": part.function_call.id,
+                                "args": part.function_call.args if hasattr(part.function_call, "args") else {}
+                            }
+                            user_query["response"].append({"type": "function_call", "data": function_data})
+    if user_query is not None and "response" in user_query:
+        parsed_events.append(user_query)
+    # print('parsed_events >>', parsed_events)
+    return parsed_events 

@@ -71,7 +71,7 @@ def after_tool_output_limit_callback(tool: BaseTool, args: Dict[str, Any], tool_
             for c in content:
                 text_content = c.text
                 if len(text_content) > MAX_LENGTH:
-                    truncated_text = text_content[:MAX_LENGTH] + f'... [truncated, full response available with tool_id: {tool_id}]'
+                    truncated_text = text_content[:MAX_LENGTH] + f'... [truncated]'
                     response_is_truncated = True
                 else:
                     truncated_text = text_content
@@ -80,12 +80,12 @@ def after_tool_output_limit_callback(tool: BaseTool, args: Dict[str, Any], tool_
                 new_tool_responses.append(new_text_response)
             
             # If response was truncated, add a special message with the tool_id
-            if response_is_truncated:
-                retrieval_info = TextContent(
-                    type="text", 
-                    text=f"Note: Some tool output was truncated. Full response can be retrieved using tool_id: {tool_id}"
-                )
-                new_tool_responses.append(retrieval_info)
+            # if response_is_truncated:
+            #     retrieval_info = TextContent(
+            #         type="text", 
+            #         text=f"Note: Some tool output was truncated. Full response can be retrieved using tool_id: {tool_id}"
+            #     )
+            #     new_tool_responses.append(retrieval_info)
             
             new_tool_result = CallToolResult(
                 content=new_tool_responses,

@@ -1,0 +1,370 @@
+.activities-page {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.activities-header {
+    margin-bottom: 24px;
+}
+
+.feedback-message {
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-weight: 500;
+    animation: fadeIn 0.3s ease;
+}
+
+.feedback-message.success {
+    background-color: rgba(46, 204, 113, 0.15);
+    color: #27ae60;
+    border: 1px solid rgba(46, 204, 113, 0.3);
+}
+
+.feedback-message.error {
+    background-color: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.activities-header h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    color: var(--color-text-primary);
+}
+
+.activities-header p {
+    color: var(--color-text-secondary);
+    margin-bottom: 24px;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.filter-btn {
+    padding: 8px 16px;
+    background-color: var(--color-bg-secondary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.filter-btn:hover {
+    background-color: var(--c-deep-light);
+}
+
+.filter-btn.active {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+.sort-control {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.sort-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background-color: var(--color-bg-secondary);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.sort-btn:hover {
+    background-color: var(--c-deep-light);
+}
+
+.sort-icon {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+}
+
+.activities-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.activity-card {
+    background-color: var(--color-bg-primary);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px var(--shadow-color, rgba(0, 0, 0, 0.1));
+    padding: 16px;
+    transition: all 0.2s ease, box-shadow 0.2s ease;
+    /* Add glassy feel */
+    backdrop-filter: blur(10px);
+    background-color: var(--glassy-color);
+    border: 1px solid var(--glassy-outline-color);
+    border-left: 4px solid var(--c-deep-light); /* Default left border */
+    display: flex;
+    flex-direction: column;
+    min-height: 160px;
+}
+
+.activity-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px var(--shadow-color, rgba(0, 0, 0, 0.15));
+    border-left-color: var(--color-success); 
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.activity-header h3 {
+    font-size: 18px;
+    margin: 0;
+    color: var(--color-text-primary);
+}
+
+.activity-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.delete-action {
+    display: flex;
+    align-items: center;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+    background-color: rgba(255, 59, 48, 0.1);
+}
+
+.delete-icon {
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    transition: color 0.2s ease;
+}
+
+.delete-btn:hover .delete-icon {
+    color: var(--color-alert, #ff3b30);
+}
+
+.delete-icon {
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    transition: color 0.2s ease;
+}
+
+.delete-btn:hover .delete-icon {
+    color: var(--color-alert, #ff3b30);
+}
+
+.activity-description {
+    color: var(--color-text-secondary);
+    margin-bottom: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.metrics-label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+    font-weight: 500;
+    text-align: left;
+    padding-left: 2px;
+}
+
+.activity-metrics {
+    display: flex;
+    gap: 16px;
+    margin: 12px 0;
+    flex-wrap: wrap;
+}
+
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: var(--color-bg-secondary);
+    padding: 6px 10px;
+    border-radius: 20px;
+    transition: background-color 0.2s ease;
+    position: relative; /* For positioning the tooltip */
+}
+
+.metric-item:hover {
+    background-color: var(--c-deep-light);
+}
+
+.metric-item:hover .metric-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.metric-tooltip {
+    position: absolute;
+    top: -35px; /* Fixed position above the icon */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 10;
+    border: 1px solid var(--glassy-outline-color);
+    pointer-events: none; /* Prevents the tooltip from interfering with hover */
+    backdrop-filter: blur(8px);
+    font-weight: 500;
+    text-align: center;
+}
+
+.metric-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -4px;
+    border-width: 4px;
+    border-style: solid;
+    border-color: var(--color-bg-primary) transparent transparent transparent;
+}
+
+.metric-icon {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+.metric-count {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: 14px;
+}
+
+.activity-footer {
+    display: flex;
+    justify-content: space-between;
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    margin-top: auto;
+    padding-top: 12px;
+}
+
+.activity-type {
+    text-transform: capitalize;
+    background-color: var(--color-bg-secondary);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.activity-session-id {
+    font-family: monospace;
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    background-color: var(--color-bg-secondary);
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.activity-time {
+    font-size: 12px;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--glassy-color);
+    border-radius: 50%;
+    border-top-color: var(--color-accent);
+    animation: spin 1s ease-in-out infinite;
+    margin-bottom: 16px;
+}
+
+.no-activities {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    background-color: var(--color-bg-secondary);
+    border-radius: 8px;
+    color: var(--color-text-secondary);
+}
+
+.activities-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px; /* Add some padding for the scrollbar */
+}
+
+.activities-content::-webkit-scrollbar {
+    width: 6px;
+    border-radius: 5px;
+}
+
+.activities-content::-webkit-scrollbar-track {
+    background-color: var(--scrollbar-track-color);
+    border-radius: 5px;
+}
+
+.activities-content::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb-color);
+    border-radius: 5px;
+}
+
+.activities-content::-webkit-scrollbar-thumb:hover {
+    background-color: var(--scrollbar-thumb-hover-color);
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

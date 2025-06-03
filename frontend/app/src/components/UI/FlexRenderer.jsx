@@ -32,6 +32,7 @@ const FlexRenderer = ({ items }) => {
             }
             return <FunctionCall key={index} data={item.data} />;
           case 'text':
+            console.log("text content recieved >>", item.content)
             return <TextResponse key={index} content={item.content} />;
           case 'error':
             // Use ErrorDisplay for error messages
