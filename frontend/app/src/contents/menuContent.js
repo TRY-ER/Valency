@@ -18,10 +18,8 @@ import {
     FaRobot,
     FaUserSecret // Added FaUserSecret
 } from 'react-icons/fa';
+import Home from "../pages/Home";
 
-// Placeholder components - consider moving these to their own files
-const HomeComponent = () => <div style={{ padding: '20px' }}><h2>Home Page</h2><p>Welcome to the Drug Discovery Toolkit. This is the central hub for all tools and features.</p></div>;
-const AutomationPage = () => <div style={{ padding: '20px' }}><h2>Automation Page</h2><p>This page will be used for automating drug discovery workflows. Content coming soon.</p></div>;
 
 const menuContent = [
     {
@@ -30,7 +28,7 @@ const menuContent = [
         icon: <FaHome />,
         link: '', // Root path
         description: 'Overview and starting point of the drug discovery toolkit.',
-        component: <HomeComponent />,
+        component: <Home />,
     },
     {
         id: 6, // ID shifted from 4

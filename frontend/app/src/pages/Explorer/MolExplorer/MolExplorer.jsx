@@ -18,7 +18,7 @@ const MolEComponent = () => {
             initial="hidden"
             animate="visible"
             variants={fadeInUpVariantStatic}
-            className="explore-container"> {/* Reverted className */}
+            className="explore-container">
             <div className="explorer-row-1">
                 <MolInputBox
                     activeMol={activeMol}

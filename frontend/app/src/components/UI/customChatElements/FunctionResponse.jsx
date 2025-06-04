@@ -4,15 +4,18 @@ import CustomMarkdownRenderer from "../CustomMarkdown";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import remarkGfm from "remark-gfm";
-import { FiTool, FiUser, FiAlertCircle, FiChevronDown, FiChevronUp, FiHelpCircle } from "react-icons/fi"; // Added chevron and help icons
+import { FiTool, FiUser, FiAlertCircle, FiChevronDown, FiChevronUp, FiHelpCircle, FiMaximize, FiX } from "react-icons/fi"; // Added maximize and close icons
 import { BsCheck2All } from 'react-icons/bs';
 import { getToolResponse } from "../../../services/api/agentService"; // Import the getToolResponse function
+import ToolResponseHandler from "../../ToolResponseHandler/ToolResponseHandler";
 
 const FunctionResponse = ({ data }) => {
     const [expanded, setExpanded] = useState(false);
     const [toolResponse, setToolResponse] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [toolTransferData, setToolTransferData] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     // Fetch the tool response when the component mounts or when expanded is toggled to true
     console.log("function call data >>", data)
@@ -36,7 +39,45 @@ const FunctionResponse = ({ data }) => {
         }
     }, [expanded, data.id, toolResponse]);
 
+    useEffect(() => {
+        if (toolResponse) {
+            if (toolResponse.response_data.content){
+                let content = toolResponse.response_data.content[0];
+                if (content.text){
+                    setToolTransferData(JSON.parse(content.text).data);
+                }
+            }
+        } 
+    }, [toolResponse])
+
+    useEffect(() => {
+        console.log("tool transfer data >>", toolTransferData)
+    }, [toolTransferData])
+
     const toggleExpand = () => setExpanded(!expanded);
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+    // Handle Escape key to close modal
+    useEffect(() => {
+        const handleEscape = (event) => {
+            if (event.key === 'Escape' && isModalOpen) {
+                closeModal();
+            }
+        };
+
+        if (isModalOpen) {
+            document.addEventListener('keydown', handleEscape);
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+
+        return () => {
+            document.removeEventListener('keydown', handleEscape);
+            document.body.style.overflow = 'unset';
+        };
+    }, [isModalOpen]);
+
 
     return (
         <motion.div
@@ -47,19 +88,31 @@ const FunctionResponse = ({ data }) => {
         >
             <div className="func-tag-holder" style={{ flexDirection: "column", width: "100%" }}>
                 <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <div className="func-tag-inner-container" style={{marginLeft: "10px"}}>
+                    <div className="func-tag-inner-container" style={{ marginLeft: "10px" }}>
                         <p>{data.name}</p>
                     </div>
-                    <div className="func-tag-inner-container" style={{marginLeft: "10px"}}>
+                    <div className="func-tag-inner-container" style={{ marginLeft: "10px" }}>
                         <p>ID: {data?.function_response_id}</p>
                     </div>
                     <div className="tool-icon-container">
                         <FiTool className="tool-icon" />
                         <BsCheck2All className="tool-icon" style={{ marginLeft: "5px", color: "#2ecc71" }} />
                     </div>
-                    <motion.div 
-                        className="tool-icon-container" 
-                        onClick={toggleExpand} 
+                    {toolResponse && toolTransferData && (
+                        <motion.div
+                            className="tool-icon-container"
+                            onClick={openModal}
+                            style={{ cursor: "pointer", marginLeft: "10px" }}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            title="Open in fullscreen"
+                        >
+                            <FiMaximize className="tool-icon" style={{ color: "#007bff" }} />
+                        </motion.div>
+                    )}
+                    <motion.div
+                        className="tool-icon-container"
+                        onClick={toggleExpand}
                         style={{ cursor: "pointer", marginLeft: "auto" }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
@@ -69,47 +122,75 @@ const FunctionResponse = ({ data }) => {
                 </div>
 
                 <AnimatePresence>
-                {expanded && (
-                    <motion.div 
-                        key="content"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ 
-                            duration: 0.3,
-                            ease: "easeInOut"
-                        }}
-                        style={{ marginTop: "10px", width: "100%", overflow: "hidden" }}
-                    >
-                        {loading && (
-                            <div className="func-tag-inner-container" style={{ width: "100%" }}>
-                                <p>Loading tool response...</p>
-                            </div>
-                        )}
+                    {expanded && (
+                        <motion.div
+                            key="content"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{
+                                duration: 0.3,
+                                ease: "easeInOut"
+                            }}
+                            style={{ marginTop: "10px", width: "100%", overflow: "hidden" }}
+                        >
+                            {loading && (
+                                <div className="func-tag-inner-container" style={{ width: "100%" }}>
+                                    <p>Loading tool response...</p>
+                                </div>
+                            )}
 
-                        {error && (
-                            <div className="func-tag-inner-container" style={{ width: "100%", color: "red" }}>
-                                <p>{error}</p>
-                            </div>
-                        )}
-
-                        {toolResponse && (
-                            <div className="func-tag-inner-container" style={{ width: "100%" }}>
-                                <pre style={{
-                                    fontFamily: 'monospace',
-                                    padding: '1em',
-                                    borderRadius: '3px',
-                                    overflowX: 'auto',
-                                    margin: 0,
-                                }}>
-                                    {JSON.stringify(toolResponse, null, 2)}
-                                </pre>
-                            </div>
-                        )}
-                    </motion.div>
-                )}
+                            {error && (
+                                <div className="func-tag-inner-container" style={{ width: "100%", color: "red" }}>
+                                    <p>{error}</p>
+                                </div>
+                            )}
+                            {toolResponse && 
+                                <ToolResponseHandler ToolName={data.name} ToolData={toolTransferData} />
+                            }
+                        </motion.div>
+                    )}
                 </AnimatePresence>
             </div>
+
+            {/* Fullscreen Modal */}
+            <AnimatePresence>
+                {isModalOpen && (
+                    <motion.div
+                        className="fullscreen-modal-overlay"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
+                        onClick={closeModal}
+                    >
+                        <motion.div
+                            className="fullscreen-modal-content"
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            transition={{ duration: 0.3 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="fullscreen-modal-header">
+                                <h2>Tool Response: {data.name}</h2>
+                                <button 
+                                    className="fullscreen-modal-close"
+                                    onClick={closeModal}
+                                    aria-label="Close modal"
+                                >
+                                    <FiX />
+                                </button>
+                            </div>
+                            <div className="fullscreen-modal-body">
+                                {toolResponse && toolTransferData && (
+                                    <ToolResponseHandler ToolName={data.name} ToolData={toolTransferData} />
+                                )}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </motion.div>
     )
 
@@ -128,19 +209,19 @@ const FunctionCall = ({ data }) => {
         >
             <div className="func-tag-holder" style={{ flexDirection: "column", width: "100%" }}>
                 <div style={{ display: "flex", alignItems: "center", width: "100%" }}>
-                    <div className="func-tag-inner-container" style={{marginLeft: "10px"}}>
+                    <div className="func-tag-inner-container" style={{ marginLeft: "10px" }}>
                         <p>{data.name}</p>
                     </div>
-                    <div className="func-tag-inner-container" style={{marginLeft: "10px"}}>
+                    <div className="func-tag-inner-container" style={{ marginLeft: "10px" }}>
                         <p>{data.args ? `${Object.keys(data.args).length} arguments` : 'No arguments'}</p>
                     </div>
                     <div className="tool-icon-container">
                         <FiTool className="tool-icon" />
                         <FiHelpCircle className="tool-icon" style={{ marginLeft: "5px", color: "#2ecc71" }} />
                     </div>
-                    <motion.div 
-                        className="tool-icon-container" 
-                        onClick={toggleExpand} 
+                    <motion.div
+                        className="tool-icon-container"
+                        onClick={toggleExpand}
                         style={{ cursor: "pointer", marginLeft: "auto" }}
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
@@ -150,31 +231,31 @@ const FunctionCall = ({ data }) => {
                 </div>
 
                 <AnimatePresence>
-                {expanded && data.args && (
-                    <motion.div 
-                        key="content"
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ 
-                            duration: 0.3,
-                            ease: "easeInOut"
-                        }}
-                        style={{ marginTop: "10px", width: "100%", overflow: "hidden" }}
-                    >
-                        <div className="func-tag-inner-container" style={{ width: "100%" }}>
-                            <pre style={{
-                                fontFamily: 'monospace',
-                                padding: '1em',
-                                borderRadius: '3px',
-                                overflowX: 'auto',
-                                margin: 0,
-                            }}>
-                                {JSON.stringify(data.args, null, 2)}
-                            </pre>
-                        </div>
-                    </motion.div>
-                )}
+                    {expanded && data.args && (
+                        <motion.div
+                            key="content"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{
+                                duration: 0.3,
+                                ease: "easeInOut"
+                            }}
+                            style={{ marginTop: "10px", width: "100%", overflow: "hidden" }}
+                        >
+                            <div className="func-tag-inner-container" style={{ width: "100%" }}>
+                                <pre style={{
+                                    fontFamily: 'monospace',
+                                    padding: '1em',
+                                    borderRadius: '3px',
+                                    overflowX: 'auto',
+                                    margin: 0,
+                                }}>
+                                    {JSON.stringify(data.args, null, 2)}
+                                </pre>
+                            </div>
+                        </motion.div>
+                    )}
                 </AnimatePresence>
             </div>
         </motion.div>

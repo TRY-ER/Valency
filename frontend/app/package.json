@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@rcsb/rcsb-saguaro": "^3.1.7",
+    "@react-three/drei": "^10.1.2",
+    "@react-three/fiber": "^9.1.2",
     "3dmol": "^2.4.2",
     "axios": "^1.7.9",
     "clipboard-copy": "^4.0.1",
@@ -19,7 +21,8 @@
     "react-markdown": "^9.0.3",
     "react-scripts": "5.0.1",
     "remark-gfm": "^4.0.1",
-    "sass": "^1.89.0"
+    "sass": "^1.89.0",
+    "three": "^0.177.0"
   },
   "scripts": {
     "start": "react-scripts start",

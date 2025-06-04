@@ -32,3 +32,119 @@
   display: flex;
   flex-direction: row;
 }
+
+/* Fullscreen Modal Styles */
+.fullscreen-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.fullscreen-modal-content {
+  background-color: var(--color-bg-primary, #ffffff);
+  border-radius: 15px;
+  width: 95vw;
+  height: 90vh;
+  max-width: 1400px;
+  max-height: 900px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--glassy-outline-color, rgba(255, 255, 255, 0.3));
+}
+
+.fullscreen-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 30px;
+  border-bottom: 1px solid var(--chat-border-color, #e0e0e0);
+  background-color: var(--color-bg-secondary, #f8f9fa);
+  border-radius: 15px 15px 0 0;
+}
+
+.fullscreen-modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-text-primary, #333);
+}
+
+.fullscreen-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-secondary, #666);
+  transition: all 0.2s ease;
+}
+
+.fullscreen-modal-close:hover {
+  background-color: var(--c-lite, rgba(0, 0, 0, 0.1));
+  color: var(--color-text-primary, #333);
+  transform: scale(1.1);
+}
+
+.fullscreen-modal-body {
+  flex: 1;
+  overflow: auto;
+  padding: 30px;
+  background-color: var(--color-bg-primary, #ffffff);
+}
+
+.fullscreen-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.fullscreen-modal-body::-webkit-scrollbar-thumb {
+  background-color: var(--c-lite, rgba(0, 0, 0, 0.2));
+  border-radius: 4px;
+}
+
+.fullscreen-modal-body::-webkit-scrollbar-track {
+  background-color: var(--color-bg-secondary, #f8f9fa);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .fullscreen-modal-overlay {
+    padding: 10px;
+  }
+  
+  .fullscreen-modal-content {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    max-width: none;
+    max-height: none;
+  }
+  
+  .fullscreen-modal-header {
+    padding: 15px 20px;
+    border-radius: 0;
+  }
+  
+  .fullscreen-modal-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .fullscreen-modal-body {
+    padding: 20px;
+  }
+}

@@ -1,5 +1,6 @@
 import BRICSGenerator from "../../pages/Generator/BRICS/BRICSGenerator";
 import LSTMGenerator from "../../pages/Generator/LSTM/LSTMGenerator";
+import ADMETComponent from "../../pages/Generator/ADMET/ADMET";
 import { BRICSGeneratorTabContents, LSTMGeneratorTabContents } from "./NestGeneratorTags";
 
 const GeneratorTabContents = [
@@ -27,13 +28,17 @@ const GeneratorTabContents = [
         includeDocs: true,
         docs: null,
     },
-    // {
-    //     id: 3,
-    //     title: 'LMLF Generator',
-    //     link: 'lmlf',
-    //     component: null, 
-    //     docs: null,
-    // },
+    {
+        id: 3,
+        title: 'ADMET',
+        link: 'admet',
+        description: `Predict Absorption, Distribution, Metabolism, Excretion, and Toxicity (ADMET) properties of molecules using machine learning models.
+                      Enter a molecular SMILES string to get predictions for how well the molecule will be absorbed, distributed throughout the body,
+                      metabolized, excreted, and its potential toxicity. This tool helps in early drug discovery by identifying promising compounds
+                      with favorable pharmacokinetic and safety profiles.`,
+        component: <ADMETComponent />,   
+        docs: null,
+    },
 ];
 
 export default GeneratorTabContents;
