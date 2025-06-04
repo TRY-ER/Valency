@@ -55,7 +55,6 @@ const ToolResponseHandler = ({ ToolName, ToolData }) => {
                     borderRadius: '3px',
                     overflowX: 'auto',
                     margin: 0,
-                    backgroundColor: '#f8f9fa',
                     border: '1px solid #dee2e6'
                 }}>
                     {JSON.stringify(ToolData, null, 2)}

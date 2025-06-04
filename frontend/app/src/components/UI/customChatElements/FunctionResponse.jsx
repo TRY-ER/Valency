@@ -40,11 +40,18 @@ const FunctionResponse = ({ data }) => {
     }, [expanded, data.id, toolResponse]);
 
     useEffect(() => {
+        console.log("tool response >>", toolResponse)
         if (toolResponse) {
             if (toolResponse.response_data.content){
                 let content = toolResponse.response_data.content[0];
                 if (content.text){
-                    setToolTransferData(JSON.parse(content.text).data);
+                    const main_return = JSON.parse(content.text);
+                    if (main_return.data) {
+                        setToolTransferData(main_return.data);
+                    }
+                    else {
+                        setToolTransferData(main_return);
+                    }
                 }
             }
         } 

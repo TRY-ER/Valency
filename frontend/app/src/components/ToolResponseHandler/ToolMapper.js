@@ -22,7 +22,8 @@ import DataViewer from '../UI/DataViewer';
  */
 const ToolMapper = {
     "get_admet_prediction": ADMETComponent,
-    
+    "get_alphafold_prediction": UniProtViewer,   
+
     // Utility Components
     'DataViewer': DataViewer,
     'data_viewer': DataViewer,

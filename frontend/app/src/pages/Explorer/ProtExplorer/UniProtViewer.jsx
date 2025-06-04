@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import PropTypes from "prop-types";
 import "./UniProtViewer.css"; // Specific styles for UniProtViewer (now contains shared styles too)
 import UniProtInputBox from "../../../components/UI/UniProtInputBox/UniProtInputBox";
 import InfoBox from "../../../components/UI/InfoBox/InfoBox";
@@ -9,14 +10,26 @@ import GlassyContainer from "../../../components/glassy_container/gc";
 import { RcsbFv } from "@rcsb/rcsb-saguaro";
 import { FaDownload } from 'react-icons/fa'; // Import the download icon
 
-const UniProtViewer = () => {
-    const [accessionKey, setAccessionKey] = useState("");
-    const [apiData, setApiData] = useState(null);
+const UniProtViewer = ({ 
+    toolData = null, 
+    initialAccessionKey = "", 
+    hideInputBox = false 
+}) => {
+    const [accessionKey, setAccessionKey] = useState(initialAccessionKey);
+    const [apiData, setApiData] = useState(toolData);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [pdbUrl, setPdbUrl] = useState("");
+    const [pdbUrl, setPdbUrl] = useState(toolData?.pdbUrl || "");
     const rcsbFvInstance = useRef(null);
     const sequenceViewerRef = useRef(null);
+
+    useEffect(() => {
+        console.log('tool data recieved >>', toolData)
+    }, [toolData])
+
+    useEffect(() => {
+        console.log("apiData updated >>", apiData);
+    }, [apiData])
 
     const handleValidationComplete = useCallback((isValid, data, errorMessage) => {
         setIsLoading(false);
@@ -36,17 +49,41 @@ const UniProtViewer = () => {
         }
     }, []);
 
+    // Effect to handle initial data passed as props
+    useEffect(() => {
+        if (toolData) {
+            var tempData = null;
+            if (typeof toolData === "object"){
+                tempData = toolData["0"];
+            }
+            else{
+                tempData = toolData;
+            }
+            setApiData(tempData);
+            setError(null);
+            if (tempData.pdbUrl) {
+                setPdbUrl(tempData.pdbUrl);
+            } else {
+                setError("PDB URL not found in provided data.");
+                setPdbUrl("");
+            }
+        }
+    }, [toolData]);
+
     useEffect(() => {
         if (!accessionKey || accessionKey.trim() === "") {
-            setApiData(null);
-            setPdbUrl("");
-            setError(null);
+            // Only clear data if no initial data was provided
+            if (!toolData) {
+                setApiData(null);
+                setPdbUrl("");
+                setError(null);
+            }
             if (rcsbFvInstance.current) {
                 rcsbFvInstance.current.unmount();
                 rcsbFvInstance.current = null;
             }
         }
-    }, [accessionKey]);
+    }, [accessionKey, toolData]);
 
     useEffect(() => {
         if (apiData && apiData.uniprotSequence && apiData.uniprotSequence.length > 0 && sequenceViewerRef.current) {
@@ -126,17 +163,19 @@ const UniProtViewer = () => {
                 variants={fadeInUpVariantStatic}
                 className="explore-container"
             >
-                <div className="explorer-row-1">
-                    <GlassyContainer>
-                        <UniProtInputBox
-                            value={accessionKey}
-                            onChange={setAccessionKey}
-                            onValidationComplete={handleValidationComplete}
-                            header="Enter UniProt Accession Key"
-                            placeholder="Try UniProt Accession: Q5VSL9"
-                        />
-                    </GlassyContainer>
-                </div>
+                {!hideInputBox && (
+                    <div className="explorer-row-1">
+                        <GlassyContainer>
+                            <UniProtInputBox
+                                value={accessionKey}
+                                onChange={setAccessionKey}
+                                onValidationComplete={handleValidationComplete}
+                                header="Enter UniProt Accession Key"
+                                placeholder="Try UniProt Accession: Q5VSL9"
+                            />
+                        </GlassyContainer>
+                    </div>
+                )}
 
                 {error && <div className="error-message" style={{ color: 'red', marginTop: '10px' }}>{error}</div>}
 
@@ -183,7 +222,7 @@ const UniProtViewer = () => {
                     </div>
                 )}
 
-                {apiData && apiData.uniprotSequence && (
+                {/* {apiData && apiData.uniprotSequence && (
                     <div className="explorer-row-3" style={{ marginTop: '20px' }}>
                         <GlassyContainer>
                             <h3 style={{ marginBottom: '15px', fontWeight: '700'}}>Sequence Viewer</h3>
@@ -196,7 +235,7 @@ const UniProtViewer = () => {
                             ></div>
                         </GlassyContainer>
                     </div>
-                )}
+                )} */}
 
                 {apiData && (
                     <div className="explorer-row-4" style={{ marginTop: '20px' }}>
@@ -215,6 +254,29 @@ const UniProtViewer = () => {
             </motion.div>
         </>
     );
+};
+
+// PropTypes for better type checking and documentation
+UniProtViewer.propTypes = {
+    toolData: PropTypes.shape({
+        gene: PropTypes.string,
+        uniprotDescription: PropTypes.string,
+        organismScientificName: PropTypes.string,
+        uniprotId: PropTypes.string,
+        entryId: PropTypes.string,
+        sequenceVersionDate: PropTypes.string,
+        modelCreatedDate: PropTypes.string,
+        latestVersion: PropTypes.string,
+        taxId: PropTypes.string,
+        uniprotSequence: PropTypes.string,
+        pdbUrl: PropTypes.string,
+        cifUrl: PropTypes.string,
+        bcifUrl: PropTypes.string,
+        paeImageUrl: PropTypes.string,
+        paeDocUrl: PropTypes.string,
+    }),
+    initialAccessionKey: PropTypes.string,
+    hideInputBox: PropTypes.bool,
 };
 
 export default UniProtViewer;
