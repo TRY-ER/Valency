@@ -303,10 +303,10 @@ const AlphafoldAnnotationsViewer = ({
                                         style={{
                                             width: '100%',
                                             padding: '8px',
-                                            borderRadius: '5px',
-                                            border: '1px solid rgba(255, 255, 255, 0.3)',
-                                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                            color: 'white'
+                                            borderRadius: '15px',
+                                            border: '1px solid var(--glassy-color)',
+                                            backgroundColor: 'var(--glassy-color)',
+                                            color: 'var(--color-text-primary)',
                                         }}
                                     />
                                     <div style={{ fontSize: '0.8em', opacity: 0.6, marginTop: '5px' }}>

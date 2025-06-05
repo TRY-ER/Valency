@@ -11,6 +11,7 @@
     color: var(--color-text-secondary);
     margin-bottom: 10px;
     text-align: left;
+    font-weight: 600;
 }
 
 .uniprot-input-box-input-wrapper {

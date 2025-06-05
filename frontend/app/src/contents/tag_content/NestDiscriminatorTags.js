@@ -1,5 +1,6 @@
 import SSContent from "../../pages/Discriminator/SimilaritySearch/SSContent";
 import DocRenderer from "../doc_content/DocRenderer";
+import ChemBLGetter from "../../pages/Explorer/ChemBLExplorer/ChemBLGetter";
 
 const SimilaritySearchTabContents = [
     {
@@ -40,6 +41,45 @@ const SimilaritySearchTabContents = [
     }
 ]; 
 
+const ChemBLTabContents = [
+    {
+        id: 1,
+        title: 'Getter',
+        link: '',
+        description: `This tool uses ChemBL database to retrieve molecule information by ChEMBL ID or preferred name.
+                      It allows you to search for molecules using either their unique ChEMBL identifier or their 
+                      common/preferred name and displays comprehensive molecular data.`,
+        component: <ChemBLGetter />,
+        // component: null,
+        docs: null,
+    },
+    {
+        id: 2,
+        title: 'Synonym Search',
+        link: 'syn-search',
+        description: `This tool uses ChemBL database to search for synonyms of a given molecule.`,
+        component: null,
+        docs: null,
+    },
+    {
+        id: 3,
+        title: 'Similarity Search',
+        link: 'similarity-search',
+        description: `This tool uses ChemBL database to conduct a similarity search for molecules.`,
+        component: null,
+        docs: null,
+    },
+    {
+        id: 4,
+        title: 'Approved Drugs',
+        link: 'app-drugs',
+        description: `This tool uses ChemBL database to retrieve information about approved drugs.`,
+        component: null,
+        docs: null,
+    },
+];
+
 export {
     SimilaritySearchTabContents,
+    ChemBLTabContents
 }

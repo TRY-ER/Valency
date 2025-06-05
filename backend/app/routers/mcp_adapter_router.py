@@ -131,12 +131,9 @@ chembl_router = APIRouter(prefix="/mcp/chembl", tags=["ChEMBL MCP Tools"])
 # Pydantic Models for ChEMBL tool arguments
 class ChemblGetMoleculeByIdArgs(BaseModel):
     chembl_id: str = Field(..., description="The ChEMBL ID of the molecule (e.g., 'CHEMBL192').")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields to return.")
 
 class ChemblFindMoleculeByPrefNameArgs(BaseModel):
     pref_name: str = Field(..., description="The preferred name to search for (e.g., 'Aspirin').")
-    exact_match: bool = Field(True, description="If True, performs an exact case-insensitive match. If False, performs a case-insensitive partial match.")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields to return.")
 
 class ChemblFindMoleculeBySynonymArgs(BaseModel):
     synonym: str = Field(..., description="The synonym to search for (case-insensitive exact match).")

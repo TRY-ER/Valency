@@ -261,6 +261,610 @@ export const getBricsCandidates = async (args) => {
   }
 };
 
+// ==================== CHEMBL TOOLS ====================
+
+/**
+ * @typedef {Object} ChemblGetMoleculeByIdArgs
+ * @property {string} chembl_id - The ChEMBL ID of the molecule (e.g., 'CHEMBL192').
+ */
+
+/**
+ * Retrieve a specific molecule by its unique ChEMBL ID.
+ * @param {ChemblGetMoleculeByIdArgs} args - The arguments for molecule retrieval
+ * @returns {Promise<object>} A promise that resolves to the molecule data
+ */
+export const getMoleculeByChemblId = async (args) => {
+  if (!args || !args.chembl_id) {
+    console.error('getMoleculeByChemblId: chembl_id is required');
+    return Promise.reject(new Error('ChEMBL ID is required'));
+  }
+  
+  if (typeof args.chembl_id !== 'string' || args.chembl_id.trim() === '') {
+    console.error('getMoleculeByChemblId: chembl_id must be a non-empty string');
+    return Promise.reject(new Error('ChEMBL ID must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/get_molecule_by_chembl_id', args);
+    console.log('ChEMBL molecule retrieved successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get ChEMBL molecule:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblFindMoleculeByPrefNameArgs
+ * @property {string} pref_name - The preferred name to search for (e.g., 'Aspirin').
+ */
+
+/**
+ * Search for molecules by their preferred name.
+ * @param {ChemblFindMoleculeByPrefNameArgs} args - The arguments for molecule search
+ * @returns {Promise<object>} A promise that resolves to the molecule search results
+ */
+export const findMoleculeByPrefName = async (args) => {
+  if (!args || !args.pref_name) {
+    console.error('findMoleculeByPrefName: pref_name is required');
+    return Promise.reject(new Error('Preferred name is required'));
+  }
+  
+  if (typeof args.pref_name !== 'string' || args.pref_name.trim() === '') {
+    console.error('findMoleculeByPrefName: pref_name must be a non-empty string');
+    return Promise.reject(new Error('Preferred name must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/find_molecule_by_pref_name', args);
+    console.log('ChEMBL molecule search by name completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to find ChEMBL molecule by name:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblFindMoleculeBySynonymArgs
+ * @property {string} synonym - The synonym to search for (case-insensitive exact match).
+ * @property {string[]} [only_fields] - Optional list of specific fields to return.
+ */
+
+/**
+ * Find molecules by their synonyms.
+ * @param {ChemblFindMoleculeBySynonymArgs} args - The arguments for synonym search
+ * @returns {Promise<object>} A promise that resolves to the molecule search results
+ */
+export const findMoleculeBySynonym = async (args) => {
+  if (!args || !args.synonym) {
+    console.error('findMoleculeBySynonym: synonym is required');
+    return Promise.reject(new Error('Synonym is required'));
+  }
+  
+  if (typeof args.synonym !== 'string' || args.synonym.trim() === '') {
+    console.error('findMoleculeBySynonym: synonym must be a non-empty string');
+    return Promise.reject(new Error('Synonym must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/find_molecule_by_synonym', args);
+    console.log('ChEMBL molecule search by synonym completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to find ChEMBL molecule by synonym:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblGetMoleculesByIdsArgs
+ * @property {string[]} chembl_ids - A list of ChEMBL IDs (e.g., ['CHEMBL25', 'CHEMBL192']).
+ * @property {string[]} [only_fields] - Optional list of specific fields to return.
+ */
+
+/**
+ * Retrieve multiple molecules by a list of ChEMBL IDs.
+ * @param {ChemblGetMoleculesByIdsArgs} args - The arguments for multiple molecule retrieval
+ * @returns {Promise<object>} A promise that resolves to the molecules data
+ */
+export const getMoleculesByChemblIds = async (args) => {
+  if (!args || !args.chembl_ids) {
+    console.error('getMoleculesByChemblIds: chembl_ids is required');
+    return Promise.reject(new Error('ChEMBL IDs list is required'));
+  }
+  
+  if (!Array.isArray(args.chembl_ids) || args.chembl_ids.length === 0) {
+    console.error('getMoleculesByChemblIds: chembl_ids must be a non-empty array');
+    return Promise.reject(new Error('ChEMBL IDs must be a non-empty array'));
+  }
+  
+  if (!args.chembl_ids.every(id => typeof id === 'string' && id.trim() !== '')) {
+    console.error('getMoleculesByChemblIds: all ChEMBL IDs must be non-empty strings');
+    return Promise.reject(new Error('All ChEMBL IDs must be non-empty strings'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/get_molecules_by_chembl_ids', args);
+    console.log('ChEMBL molecules retrieved successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get ChEMBL molecules:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblGetMoleculeImageSvgArgs
+ * @property {string} chembl_id - The ChEMBL ID of the molecule.
+ */
+
+/**
+ * Get the 2D chemical structure image of a molecule as an SVG string.
+ * @param {ChemblGetMoleculeImageSvgArgs} args - The arguments for molecule image retrieval
+ * @returns {Promise<object>} A promise that resolves to the SVG image data
+ */
+export const getMoleculeImageSvg = async (args) => {
+  if (!args || !args.chembl_id) {
+    console.error('getMoleculeImageSvg: chembl_id is required');
+    return Promise.reject(new Error('ChEMBL ID is required'));
+  }
+  
+  if (typeof args.chembl_id !== 'string' || args.chembl_id.trim() === '') {
+    console.error('getMoleculeImageSvg: chembl_id must be a non-empty string');
+    return Promise.reject(new Error('ChEMBL ID must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/get_molecule_image_svg', args);
+    console.log('ChEMBL molecule image retrieved successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get ChEMBL molecule image:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblFindSimilarMoleculesBySmilesArgs
+ * @property {string} smiles - The SMILES string of the query molecule (e.g., 'CCO').
+ * @property {number} [similarity_threshold=70] - Minimum similarity percentage (0-100).
+ * @property {string[]} [only_fields] - Optional list of specific fields for similar molecules.
+ */
+
+/**
+ * Find molecules structurally similar to a given SMILES string.
+ * @param {ChemblFindSimilarMoleculesBySmilesArgs} args - The arguments for similarity search
+ * @returns {Promise<object>} A promise that resolves to the similar molecules data
+ */
+export const findSimilarMoleculesBySmiles = async (args) => {
+  if (!args || !args.smiles) {
+    console.error('findSimilarMoleculesBySmiles: smiles is required');
+    return Promise.reject(new Error('SMILES string is required'));
+  }
+  
+  if (typeof args.smiles !== 'string' || args.smiles.trim() === '') {
+    console.error('findSimilarMoleculesBySmiles: smiles must be a non-empty string');
+    return Promise.reject(new Error('SMILES string must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/find_similar_molecules_by_smiles', args);
+    console.log('ChEMBL similar molecules search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to find similar ChEMBL molecules by SMILES:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblFindSimilarMoleculesByIdArgs
+ * @property {string} chembl_id - The ChEMBL ID of the query molecule.
+ * @property {number} [similarity_threshold=70] - Minimum similarity percentage (0-100).
+ * @property {string[]} [only_fields] - Optional list of specific fields for similar molecules.
+ */
+
+/**
+ * Find molecules structurally similar to a given ChEMBL ID.
+ * @param {ChemblFindSimilarMoleculesByIdArgs} args - The arguments for similarity search
+ * @returns {Promise<object>} A promise that resolves to the similar molecules data
+ */
+export const findSimilarMoleculesByChemblId = async (args) => {
+  if (!args || !args.chembl_id) {
+    console.error('findSimilarMoleculesByChemblId: chembl_id is required');
+    return Promise.reject(new Error('ChEMBL ID is required'));
+  }
+  
+  if (typeof args.chembl_id !== 'string' || args.chembl_id.trim() === '') {
+    console.error('findSimilarMoleculesByChemblId: chembl_id must be a non-empty string');
+    return Promise.reject(new Error('ChEMBL ID must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/find_similar_molecules_by_chembl_id', args);
+    console.log('ChEMBL similar molecules search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to find similar ChEMBL molecules by ID:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblGetApprovedDrugsArgs
+ * @property {boolean} [order_by_mw=false] - If true, sorts results by molecular weight.
+ * @property {string[]} [only_fields] - Optional list of specific fields to return.
+ */
+
+/**
+ * Retrieve all drugs that have reached the maximum clinical trial phase.
+ * @param {ChemblGetApprovedDrugsArgs} args - The arguments for approved drugs retrieval
+ * @returns {Promise<object>} A promise that resolves to the approved drugs data
+ */
+export const getApprovedDrugs = async (args = {}) => {
+  try {
+    const result = await callMcpTool('/mcp/chembl/get_approved_drugs', args);
+    console.log('ChEMBL approved drugs retrieved successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get ChEMBL approved drugs:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblGetActivitiesForTargetArgs
+ * @property {string} target_chembl_id - ChEMBL ID of the target (e.g., 'CHEMBL240').
+ * @property {string} [standard_type='IC50'] - Bioactivity measurement type (e.g., 'IC50', 'Ki').
+ * @property {string[]} [only_fields] - Optional list of specific fields for activity records.
+ */
+
+/**
+ * Fetch bioactivity data for a specific biological target.
+ * @param {ChemblGetActivitiesForTargetArgs} args - The arguments for target activities retrieval
+ * @returns {Promise<object>} A promise that resolves to the target activities data
+ */
+export const getActivitiesForTarget = async (args) => {
+  if (!args || !args.target_chembl_id) {
+    console.error('getActivitiesForTarget: target_chembl_id is required');
+    return Promise.reject(new Error('Target ChEMBL ID is required'));
+  }
+  
+  if (typeof args.target_chembl_id !== 'string' || args.target_chembl_id.trim() === '') {
+    console.error('getActivitiesForTarget: target_chembl_id must be a non-empty string');
+    return Promise.reject(new Error('Target ChEMBL ID must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/get_activities_for_target', args);
+    console.log('ChEMBL target activities retrieved successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get ChEMBL target activities:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblGetActivitiesForMoleculeArgs
+ * @property {string} molecule_chembl_id - ChEMBL ID of the molecule.
+ * @property {boolean} [pchembl_value_exists=true] - If true, only returns activities with a pChEMBL value.
+ * @property {string[]} [only_fields] - Optional list of specific fields for activity records.
+ */
+
+/**
+ * Retrieve all recorded bioactivities for a specific molecule.
+ * @param {ChemblGetActivitiesForMoleculeArgs} args - The arguments for molecule activities retrieval
+ * @returns {Promise<object>} A promise that resolves to the molecule activities data
+ */
+export const getActivitiesForMolecule = async (args) => {
+  if (!args || !args.molecule_chembl_id) {
+    console.error('getActivitiesForMolecule: molecule_chembl_id is required');
+    return Promise.reject(new Error('Molecule ChEMBL ID is required'));
+  }
+  
+  if (typeof args.molecule_chembl_id !== 'string' || args.molecule_chembl_id.trim() === '') {
+    console.error('getActivitiesForMolecule: molecule_chembl_id must be a non-empty string');
+    return Promise.reject(new Error('Molecule ChEMBL ID must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/get_activities_for_molecule', args);
+    console.log('ChEMBL molecule activities retrieved successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get ChEMBL molecule activities:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblFindTargetByGeneNameArgs
+ * @property {string} gene_name - Gene name or symbol (e.g., 'BRCA1'). Case-insensitive contains match.
+ * @property {string[]} [only_fields] - Optional list of fields (e.g., ['organism', 'pref_name']).
+ */
+
+/**
+ * Search for biological targets by a gene name or symbol.
+ * @param {ChemblFindTargetByGeneNameArgs} args - The arguments for target search by gene name
+ * @returns {Promise<object>} A promise that resolves to the target search results
+ */
+export const findTargetByGeneName = async (args) => {
+  if (!args || !args.gene_name) {
+    console.error('findTargetByGeneName: gene_name is required');
+    return Promise.reject(new Error('Gene name is required'));
+  }
+  
+  if (typeof args.gene_name !== 'string' || args.gene_name.trim() === '') {
+    console.error('findTargetByGeneName: gene_name must be a non-empty string');
+    return Promise.reject(new Error('Gene name must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/find_target_by_gene_name', args);
+    console.log('ChEMBL target search by gene name completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to find ChEMBL target by gene name:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblGetMoleculesByFilterArgs
+ * @property {Object} filters - Django-style filters (e.g., {'molecule_properties__mw_freebase__gte': 200}).
+ * @property {string[]} [only_fields] - Optional list of specific fields to return.
+ * @property {string[]} [order_by] - Fields to sort by (e.g., ['molecule_properties__mw_freebase']).
+ */
+
+/**
+ * Retrieve molecules based on a custom set of filter conditions.
+ * @param {ChemblGetMoleculesByFilterArgs} args - The arguments for filtered molecule retrieval
+ * @returns {Promise<object>} A promise that resolves to the filtered molecules data
+ */
+export const getMoleculesByFilter = async (args) => {
+  if (!args || !args.filters) {
+    console.error('getMoleculesByFilter: filters is required');
+    return Promise.reject(new Error('Filters object is required'));
+  }
+  
+  if (typeof args.filters !== 'object' || args.filters === null) {
+    console.error('getMoleculesByFilter: filters must be an object');
+    return Promise.reject(new Error('Filters must be an object'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/get_molecules_by_filter', args);
+    console.log('ChEMBL filtered molecules retrieved successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get ChEMBL molecules by filter:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblGetActivitiesByFilterArgs
+ * @property {Object} filters - Filters for activity fields (e.g., {'pchembl_value__gte': 6.0}).
+ * @property {string[]} [only_fields] - Optional list of specific fields to return.
+ * @property {string[]} [order_by] - Fields to sort by (e.g., ['-pchembl_value']).
+ */
+
+/**
+ * Retrieve bioactivity data based on a custom set of filter conditions.
+ * @param {ChemblGetActivitiesByFilterArgs} args - The arguments for filtered activities retrieval
+ * @returns {Promise<object>} A promise that resolves to the filtered activities data
+ */
+export const getActivitiesByFilter = async (args) => {
+  if (!args || !args.filters) {
+    console.error('getActivitiesByFilter: filters is required');
+    return Promise.reject(new Error('Filters object is required'));
+  }
+  
+  if (typeof args.filters !== 'object' || args.filters === null) {
+    console.error('getActivitiesByFilter: filters must be an object');
+    return Promise.reject(new Error('Filters must be an object'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/get_activities_by_filter', args);
+    console.log('ChEMBL filtered activities retrieved successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get ChEMBL activities by filter:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblGetTargetsByFilterArgs
+ * @property {Object} filters - Filters for target fields (e.g., {'target_type': 'SINGLE PROTEIN'}).
+ * @property {string[]} [only_fields] - Optional list of specific fields to return.
+ * @property {string[]} [order_by] - Fields to sort by (e.g., ['pref_name']).
+ */
+
+/**
+ * Retrieve biological targets based on a custom set of filter conditions.
+ * @param {ChemblGetTargetsByFilterArgs} args - The arguments for filtered targets retrieval
+ * @returns {Promise<object>} A promise that resolves to the filtered targets data
+ */
+export const getTargetsByFilter = async (args) => {
+  if (!args || !args.filters) {
+    console.error('getTargetsByFilter: filters is required');
+    return Promise.reject(new Error('Filters object is required'));
+  }
+  
+  if (typeof args.filters !== 'object' || args.filters === null) {
+    console.error('getTargetsByFilter: filters must be an object');
+    return Promise.reject(new Error('Filters must be an object'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/get_targets_by_filter', args);
+    console.log('ChEMBL filtered targets retrieved successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get ChEMBL targets by filter:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblSmilesToCtabArgs
+ * @property {string} smiles - SMILES string to convert.
+ */
+
+/**
+ * Convert a SMILES string to a CTAB block.
+ * @param {ChemblSmilesToCtabArgs} args - The arguments for SMILES to CTAB conversion
+ * @returns {Promise<object>} A promise that resolves to the CTAB data
+ */
+export const smilesToCtab = async (args) => {
+  if (!args || !args.smiles) {
+    console.error('smilesToCtab: smiles is required');
+    return Promise.reject(new Error('SMILES string is required'));
+  }
+  
+  if (typeof args.smiles !== 'string' || args.smiles.trim() === '') {
+    console.error('smilesToCtab: smiles must be a non-empty string');
+    return Promise.reject(new Error('SMILES string must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/smiles_to_ctab', args);
+    console.log('ChEMBL SMILES to CTAB conversion completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to convert SMILES to CTAB:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblComputeMolecularDescriptorsArgs
+ * @property {string} smiles - SMILES string for descriptor calculation.
+ */
+
+/**
+ * Calculate physicochemical properties for a molecule from its SMILES string.
+ * @param {ChemblComputeMolecularDescriptorsArgs} args - The arguments for molecular descriptors calculation
+ * @returns {Promise<object>} A promise that resolves to the molecular descriptors data
+ */
+export const computeMolecularDescriptors = async (args) => {
+  if (!args || !args.smiles) {
+    console.error('computeMolecularDescriptors: smiles is required');
+    return Promise.reject(new Error('SMILES string is required'));
+  }
+  
+  if (typeof args.smiles !== 'string' || args.smiles.trim() === '') {
+    console.error('computeMolecularDescriptors: smiles must be a non-empty string');
+    return Promise.reject(new Error('SMILES string must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/compute_molecular_descriptors', args);
+    console.log('ChEMBL molecular descriptors computed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to compute molecular descriptors:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblComputeStructuralAlertsArgs
+ * @property {string} smiles - SMILES string for structural alert analysis.
+ */
+
+/**
+ * Identify known structural alerts within a molecule from its SMILES string.
+ * @param {ChemblComputeStructuralAlertsArgs} args - The arguments for structural alerts computation
+ * @returns {Promise<object>} A promise that resolves to the structural alerts data
+ */
+export const computeStructuralAlerts = async (args) => {
+  if (!args || !args.smiles) {
+    console.error('computeStructuralAlerts: smiles is required');
+    return Promise.reject(new Error('SMILES string is required'));
+  }
+  
+  if (typeof args.smiles !== 'string' || args.smiles.trim() === '') {
+    console.error('computeStructuralAlerts: smiles must be a non-empty string');
+    return Promise.reject(new Error('SMILES string must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/compute_structural_alerts', args);
+    console.log('ChEMBL structural alerts computed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to compute structural alerts:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblStandardizeMoleculeFromSmilesArgs
+ * @property {string} smiles - SMILES string of the molecule to standardize.
+ */
+
+/**
+ * Standardize a molecular structure provided as a SMILES string.
+ * @param {ChemblStandardizeMoleculeFromSmilesArgs} args - The arguments for molecule standardization
+ * @returns {Promise<object>} A promise that resolves to the standardized molecule data
+ */
+export const standardizeMoleculeFromSmiles = async (args) => {
+  if (!args || !args.smiles) {
+    console.error('standardizeMoleculeFromSmiles: smiles is required');
+    return Promise.reject(new Error('SMILES string is required'));
+  }
+  
+  if (typeof args.smiles !== 'string' || args.smiles.trim() === '') {
+    console.error('standardizeMoleculeFromSmiles: smiles must be a non-empty string');
+    return Promise.reject(new Error('SMILES string must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/standardize_molecule_from_smiles', args);
+    console.log('ChEMBL molecule standardization completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to standardize molecule:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} ChemblGetParentMoleculeFromSmilesArgs
+ * @property {string} smiles - SMILES string of the molecule (possibly salt/mixture).
+ */
+
+/**
+ * Identify and return the parent structure for a molecule (e.g., removing counter-ions).
+ * @param {ChemblGetParentMoleculeFromSmilesArgs} args - The arguments for parent molecule extraction
+ * @returns {Promise<object>} A promise that resolves to the parent molecule data
+ */
+export const getParentMoleculeFromSmiles = async (args) => {
+  if (!args || !args.smiles) {
+    console.error('getParentMoleculeFromSmiles: smiles is required');
+    return Promise.reject(new Error('SMILES string is required'));
+  }
+  
+  if (typeof args.smiles !== 'string' || args.smiles.trim() === '') {
+    console.error('getParentMoleculeFromSmiles: smiles must be a non-empty string');
+    return Promise.reject(new Error('SMILES string must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/chembl/get_parent_molecule_from_smiles', args);
+    console.log('ChEMBL parent molecule extraction completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get parent molecule:', error.message);
+    throw error;
+  }
+};
+
 // ==================== GENERIC MCP TOOLS EXPORTS ====================
 
 /**
@@ -286,101 +890,3 @@ export const pingMcpToolsServer = async () => {
     throw error;
   }
 };
-
-// ==================== FUTURE TOOL CATEGORIES ====================
-// Add other MCP tool categories here as they become available
-// For example:
-// - Molecular property prediction tools
-// - Protein analysis tools  
-// - Drug discovery tools
-// - Chemical reaction prediction tools
-// etc.
-
-// Example usage:
-/*
-import { 
-  getAdmetPrediction, 
-  getAlphafoldPrediction,
-  getUniprotSummary,
-  getAlphafoldAnnotations,
-  getBricsCandidates,
-  callGenericMcpTool 
-} from './services/api/mcpToolsService';
-
-// Using the specific ADMET function
-const handleAdmetPrediction = async () => {
-  try {
-    const result = await getAdmetPrediction({ 
-      smiles: 'CCO' // Ethanol SMILES
-    });
-    console.log('ADMET Prediction:', result);
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-};
-
-// Using the AlphaFold prediction function
-const handleAlphafoldPrediction = async () => {
-  try {
-    const result = await getAlphafoldPrediction({ 
-      uniprot_accession: 'P04637' // Example UniProt ID for p53
-    });
-    console.log('AlphaFold Prediction:', result);
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-};
-
-// Using the UniProt summary function
-const handleUniprotSummary = async () => {
-  try {
-    const result = await getUniprotSummary({ 
-      qualifier: 'P04637', // UniProtKB accession number, entry name, or CRC64 checksum
-      start: 1,
-      end: 100
-    });
-    console.log('UniProt Summary:', result);
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-};
-
-// Using the AlphaFold annotations function
-const handleAlphafoldAnnotations = async () => {
-  try {
-    const result = await getAlphafoldAnnotations({ 
-      qualifier: 'P04637',
-      annotation_type: 'MUTAGEN'
-    });
-    console.log('AlphaFold Annotations:', result);
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-};
-
-// Using the BRICS candidates function
-const handleBricsCandidates = async () => {
-  try {
-    const result = await getBricsCandidates({ 
-      smiles_list: ['CCO', 'C1=CC=CC=C1', 'CC(=O)O'], // Example SMILES strings
-      is_polymer: false
-    });
-    console.log('BRICS Candidates:', result);
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-};
-
-// Using the generic function for flexibility
-const handleGenericToolCall = async () => {
-  try {
-    const result = await callGenericMcpTool(
-      '/mcp/admet/get_admet_prediction',
-      { smiles: 'CCO' }
-    );
-    console.log('Tool Result:', result);
-  } catch (error) {
-    console.error('Error:', error.message);
-  }
-};
-*/

@@ -34,10 +34,10 @@ const ExplorerTabContent = [
     },
     {
         id: 3,
-        title: 'Uniprot Explorer',
-        link: 'uniprot', // This is correct for /explorer/proe
+        title: 'Alphafold',
+        link: 'alphafold', // This is correct for /explorer/proe
         description: `The Uniprot explorer tool takes the Uniprot ID to show it's details`,
-        component: <ProtEComponent tabContent={UniProtExploreTabContents} basePath="explorer/uniprot"/>, // Corrected basePath
+        component: <ProtEComponent tabContent={UniProtExploreTabContents} basePath="explorer/alphafold"/>, // Corrected basePath
         // docs: <DocRenderer filePath="/markdown_repo/ProteinExplorer.md"/>,
         subElements: UniProtExploreTabContents,
         includeDocs: true,

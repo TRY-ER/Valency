@@ -1,5 +1,6 @@
 import SSComponent from "../../pages/Discriminator/SimilaritySearch/SSearch";
-import { SimilaritySearchTabContents } from "./NestDiscriminatorTags";
+import { SimilaritySearchTabContents, ChemBLTabContents } from "./NestDiscriminatorTags";
+import ChemBLComponent from "../../pages/Discriminator/ChemBL/ChemBL";
 
 const DiscriminatorTabContents = [
     {
@@ -13,6 +14,16 @@ const DiscriminatorTabContents = [
         docs: null,
         includeDocs: true,
         subElements: SimilaritySearchTabContents
+    },
+    {
+        id: 2,
+        title: 'ChemBL',
+        link: 'chembl',
+        description: `This tool uses ChemBL database to conduct a similarity search`,
+        component: <ChemBLComponent tabContent={ChemBLTabContents} basePath="identification/chembl" />,
+        docs: null,
+        includeDocs: true,
+        subElements: ChemBLTabContents 
     }
 ]
 
