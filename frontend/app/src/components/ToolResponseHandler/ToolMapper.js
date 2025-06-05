@@ -7,6 +7,9 @@ import PolyEComponent from '../../pages/Explorer/PolyExplorer/PolyExplorer';
 import BasicProtViewer from '../../pages/Explorer/ProtExplorer/BasicProtViewer';
 import MolStarViewer from '../../pages/Explorer/ProtExplorer/MolStarViewer';
 import UniProtViewer from '../../pages/Explorer/ProtExplorer/UniProtViewer';
+import UniProtSummaryViewer from '../../pages/Explorer/ProtExplorer/UniProtSummaryViewer';
+import AlphafoldAnnotationsViewer from '../../pages/Explorer/ProtExplorer/AlphafoldAnnotationsViewer';
+import PSMILESListComponent from '../../pages/Generator/BRICS/PSMILESListComponent';
 
 // Import Generator Components
 import BRICSComponent from '../../pages/Generator/BRICS/PSMILESContent';
@@ -23,6 +26,9 @@ import DataViewer from '../UI/DataViewer';
 const ToolMapper = {
     "get_admet_prediction": ADMETComponent,
     "get_alphafold_prediction": UniProtViewer,   
+    "get_uniprot_summary": UniProtSummaryViewer,
+    "get_alphafold_annotations": AlphafoldAnnotationsViewer,
+    "get_brics_candidates": PSMILESListComponent,
 
     // Utility Components
     'DataViewer': DataViewer,

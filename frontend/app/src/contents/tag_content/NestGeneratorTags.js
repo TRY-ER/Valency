@@ -1,6 +1,7 @@
 import BRICSComponent from "../../pages/Generator/BRICS/PSMILESContent";
 import LSTMComponent from "../../pages/Generator/LSTM/LSTMContent";
 import DocRenderer from "../doc_content/DocRenderer";
+import PSMILESListComponent from "../../pages/Generator/BRICS/PSMILESListComponent";
 
 const BRICSGeneratorTabContents = [
     {
@@ -30,6 +31,14 @@ const BRICSGeneratorTabContents = [
                       a set of polymers and you want to generate more polymers based on the given set.`,
         component: <BRICSComponent key="psmiles" inputType="psmiles"/>, 
         docs: <DocRenderer filePath="/markdown_repo/BRICSPSMILES.md"/>,
+    },
+    {
+        id: 3,
+        title: 'Advanced',
+        link: 'adv',
+        description: `This tool uses SMILES string to generate molecules using LSTM algorithm. The algorithm generates hypothetical molecules without any given input molecule string.`,
+        component: <PSMILESListComponent />,
+        docs: null,
     }
 ];
 

@@ -3,11 +3,14 @@ import './DataViewer.css';
 
 const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, initiallyExpanded = true }) => {
     const [expandedKeys, setExpandedKeys] = useState(new Set());
+    const [expandedStrings, setExpandedStrings] = useState(new Set());
+    const [copiedItems, setCopiedItems] = useState(new Set());
 
     // Initialize all keys as expanded if initiallyExpanded is true
     React.useEffect(() => {
         if (initiallyExpanded && data) {
             const allKeys = new Set();
+            const allStringPaths = new Set();
             const collectKeys = (obj, path = '') => {
                 if (Array.isArray(obj)) {
                     // Add the array path itself
@@ -17,6 +20,8 @@ const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, ini
                         const itemPath = path ? `${path}[${index}]` : `[${index}]`;
                         if (typeof item === 'object' && item !== null) {
                             collectKeys(item, itemPath);
+                        } else if (typeof item === 'string' && item.length > 50) {
+                            allStringPaths.add(`${itemPath}_string`);
                         }
                     });
                 } else if (typeof obj === 'object' && obj !== null) {
@@ -28,12 +33,15 @@ const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, ini
                         allKeys.add(fullPath);
                         if (typeof obj[key] === 'object' && obj[key] !== null) {
                             collectKeys(obj[key], fullPath);
+                        } else if (typeof obj[key] === 'string' && obj[key].length > 50) {
+                            allStringPaths.add(`${fullPath}_string`);
                         }
                     });
                 }
             };
             collectKeys(data, 'root');
             setExpandedKeys(allKeys);
+            setExpandedStrings(allStringPaths);
         }
     }, [data, initiallyExpanded]);
 
@@ -55,6 +63,7 @@ const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, ini
 
     const expandAll = () => {
         const allKeys = new Set();
+        const allStringPaths = new Set();
         const collectKeys = (obj, path = '') => {
             if (Array.isArray(obj)) {
                 // Add the array path itself
@@ -64,6 +73,8 @@ const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, ini
                     const itemPath = path ? `${path}[${index}]` : `[${index}]`;
                     if (typeof item === 'object' && item !== null) {
                         collectKeys(item, itemPath);
+                    } else if (typeof item === 'string' && item.length > 50) {
+                        allStringPaths.add(`${itemPath}_string`);
                     }
                 });
             } else if (typeof obj === 'object' && obj !== null) {
@@ -75,16 +86,67 @@ const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, ini
                     allKeys.add(fullPath);
                     if (typeof obj[key] === 'object' && obj[key] !== null) {
                         collectKeys(obj[key], fullPath);
+                    } else if (typeof obj[key] === 'string' && obj[key].length > 50) {
+                        allStringPaths.add(`${fullPath}_string`);
                     }
                 });
             }
         };
         collectKeys(data, 'root');
         setExpandedKeys(allKeys);
+        setExpandedStrings(allStringPaths);
     };
 
     const collapseAll = () => {
         setExpandedKeys(new Set());
+        setExpandedStrings(new Set());
+    };
+
+    const copyToClipboard = async (text, stringPath) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            // Visual feedback
+            const newCopiedItems = new Set(copiedItems);
+            newCopiedItems.add(stringPath);
+            setCopiedItems(newCopiedItems);
+            // Clear feedback after 2 seconds
+            setTimeout(() => {
+                setCopiedItems(prev => {
+                    const updated = new Set(prev);
+                    updated.delete(stringPath);
+                    return updated;
+                });
+            }, 2000);
+        } catch (err) {
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            // Same visual feedback for fallback
+            const newCopiedItems = new Set(copiedItems);
+            newCopiedItems.add(stringPath);
+            setCopiedItems(newCopiedItems);
+            setTimeout(() => {
+                setCopiedItems(prev => {
+                    const updated = new Set(prev);
+                    updated.delete(stringPath);
+                    return updated;
+                });
+            }, 2000);
+        }
+    };
+
+    const toggleStringExpansion = (stringPath) => {
+        const newExpandedStrings = new Set(expandedStrings);
+        if (newExpandedStrings.has(stringPath)) {
+            newExpandedStrings.delete(stringPath);
+        } else {
+            newExpandedStrings.add(stringPath);
+        }
+        setExpandedStrings(newExpandedStrings);
     };
 
     const getValueType = (value) => {
@@ -96,6 +158,25 @@ const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, ini
     const getValueTypeClass = (value) => {
         const type = getValueType(value);
         return `value-${type}`;
+    };
+
+    const isValidUrl = (string) => {
+        // Basic checks first
+        if (!string || typeof string !== 'string' || string.length < 7) {
+            return false;
+        }
+        
+        // Check if it starts with http:// or https://
+        if (!string.match(/^https?:\/\//i)) {
+            return false;
+        }
+        
+        try {
+            const url = new URL(string);
+            return url.protocol === 'http:' || url.protocol === 'https:';
+        } catch {
+            return false;
+        }
     };
 
     const renderValue = (value, keyPath = '', depth = 0) => {
@@ -112,12 +193,73 @@ const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, ini
         }
 
         if (typeof value === 'string') {
+            const isUrl = isValidUrl(value);
             const isLongString = value.length > 50;
-            const displayValue = isLongString ? `${value.substring(0, 47)}...` : value;
+            const stringPath = `${keyPath}_string`;
+            const isExpanded = expandedStrings.has(stringPath);
+            const isCopied = copiedItems.has(stringPath);
+            const displayValue = isLongString && !isExpanded ? `${value.substring(0, 47)}...` : value;
+            
+            if (isUrl) {
+                return (
+                    <div className="string-value-container">
+                        <span className={`value-string value-url ${isExpanded ? 'expanded' : ''} ${isLongString && !isExpanded ? 'truncated' : ''}`}>
+                            "<a 
+                                href={value} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                title={isLongString ? value : `Open ${value} in new tab`}
+                                className="url-link"
+                            >
+                                {displayValue}
+                            </a>"
+                        </span>
+                        {isLongString && (
+                            <div className="string-controls">
+                                <button 
+                                    className="string-control-btn expand-btn"
+                                    onClick={() => toggleStringExpansion(stringPath)}
+                                    title={isExpanded ? "Collapse" : "Expand"}
+                                >
+                                    {isExpanded ? "▲" : "▼"}
+                                </button>
+                                <button 
+                                    className={`string-control-btn copy-btn ${isCopied ? 'copied' : ''}`}
+                                    onClick={() => copyToClipboard(value, stringPath)}
+                                    title={isCopied ? "Copied!" : "Copy to clipboard"}
+                                >
+                                    {isCopied ? "✓" : "📋"}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+            
             return (
-                <span className="value-string" title={isLongString ? value : undefined}>
-                    "{displayValue}"
-                </span>
+                <div className="string-value-container">
+                    <span className={`value-string ${isExpanded ? 'expanded' : ''} ${isLongString && !isExpanded ? 'truncated' : ''}`} title={isLongString && !isExpanded ? value : undefined}>
+                        "{displayValue}"
+                    </span>
+                    {isLongString && (
+                        <div className="string-controls">
+                            <button 
+                                className="string-control-btn expand-btn"
+                                onClick={() => toggleStringExpansion(stringPath)}
+                                title={isExpanded ? "Collapse" : "Expand"}
+                            >
+                                {isExpanded ? "▲" : "▼"}
+                            </button>
+                            <button 
+                                className={`string-control-btn copy-btn ${isCopied ? 'copied' : ''}`}
+                                onClick={() => copyToClipboard(value, stringPath)}
+                                title={isCopied ? "Copied!" : "Copy to clipboard"}
+                            >
+                                {isCopied ? "✓" : "📋"}
+                            </button>
+                        </div>
+                    )}
+                </div>
             );
         }
 

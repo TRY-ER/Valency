@@ -2,6 +2,8 @@ import BasicProtViewer from "../../pages/Explorer/ProtExplorer/BasicProtViewer"
 import MolStarViewer from "../../pages/Explorer/ProtExplorer/MolStarViewer";
 import UniProtViewer from "../../pages/Explorer/ProtExplorer/UniProtViewer"; // Import the new component
 import DocRenderer from "../doc_content/DocRenderer";
+import UniProtSummaryViewer from "../../pages/Explorer/ProtExplorer/UniProtSummaryViewer";
+import AlphafoldAnnotationsViewer from "../../pages/Explorer/ProtExplorer/AlphafoldAnnotationsViewer";
 
 const ProtExploreTabContents = [
     {
@@ -31,15 +33,35 @@ const ProtExploreTabContents = [
                       a set of molecules and you want to generate more molecules based on the given set.`,
         component: <MolStarViewer />, 
         // docs: <DocRenderer filePath="/markdown_repo/BRICSSMILES.md"/>,
-    },
-    {
-        id: 3, // New ID for the UniProt tab
-        title: 'UniProt',
-        link: 'uniprot', // New link for the UniProt tab
-        description: `Explore protein structures and information from AlphaFold using a UniProt accession key. Fetches data from the AlphaFold DB API and displays the 3D model, sequence, and other relevant details.`,
-        component: <UniProtViewer />,
-        docs: <DocRenderer filePath="/markdown_repo/UniProtViewer.md"/>, // Assuming you might create a doc file later
     }
 ]
 
-export { ProtExploreTabContents };
+const UniProtExploreTabContents = [
+    {
+        id: 1, // New ID for the UniProt tab
+        title: 'Basic',
+        link: '', // New link for the UniProt tab
+        description: `Explore protein structures and information from AlphaFold using a UniProt accession key. Fetches data from the AlphaFold DB API and displays the 3D model, sequence, and other relevant details.`,
+        component: <UniProtViewer />,
+        docs: null 
+    },
+    {
+        id: 2, // New ID for the UniProt tab
+        title: 'Summary',
+        link: 'summary', // New link for the UniProt tab
+        description: `Explore protein structures and information from AlphaFold using a UniProt accession key. Fetches data from the AlphaFold DB API and displays the 3D model, sequence, and other relevant details.`,
+        component: <UniProtSummaryViewer />, 
+        docs: null 
+    },
+    {
+        id: 3, // New ID for the AlphaFold Annotations tab
+        title: 'Annotations',
+        link: 'annotations', // New link for the AlphaFold Annotations tab
+        description: `View AlphaFold annotations for a specific UniProt accession. Fetches annotation data from the AlphaFold API and displays it in an interactive visualization with detailed annotation tracks.`,
+        component: <AlphafoldAnnotationsViewer />, 
+        docs: <DocRenderer filePath="/markdown_repo/AlphaFoldAnnotationsViewer.md"/>
+    }
+]
+
+
+export { ProtExploreTabContents, UniProtExploreTabContents };
