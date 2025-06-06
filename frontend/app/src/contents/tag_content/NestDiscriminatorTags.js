@@ -1,6 +1,9 @@
 import SSContent from "../../pages/Discriminator/SimilaritySearch/SSContent";
 import DocRenderer from "../doc_content/DocRenderer";
 import ChemBLGetter from "../../pages/Explorer/ChemBLExplorer/ChemBLGetter";
+import ChemBLSimilarityGetter from "../../pages/Explorer/ChemBLExplorer/ChemBLSimilarityGetter";
+import ApprovedDrugsViewer from "../../pages/Explorer/ChemBLExplorer/ApprovedDrugsViewer";
+import ChemBLActivityFetcher from "../../pages/Explorer/ChemBLExplorer/ChemBLActivityFetcher";
 
 const SimilaritySearchTabContents = [
     {
@@ -55,18 +58,19 @@ const ChemBLTabContents = [
     },
     {
         id: 2,
-        title: 'Synonym Search',
-        link: 'syn-search',
-        description: `This tool uses ChemBL database to search for synonyms of a given molecule.`,
-        component: null,
+        title: 'Similarity Search',
+        link: 'similarity-search',
+        description: `This tool uses ChemBL database to conduct a similarity search for molecules.`,
+        component: <ChemBLSimilarityGetter />,
         docs: null,
     },
     {
         id: 3,
-        title: 'Similarity Search',
-        link: 'similarity-search',
-        description: `This tool uses ChemBL database to conduct a similarity search for molecules.`,
-        component: null,
+        title: 'Activity Fetcher',
+        link: 'activity-fetcher',
+        description: `This tool fetches bioactivity data for biological targets and molecules using ChEMBL database.
+                      You can search for target activities using target ChEMBL ID or molecule activities using molecule ChEMBL ID.`,
+        component: <ChemBLActivityFetcher />,
         docs: null,
     },
     {
@@ -74,7 +78,7 @@ const ChemBLTabContents = [
         title: 'Approved Drugs',
         link: 'app-drugs',
         description: `This tool uses ChemBL database to retrieve information about approved drugs.`,
-        component: null,
+        component: <ApprovedDrugsViewer />,
         docs: null,
     },
 ];

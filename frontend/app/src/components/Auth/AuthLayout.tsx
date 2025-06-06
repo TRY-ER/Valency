@@ -17,7 +17,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title }) => {
       >
         <div className="bg-theme-glassy shadow-glassy backdrop-blur-xl rounded-xl p-8">
           <div className="flex justify-center mb-6">
-            <img src="/images/valency_logo_light_600x600.png" alt="Valency Logo" className="w-24 h-24" />
+            <img src="/images/logo_rendered_main.png" alt="Valency Logo" className="w-24 h-24" />
           </div>
           <h2 className="text-3xl font-bold text-center text-theme-text-primary mb-8">{title}</h2>
           {children}

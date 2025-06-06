@@ -440,27 +440,44 @@ def get_approved_drugs(order_by_mw: bool = False) -> str:
 
 
 @mcp.tool()
-def get_activities_for_target(target_chembl_id: str, standard_type: str = "IC50") -> str:
+def get_activities_for_target(biological_target_name: str, standard_type: str = "") -> str:
     """Fetch bioactivity data (e.g., IC50, Ki) for a specific biological target.
     Useful for finding out which compounds are active against a particular target.
     Args:
-        target_chembl_id: The ChEMBL ID of the target (e.g., 'CHEMBL240' for EGFR).
+        biological_target_name : The name of the biological target (e.g., "hERG"). 
         standard_type: The type of bioactivity measurement (e.g., 'IC50', 'Ki', 'EC50'). Default is 'IC50'. 
                        Pass None to get all activity types.
     Returns:
         A JSON string containing a list of dictionaries, each representing an activity record.
     
-    Example Return Schema (for target CHEMBL255):
-    13200 <int>
+    Example Return Schema
+    List of activity records for the target, each with fields like:
+    {'activity_id': 123456, 'target_chembl_id': 'CHEMBL255', 'standard_type': 'IC50', 'standard_value': 0.5, ...} 
+
     """
+    LIMITING_RESPONSE = 100
     try:
         activity_client = new_client.activity
-        query = activity_client.filter(target_chembl_id=target_chembl_id)
-        if standard_type:
-            query = query.filter(standard_type__iexact=standard_type)
-        return json.dumps({"data": list(query)})
+        target_client = new_client.target
+        target_data = target_client.filter(pref_name__iexact=biological_target_name)
+        if standard_type != "": 
+            activity_data = activity_client.filter(target_chembl_id=target_data[0]['target_chembl_id']).filter(standard_type=standard_type)
+        else:
+            activity_data = activity_client.filter(target_chembl_id=target_data[0]['target_chembl_id'])
+
+        # handling activity data length
+        if len(activity_data) == 0:
+            return json.dumps({"error": f"No activities found for target '{biological_target_name}'."})
+        if len(activity_data) > LIMITING_RESPONSE:
+            activity_data = activity_data[:LIMITING_RESPONSE]
+
+        returnable = {
+            "target_data": list(target_data),
+            "activity_data": list(activity_data)
+        }
+        return json.dumps({"data": returnable})
     except Exception as e:
-        return json.dumps({"error": f"Failed to get activities for target ChEMBL ID '{target_chembl_id}'.", "details": str(e)})
+        return json.dumps({"error": f"Failed to get activities for target ChEMBL ID '{biological_target_name}'.", "details": str(e)})
 
 
 @mcp.tool()

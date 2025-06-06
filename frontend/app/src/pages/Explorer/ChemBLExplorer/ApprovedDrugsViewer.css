@@ -1,0 +1,397 @@
+/* ApprovedDrugsViewer.css */
+
+.approved-drugs-container {
+    width: 100%;
+    margin: 0;
+    padding: 0 20px;
+}
+
+.approved-drugs-row-1,
+.approved-drugs-row-2 {
+    margin-bottom: 20px;
+}
+
+.approved-drugs-search-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    overflow: visible !important;
+    position: relative;
+    z-index: 100;
+}
+
+.approved-drugs-header {
+    font-size: 1.5em;
+    color: var(--color-text-primary);
+    margin: 0 0 20px 0;
+    font-weight: 700;
+    text-align: center;
+}
+
+.approved-drugs-controls-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.approved-drugs-dropdown-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    overflow: visible !important;
+    z-index: 1001;
+    min-width: 200px;
+}
+
+.approved-drugs-dropdown-header {
+    font-size: 1.1em;
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-weight: 600;
+}
+
+.approved-drugs-dropdown {
+    width: 100%;
+    max-width: 250px;
+}
+
+.approved-drugs-search-section {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.approved-drugs-action-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.approved-drugs-refresh-btn {
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.approved-drugs-refresh-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--color-accent-dark), var(--color-accent));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.approved-drugs-refresh-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.approved-drugs-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--color-bg-secondary);
+    border-top: 4px solid var(--color-accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.approved-drugs-loading p {
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.approved-drugs-error {
+    background-color: var(--color-error-bg, #fee);
+    color: var(--color-error-text, #c53030);
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid var(--color-error-border, #fed7d7);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.approved-drugs-error p {
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Drug Selection Container */
+.approved-drugs-selection-container {
+    display: flex;
+    gap: 20px;
+    min-height: 500px;
+}
+
+.approved-drugs-list-panel {
+    flex: 0 0 350px;
+    min-width: 300px;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+}
+
+.approved-drugs-list-header {
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--c-light-border);
+}
+
+.approved-drugs-list-header h4 {
+    color: var(--color-text-primary);
+    font-size: 1.1rem;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+}
+
+.approved-drugs-list-instruction {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    margin: 0;
+    font-style: italic;
+}
+
+.approved-drugs-list-container {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 450px;
+    border: 1px solid var(--c-light-border);
+    border-radius: 8px;
+    background-color: var(--color-bg-primary);
+}
+
+.approved-drugs-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--c-light-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 12px;
+}
+
+.approved-drugs-item:last-child {
+    border-bottom: none;
+}
+
+.approved-drugs-item:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.approved-drugs-item.selected {
+    background-color: var(--color-accent-bg, rgba(66, 153, 225, 0.1));
+    border-left: 4px solid var(--color-accent);
+    padding-left: 12px;
+}
+
+.approved-drugs-item-number {
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    min-width: 30px;
+    text-align: right;
+    margin-top: 2px;
+}
+
+.approved-drugs-item-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.approved-drugs-item-name {
+    color: var(--color-text-primary);
+    font-weight: 600;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.approved-drugs-item-id {
+    color: var(--color-text-secondary);
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+}
+
+.approved-drugs-item-mw {
+    color: var(--color-accent);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.approved-drugs-details-panel {
+    flex: 1;
+    min-width: 600px;
+    display: flex;
+    flex-direction: column;
+}
+
+.approved-drugs-details-row {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+}
+
+.approved-drugs-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    background-color: var(--color-bg-primary);
+    border: 2px dashed var(--c-light-border);
+    border-radius: 8px;
+    text-align: center;
+    padding: 20px;
+}
+
+/* Sort Selector Styles */
+.approved-drugs-sort-selector {
+    position: relative;
+    overflow: visible !important;
+    z-index: 1000;
+}
+
+.approved-drugs-sort-selector .selector-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 48px;
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+}
+
+.approved-drugs-sort-selector .selector-trigger:hover:not(.disabled) {
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-secondary);
+}
+
+.approved-drugs-sort-selector .selector-trigger.open {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
+}
+
+.approved-drugs-sort-selector.disabled .selector-trigger {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: var(--color-bg-disabled, #f7fafc);
+}
+
+.approved-drugs-sort-selector .selected-text {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.approved-drugs-sort-selector .dropdown-arrow {
+    margin-left: 8px;
+    color: var(--color-text-secondary);
+    transition: transform 0.2s ease;
+}
+
+/* Dropdown Portal Styles */
+.approved-drugs-dropdown-portal {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    margin-top: 4px;
+}
+
+.approved-drugs-dropdown-options {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.approved-drugs-dropdown-option {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--c-light-border);
+}
+
+.approved-drugs-dropdown-option:last-child {
+    border-bottom: none;
+}
+
+.approved-drugs-dropdown-option:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.approved-drugs-dropdown-option.selected {
+    background-color: var(--color-accent-bg, rgba(66, 153, 225, 0.1));
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .approved-drugs-controls-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .approved-drugs-dropdown-section,
+    .approved-drugs-search-section,
+    .approved-drugs-action-section {
+        min-width: unset;
+    }
+    
+    .approved-drugs-selection-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .approved-drugs-list-panel,
+    .approved-drugs-details-panel {
+        min-width: unset;
+    }
+    
+    .approved-drugs-details-row {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .approved-drugs-list-container {
+        max-height: 300px;
+    }
+}

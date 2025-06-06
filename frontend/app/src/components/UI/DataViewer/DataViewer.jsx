@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './DataViewer.css';
 
-const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, initiallyExpanded = true }) => {
+const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, initiallyExpanded = false }) => {
     const [expandedKeys, setExpandedKeys] = useState(new Set());
     const [expandedStrings, setExpandedStrings] = useState(new Set());
     const [copiedItems, setCopiedItems] = useState(new Set());

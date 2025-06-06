@@ -487,13 +487,13 @@ const ChatInterface = () => {
 
                             <div className="response-profile">
                                 {index === (components.length - 1) ?
-                                    <img src="/images/valency_logo_light_600x600.png"
+                                    <img src="/images/logo_rendered_main.png"
                                         alt="logo"
                                         className={`ai-profile-image ${generationState === "init" || generationState === "generating"
                                             ? "loading" : ""}`}
                                     />
                                     :
-                                    <img src="/images/valency_logo_light_600x600.png"
+                                    <img src="/images/logo_rendered_main.png"
                                         alt="logo"
                                         className={`ai-profile-image`}
 

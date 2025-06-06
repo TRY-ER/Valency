@@ -137,11 +137,9 @@ class ChemblFindMoleculeByPrefNameArgs(BaseModel):
 
 class ChemblFindMoleculeBySynonymArgs(BaseModel):
     synonym: str = Field(..., description="The synonym to search for (case-insensitive exact match).")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields to return.")
 
 class ChemblGetMoleculesByIdsArgs(BaseModel):
     chembl_ids: List[str] = Field(..., description="A list of ChEMBL IDs (e.g., ['CHEMBL25', 'CHEMBL192']).")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields to return.")
 
 class ChemblGetMoleculeImageSvgArgs(BaseModel):
     chembl_id: str = Field(..., description="The ChEMBL ID of the molecule.")
@@ -149,44 +147,35 @@ class ChemblGetMoleculeImageSvgArgs(BaseModel):
 class ChemblFindSimilarMoleculesBySmilesArgs(BaseModel):
     smiles: str = Field(..., description="The SMILES string of the query molecule (e.g., 'CCO').")
     similarity_threshold: int = Field(70, description="Minimum similarity percentage (0-100, default 70).")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields for similar molecules.")
 
 class ChemblFindSimilarMoleculesByIdArgs(BaseModel):
     chembl_id: str = Field(..., description="The ChEMBL ID of the query molecule.")
     similarity_threshold: int = Field(70, description="Minimum similarity percentage (0-100, default 70).")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields for similar molecules.")
 
 class ChemblGetApprovedDrugsArgs(BaseModel):
     order_by_mw: bool = Field(False, description="If True, sorts results by molecular weight.")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields to return.")
 
 class ChemblGetActivitiesForTargetArgs(BaseModel):
-    target_chembl_id: str = Field(..., description="ChEMBL ID of the target (e.g., 'CHEMBL240').")
-    standard_type: Optional[str] = Field("IC50", description="Bioactivity measurement type (e.g., 'IC50', 'Ki'). None for all.")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields for activity records.")
+    biological_target_name: str = Field(..., description="Biological target name (e.g., 'hERG').")
+    standard_type: Optional[str] = Field("", description="Bioactivity measurement type (e.g., 'IC50', 'Ki'). None for all.")
 
 class ChemblGetActivitiesForMoleculeArgs(BaseModel):
     molecule_chembl_id: str = Field(..., description="ChEMBL ID of the molecule.")
     pchembl_value_exists: bool = Field(True, description="If True, only returns activities with a pChEMBL value.")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields for activity records.")
 
 class ChemblFindTargetByGeneNameArgs(BaseModel):
     gene_name: str = Field(..., description="Gene name or symbol (e.g., 'BRCA1'). Case-insensitive contains match.")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of fields (e.g., ['organism', 'pref_name']).")
 
 class ChemblGetMoleculesByFilterArgs(BaseModel):
     filters: Dict[str, Any] = Field(..., description="Django-style filters (e.g., {'molecule_properties__mw_freebase__gte': 200}).")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields to return.")
     order_by: Optional[List[str]] = Field(None, description="Fields to sort by (e.g., ['molecule_properties__mw_freebase']).")
 
 class ChemblGetActivitiesByFilterArgs(BaseModel):
     filters: Dict[str, Any] = Field(..., description="Filters for activity fields (e.g., {'pchembl_value__gte': 6.0}).")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields to return.")
     order_by: Optional[List[str]] = Field(None, description="Fields to sort by (e.g., ['-pchembl_value']).")
 
 class ChemblGetTargetsByFilterArgs(BaseModel):
     filters: Dict[str, Any] = Field(..., description="Filters for target fields (e.g., {'target_type': 'SINGLE PROTEIN'}).")
-    only_fields: Optional[List[str]] = Field(None, description="Optional list of specific fields to return.")
     order_by: Optional[List[str]] = Field(None, description="Fields to sort by (e.g., ['pref_name']).")
 
 class ChemblSmilesToCtabArgs(BaseModel):

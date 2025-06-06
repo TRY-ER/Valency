@@ -17,7 +17,7 @@ const DiscriminatorTabContents = [
     },
     {
         id: 2,
-        title: 'ChemBL',
+        title: 'ChEMBL',
         link: 'chembl',
         description: `This tool uses ChemBL database to conduct a similarity search`,
         component: <ChemBLComponent tabContent={ChemBLTabContents} basePath="identification/chembl" />,

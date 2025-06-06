@@ -25,7 +25,18 @@ const Sidebar = ({ }) => {
                 animate="visible"
                 className={`logo ${isCollapsed ? 'collapsed' : ''}`}>
                 {/* Placeholder for Logo */}
-                <img src="/images/valency_logo_light_600x600.png" alt="Logo" />
+                <img src="/images/logo_rendered_main.png" alt="Logo" />
+                {!isCollapsed && (
+                    <motion.h1
+                        variants={fadeInLeftVariants}
+                        initial="hidden"
+                        animate="visible"
+                        custom={0}
+                        className="logo-text"
+                    >
+                        VALENCY
+                    </motion.h1>
+                )}
             </motion.div>
 
             <div className={`sidebar-menu-container ${isCollapsed ? 'collapsed' : ''}`}>

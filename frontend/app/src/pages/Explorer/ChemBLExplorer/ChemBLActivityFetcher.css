@@ -1,0 +1,448 @@
+/* ChemBLActivityFetcher.css */
+
+.activity-fetcher-container {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.activity-fetcher-row-1,
+.activity-fetcher-row-2 {
+    margin-bottom: 20px;
+}
+
+.activity-fetcher-search-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    overflow: visible !important;
+    position: relative;
+    z-index: 100;
+}
+
+.activity-fetcher-controls-row-1 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.activity-fetcher-controls-row-2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.activity-fetcher-dropdown-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: visible !important;
+    z-index: 1001;
+    flex: 0 0 auto;
+}
+
+.activity-fetcher-dropdown-header {
+    font-size: 0.85em;
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: left;
+}
+
+.activity-fetcher-dropdown {
+    width: 180px;
+    min-width: 160px;
+}
+
+.activity-fetcher-checkbox-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.85em;
+    color: var(--color-text-primary);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--color-primary);
+}
+
+.checkbox-label input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.checkbox-text {
+    user-select: none;
+}
+
+.activity-fetcher-input-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+}
+
+.activity-fetcher-input-section .activity-fetcher-dropdown-header {
+    min-width: 90px;
+    flex-shrink: 0;
+}
+
+.activity-fetcher-loading,
+.activity-fetcher-error,
+.activity-fetcher-info {
+    margin: 20px 0;
+}
+
+.activity-fetcher-results {
+    margin-top: 30px;
+}
+
+.activity-fetcher-results-header {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--color-background-secondary);
+    border-radius: 8px;
+    border-left: 4px solid var(--color-primary);
+}
+
+.activity-fetcher-results-header h3 {
+    margin: 0 0 10px 0;
+    color: var(--color-text-primary);
+    font-size: 1.2em;
+}
+
+.activity-fetcher-results-header p {
+    margin: 5px 0;
+    color: var(--color-text-secondary);
+    font-size: 0.9em;
+}
+
+.activity-fetcher-results-header strong {
+    color: var(--color-text-primary);
+}
+
+/* Activity Search Selector Styles */
+.activity-search-selector {
+    position: relative;
+    width: 100%;
+    z-index: 1001;
+}
+
+.activity-search-selector.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.activity-search-selector .selector-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 40px;
+}
+
+.activity-search-selector .selector-trigger:hover:not(.disabled) {
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-secondary);
+}
+
+.activity-search-selector .selector-trigger.open {
+    border-color: var(--color-accent);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    background-color: var(--color-bg-primary);
+}
+
+.activity-search-selector .selected-text {
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.activity-search-selector .dropdown-arrow {
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.activity-search-selector .dropdown-arrow.open {
+    transform: rotate(180deg);
+}
+
+/* Portal Dropdown Styles */
+.activity-search-dropdown-portal {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-accent);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 16px var(--shadow-color);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 10000;
+}
+
+/* Webkit scrollbar styling */
+.activity-search-dropdown-portal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.activity-search-dropdown-portal::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+    border-radius: 3px;
+}
+
+.activity-search-dropdown-portal::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 3px;
+}
+
+.activity-search-dropdown-portal::-webkit-scrollbar-thumb:hover {
+    opacity: 1;
+}
+
+.activity-selector-option {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--c-light-border);
+    min-height: 48px;
+}
+
+.activity-selector-option:last-child {
+    border-bottom: none;
+}
+
+.activity-selector-option:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.activity-selector-option.selected {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+.activity-selector-option .option-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.activity-selector-option .option-description {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    line-height: 1.3;
+    word-wrap: break-word;
+}
+
+.activity-selector-option.selected .option-description {
+    color: rgba(255,255,255,0.8);
+}
+
+.activity-selector-option .check-icon {
+    color: white;
+    font-weight: bold;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .activity-fetcher-controls-row-1 {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .activity-fetcher-dropdown-section,
+    .activity-fetcher-checkbox-section {
+        flex-direction: column;
+        align-items: stretch;
+        flex: none;
+        gap: 6px;
+    }
+    
+    .activity-fetcher-input-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+    
+    .activity-fetcher-dropdown {
+        width: 100%;
+        max-width: 100%;
+        min-width: auto;
+    }
+    
+    .activity-fetcher-dropdown-header {
+        min-width: auto;
+        text-align: left;
+    }
+    
+    .activity-fetcher-input-section .activity-fetcher-dropdown-header {
+        min-width: auto;
+    }
+}
+
+/* Activity Molecules Results Container */
+.activity-molecules-results-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 16px;
+    min-height: 500px;
+}
+
+.activity-molecules-candidates-panel {
+    flex: 0 0 350px;
+    background-color: var(--color-bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--c-light-border);
+    padding: 12px;
+    overflow-y: auto;
+    max-height: 500px;
+}
+
+.activity-molecules-candidates-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.activity-molecules-candidates-panel::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+    border-radius: 3px;
+}
+
+.activity-molecules-candidates-panel::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 3px;
+}
+
+.activity-molecules-candidates-panel::-webkit-scrollbar-thumb:hover {
+    background: var(--color-success);
+}
+
+.activity-molecule-candidate-item {
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.activity-molecule-candidate-item:hover {
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-primary);
+}
+
+.activity-molecule-candidate-item.selected {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+}
+
+.activity-molecule-candidate-number {
+    font-weight: 600;
+    font-size: 0.8rem;
+    min-width: 20px;
+    color: var(--color-accent);
+}
+
+.activity-molecule-candidate-item.selected .activity-molecule-candidate-number {
+    color: white;
+}
+
+.activity-molecule-candidate-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.activity-molecule-candidate-id {
+    font-family: monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.activity-molecule-candidate-item.selected .activity-molecule-candidate-id {
+    color: white;
+}
+
+.activity-molecule-candidate-activity {
+    font-size: 0.75rem;
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+.activity-molecule-candidate-item.selected .activity-molecule-candidate-activity {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.activity-molecules-details-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activity-molecules-details-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 16px;
+    height: 100%;
+}
+
+.activity-molecules-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: var(--color-bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--c-light-border);
+    color: var(--color-text-secondary);
+    font-style: italic;
+    text-align: center;
+    padding: 40px 20px;
+    min-height: 200px;
+}

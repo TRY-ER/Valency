@@ -1,0 +1,562 @@
+/* ChemBLSimilarityGetter.css */
+
+.chembl-similarity-getter-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.chembl-similarity-getter-row-1,
+.chembl-similarity-getter-row-2 {
+    margin-bottom: 16px;
+}
+
+.chembl-similarity-getter-search-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    overflow: visible !important;
+    position: relative;
+    z-index: 100;
+}
+
+.chembl-similarity-getter-controls-row-1 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    width: 100%;
+}
+
+.chembl-similarity-getter-controls-row-2 {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.chembl-similarity-getter-dropdown-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: visible !important;
+    z-index: 1001;
+    flex: 0 0 auto;
+}
+
+.chembl-similarity-getter-dropdown-header {
+    font-size: 0.85em;
+    color: var(--color-text-secondary);
+    margin: 0;
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: left;
+}
+
+.chembl-similarity-getter-dropdown {
+    width: 180px;
+    min-width: 160px;
+}
+
+.chembl-similarity-getter-threshold-section {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.chembl-similarity-getter-threshold-input {
+    width: 100px;
+    min-width: 80px;
+    padding: 8px 12px;
+    border: 1px solid var(--c-light-border);
+    border-radius: 6px;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+}
+
+.chembl-similarity-getter-threshold-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.2);
+}
+
+.chembl-similarity-getter-threshold-input:disabled {
+    background-color: var(--color-bg-secondary);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.chembl-similarity-getter-threshold-help {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    white-space: nowrap;
+}
+
+.chembl-similarity-getter-input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+}
+
+.chembl-similarity-input-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.chembl-similarity-getter-input-section .chembl-similarity-getter-dropdown-header {
+    min-width: 90px;
+    flex-shrink: 0;
+}
+
+.chembl-similarity-getter-loading {
+    text-align: center;
+    padding: 20px;
+    color: var(--color-text-secondary);
+    font-style: italic;
+}
+
+.chembl-similarity-getter-error {
+    background-color: rgba(var(--color-alert-rgb), 0.1);
+    border: 1px solid var(--color-alert);
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.chembl-similarity-getter-error p {
+    color: var(--color-alert);
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Similarity Search Type Selector Styles */
+.chembl-similarity-search-selector {
+    position: relative;
+    width: 100%;
+    z-index: 1001;
+}
+
+.chembl-similarity-search-selector.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.chembl-similarity-search-selector .selector-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 40px;
+}
+
+.chembl-similarity-search-selector .selector-trigger:hover:not(.disabled) {
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-secondary);
+}
+
+.chembl-similarity-search-selector .selector-trigger.open {
+    border-color: var(--color-accent);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    background-color: var(--color-bg-primary);
+}
+
+.chembl-similarity-search-selector .selected-text {
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.chembl-similarity-search-selector .dropdown-arrow {
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.chembl-similarity-search-selector .dropdown-arrow.open {
+    transform: rotate(180deg);
+}
+
+/* Portal dropdown styles */
+.similarity-selector-options-portal {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-accent);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 16px var(--shadow-color);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10000;
+}
+
+.similarity-selector-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--c-light-border);
+}
+
+.similarity-selector-option:last-child {
+    border-bottom: none;
+}
+
+.similarity-selector-option:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.similarity-selector-option.selected {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+.similarity-selector-option .option-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.similarity-selector-option .check-icon {
+    color: white;
+    font-weight: bold;
+}
+
+/* Similar Molecules Results Container */
+.chembl-similarity-results-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 16px;
+    min-height: 500px;
+}
+
+.chembl-similarity-candidates-panel {
+    flex: 0 0 350px;
+    background-color: var(--color-bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--c-light-border);
+    padding: 12px;
+    overflow-y: auto;
+    max-height: 500px;
+}
+
+.chembl-similarity-candidates-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chembl-similarity-candidates-panel::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+    border-radius: 3px;
+}
+
+.chembl-similarity-candidates-panel::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 3px;
+}
+
+.chembl-similarity-candidates-panel::-webkit-scrollbar-thumb:hover {
+    background: var(--color-success);
+}
+
+.chembl-similarity-candidate-item {
+    padding: 12px;
+    margin-bottom: 8px;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chembl-similarity-candidate-item:hover {
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-primary);
+}
+
+.chembl-similarity-candidate-item.selected {
+    background-color: var(--color-accent);
+    border-color: var(--color-accent);
+    color: white;
+}
+
+.chembl-similarity-candidate-number {
+    font-weight: 600;
+    font-size: 0.8rem;
+    min-width: 20px;
+    color: var(--color-accent);
+}
+
+.chembl-similarity-candidate-item.selected .chembl-similarity-candidate-number {
+    color: white;
+}
+
+.chembl-similarity-candidate-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.chembl-similarity-candidate-id {
+    font-family: monospace;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.chembl-similarity-candidate-item.selected .chembl-similarity-candidate-id {
+    color: white;
+}
+
+.chembl-similarity-candidate-score {
+    font-size: 0.75rem;
+    color: var(--color-success);
+    font-weight: 600;
+}
+
+.chembl-similarity-candidate-item.selected .chembl-similarity-candidate-score {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.chembl-similarity-details-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.chembl-similarity-details-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    gap: 16px;
+    height: 100%;
+}
+
+.chembl-similarity-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: var(--color-bg-primary);
+    border-radius: 8px;
+    border: 1px solid var(--c-light-border);
+    color: var(--color-text-secondary);
+    font-style: italic;
+    text-align: center;
+    padding: 40px 20px;
+    min-height: 200px;
+}
+
+/* Validation Input Styles */
+.chembl-similarity-input-with-validation {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.chembl-similarity-search-input {
+    width: 100%;
+    padding: 12px 45px 12px 16px; /* Right padding for validation icon */
+    font-size: 14px;
+    border: 1px solid var(--c-light-border);
+    border-radius: 8px;
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    transition: all 0.2s ease;
+    font-family: monospace;
+    min-height: 44px;
+}
+
+.chembl-similarity-search-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.1);
+}
+
+.chembl-similarity-search-input:disabled {
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    cursor: not-allowed;
+}
+
+.chembl-similarity-search-input.valid {
+    border-color: var(--color-success);
+}
+
+.chembl-similarity-search-input.invalid {
+    border-color: var(--color-alert);
+}
+
+.chembl-similarity-validation-icons {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+}
+
+.validation-icon {
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.validation-icon.success {
+    color: var(--color-success);
+}
+
+.validation-icon.fail {
+    color: var(--color-alert);
+}
+
+.validation-icon.empty {
+    color: var(--glassy-color);
+}
+
+.chembl-similarity-submit-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 200px;
+    margin-bottom: 8px;
+}
+
+.chembl-similarity-submit-btn.enabled {
+    background-color: var(--color-accent);
+    color: white;
+}
+
+.chembl-similarity-submit-btn.enabled:hover {
+    background-color: var(--color-success);
+    transform: translateY(-1px);
+}
+
+.chembl-similarity-submit-btn.disabled {
+    background-color: var(--c-deep-light);
+    color: var(--color-text-secondary);
+    cursor: not-allowed;
+}
+
+.chembl-similarity-validation-error {
+    background-color: rgba(var(--color-alert-rgb), 0.1);
+    border: 1px solid var(--color-alert);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-top: 4px;
+}
+
+.chembl-similarity-validation-error p {
+    margin: 0;
+    color: var(--color-alert);
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .chembl-similarity-getter-controls-row-1 {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+    
+    .chembl-similarity-getter-dropdown-section,
+    .chembl-similarity-getter-threshold-section {
+        flex-direction: column;
+        align-items: stretch;
+        flex: none;
+        gap: 6px;
+    }
+    
+    .chembl-similarity-getter-input-section {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+    
+    .chembl-similarity-getter-dropdown,
+    .chembl-similarity-getter-threshold-input {
+        width: 100%;
+        max-width: 100%;
+        min-width: auto;
+    }
+    
+    .chembl-similarity-getter-dropdown-header {
+        min-width: auto;
+        text-align: left;
+    }
+    
+    .chembl-similarity-getter-input-section .chembl-similarity-getter-dropdown-header {
+        min-width: auto;
+    }
+    
+    .chembl-similarity-results-container {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .chembl-similarity-candidates-panel {
+        flex: none;
+        max-height: 200px;
+    }
+    
+    .chembl-similarity-details-row {
+        flex-direction: column;
+    }
+    
+    .chembl-similarity-placeholder {
+        min-height: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chembl-similarity-candidate-item {
+        padding: 8px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .chembl-similarity-candidate-info {
+        gap: 4px;
+    }
+    
+    .chembl-similarity-candidate-id {
+        font-size: 0.8rem;
+    }
+}

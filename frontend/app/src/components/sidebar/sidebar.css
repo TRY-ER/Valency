@@ -27,10 +27,12 @@
 .logo {
     margin-bottom: 20px;
     display: flex;
+    align-items: center; /* Center align the logo and text vertically */
     justify-content: left !important; /* This aligns the img to the left of the .logo container */
     padding-left: 10px; /* Indents the logo image to align with menu item text */
     box-sizing: border-box; /* Ensures padding is included in width calculation */
     width: 100%; /* Makes the .logo container take full available width */
+    gap: 12px; /* Add space between logo and text */
 }
 
 .logo.collapsed {
@@ -44,6 +46,16 @@
     width: 40px;
     border-radius: 0px;
     height: 40px;
+}
+
+.logo-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--color-success);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0;
+    white-space: nowrap;
 }
 
 .sidebar-icon { /* New style for sidebar icons */

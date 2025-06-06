@@ -328,7 +328,6 @@ export const findMoleculeByPrefName = async (args) => {
 /**
  * @typedef {Object} ChemblFindMoleculeBySynonymArgs
  * @property {string} synonym - The synonym to search for (case-insensitive exact match).
- * @property {string[]} [only_fields] - Optional list of specific fields to return.
  */
 
 /**
@@ -360,7 +359,6 @@ export const findMoleculeBySynonym = async (args) => {
 /**
  * @typedef {Object} ChemblGetMoleculesByIdsArgs
  * @property {string[]} chembl_ids - A list of ChEMBL IDs (e.g., ['CHEMBL25', 'CHEMBL192']).
- * @property {string[]} [only_fields] - Optional list of specific fields to return.
  */
 
 /**
@@ -429,7 +427,6 @@ export const getMoleculeImageSvg = async (args) => {
  * @typedef {Object} ChemblFindSimilarMoleculesBySmilesArgs
  * @property {string} smiles - The SMILES string of the query molecule (e.g., 'CCO').
  * @property {number} [similarity_threshold=70] - Minimum similarity percentage (0-100).
- * @property {string[]} [only_fields] - Optional list of specific fields for similar molecules.
  */
 
 /**
@@ -462,7 +459,6 @@ export const findSimilarMoleculesBySmiles = async (args) => {
  * @typedef {Object} ChemblFindSimilarMoleculesByIdArgs
  * @property {string} chembl_id - The ChEMBL ID of the query molecule.
  * @property {number} [similarity_threshold=70] - Minimum similarity percentage (0-100).
- * @property {string[]} [only_fields] - Optional list of specific fields for similar molecules.
  */
 
 /**
@@ -494,7 +490,6 @@ export const findSimilarMoleculesByChemblId = async (args) => {
 /**
  * @typedef {Object} ChemblGetApprovedDrugsArgs
  * @property {boolean} [order_by_mw=false] - If true, sorts results by molecular weight.
- * @property {string[]} [only_fields] - Optional list of specific fields to return.
  */
 
 /**
@@ -515,9 +510,8 @@ export const getApprovedDrugs = async (args = {}) => {
 
 /**
  * @typedef {Object} ChemblGetActivitiesForTargetArgs
- * @property {string} target_chembl_id - ChEMBL ID of the target (e.g., 'CHEMBL240').
+ * @property {string} biological_target_name - Biological target name (e.g., 'hERG').
  * @property {string} [standard_type='IC50'] - Bioactivity measurement type (e.g., 'IC50', 'Ki').
- * @property {string[]} [only_fields] - Optional list of specific fields for activity records.
  */
 
 /**
@@ -526,12 +520,12 @@ export const getApprovedDrugs = async (args = {}) => {
  * @returns {Promise<object>} A promise that resolves to the target activities data
  */
 export const getActivitiesForTarget = async (args) => {
-  if (!args || !args.target_chembl_id) {
+  if (!args || !args.biological_target_name) {
     console.error('getActivitiesForTarget: target_chembl_id is required');
     return Promise.reject(new Error('Target ChEMBL ID is required'));
   }
   
-  if (typeof args.target_chembl_id !== 'string' || args.target_chembl_id.trim() === '') {
+  if (typeof args.biological_target_name!== 'string' || args.biological_target_name.trim() === '') {
     console.error('getActivitiesForTarget: target_chembl_id must be a non-empty string');
     return Promise.reject(new Error('Target ChEMBL ID must be a non-empty string'));
   }
@@ -550,7 +544,6 @@ export const getActivitiesForTarget = async (args) => {
  * @typedef {Object} ChemblGetActivitiesForMoleculeArgs
  * @property {string} molecule_chembl_id - ChEMBL ID of the molecule.
  * @property {boolean} [pchembl_value_exists=true] - If true, only returns activities with a pChEMBL value.
- * @property {string[]} [only_fields] - Optional list of specific fields for activity records.
  */
 
 /**
