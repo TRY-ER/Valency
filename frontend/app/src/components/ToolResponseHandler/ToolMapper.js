@@ -10,11 +10,21 @@ import UniProtViewer from '../../pages/Explorer/ProtExplorer/UniProtViewer';
 import UniProtSummaryViewer from '../../pages/Explorer/ProtExplorer/UniProtSummaryViewer';
 import AlphafoldAnnotationsViewer from '../../pages/Explorer/ProtExplorer/AlphafoldAnnotationsViewer';
 import PSMILESListComponent from '../../pages/Generator/BRICS/PSMILESListComponent';
+import ChemBLGetter from '../../pages/Explorer/ChemBLExplorer/ChemBLGetter';
+import ChemBLSimilarityGetter from '../../pages/Explorer/ChemBLExplorer/ChemBLSimilarityGetter';
+import ChemBLActivityFetcher from '../../pages/Explorer/ChemBLExplorer/ChemBLActivityFetcher';
+import TargetByGeneName from '../../pages/Explorer/ChemBLExplorer/UtilityComponents/TargetByGeneName';
+import SmilesToCTAB from '../../pages/Explorer/ChemBLExplorer/UtilityComponents/SmilesToCTAB';
+import ComputeMolecularDescriptor from '../../pages/Explorer/ChemBLExplorer/UtilityComponents/ComputeMolecularDescriptor';
+import ComputeStructuralAlerts from '../../pages/Explorer/ChemBLExplorer/UtilityComponents/ComputeStructuralAlerts';
+import StandardizeMolecules from '../../pages/Explorer/ChemBLExplorer/UtilityComponents/StandardizeMolecules';
+import ParentMolecule from '../../pages/Explorer/ChemBLExplorer/UtilityComponents/ParentMolecule';
 
 // Import Generator Components
 import BRICSComponent from '../../pages/Generator/BRICS/PSMILESContent';
 import LSTMComponent from '../../pages/Generator/LSTM/LSTMContent';
 import ADMETComponent from '../../pages/Generator/ADMET/ADMET';
+
 
 // Import other UI components that might be useful for tools
 import DataViewer from '../UI/DataViewer';
@@ -29,6 +39,22 @@ const ToolMapper = {
     "get_uniprot_summary": UniProtSummaryViewer,
     "get_alphafold_annotations": AlphafoldAnnotationsViewer,
     "get_brics_candidates": PSMILESListComponent,
+    "find_molecule_by_pref_name": ChemBLGetter,
+    "get_molecule_by_chembl_id": ChemBLGetter,
+    "find_molecule_by_synonym": ChemBLGetter,
+    "get_molecules_by_chembl_ids": ChemBLGetter,
+
+    "find_similar_molecules_by_smiles": ChemBLSimilarityGetter,
+    "find_similar_molecules_by_chembl_id": ChemBLSimilarityGetter,
+    
+    "get_activities_for_target": ChemBLActivityFetcher,
+    "get_activities_for_molecule": ChemBLActivityFetcher,
+    "find_target_by_gene_name": TargetByGeneName, 
+    "smiles_to_ctab": SmilesToCTAB,
+    "compute_molecular_descriptors": ComputeMolecularDescriptor,
+    "compute_structural_alerts": ComputeStructuralAlerts,
+    "standardize_molecule_from_smiles": StandardizeMolecules,
+    "get_parent_molecule_from_smiles": ParentMolecule,
 
     // Utility Components
     'DataViewer': DataViewer,
@@ -82,7 +108,7 @@ export const getToolComponent = (toolName, toolData) => {
     // Try exact match first
     if (ToolMapper[toolName]) {
         const Component = ToolMapper[toolName];
-        return <Component toolData={toolData} />; 
+        return Component; 
     }
     
     // Try case-insensitive match
@@ -93,7 +119,7 @@ export const getToolComponent = (toolName, toolData) => {
     
     if (matchingKey) {
         const Component = ToolMapper[matchingKey];
-        return <Component toolData={toolData} />;
+        return Component;
 
     }
     

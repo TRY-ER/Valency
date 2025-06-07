@@ -8,6 +8,7 @@ import { FiTool, FiUser, FiAlertCircle, FiChevronDown, FiChevronUp, FiHelpCircle
 import { BsCheck2All } from 'react-icons/bs';
 import { getToolResponse } from "../../../services/api/agentService"; // Import the getToolResponse function
 import ToolResponseHandler from "../../ToolResponseHandler/ToolResponseHandler";
+import toolTypeMapper from "../../../utils/toolTypeMapper";
 
 const FunctionResponse = ({ data }) => {
     const [expanded, setExpanded] = useState(false);
@@ -46,12 +47,18 @@ const FunctionResponse = ({ data }) => {
                 let content = toolResponse.response_data.content[0];
                 if (content.text){
                     const main_return = JSON.parse(content.text);
+                    let rawData;
                     if (main_return.data) {
-                        setToolTransferData(main_return.data);
+                        rawData = main_return.data;
                     }
                     else {
-                        setToolTransferData(main_return);
+                        rawData = main_return;
                     }
+                    
+                    // Process the tool data using the type mapper
+                    const processedData = toolTypeMapper.processToolData(data.name, rawData);
+                    console.log("processed data >>", processedData);
+                    setToolTransferData(processedData);
                 }
             }
         } 
@@ -139,7 +146,13 @@ const FunctionResponse = ({ data }) => {
                                 duration: 0.3,
                                 ease: "easeInOut"
                             }}
-                            style={{ marginTop: "10px", width: "100%", overflow: "hidden" }}
+                            style={{ 
+                                marginTop: "10px", 
+                                width: "100%", 
+                                maxHeight: "70vh",
+                                overflowY: "auto",
+                                overflowX: "hidden"
+                            }}
                         >
                             {loading && (
                                 <div className="func-tag-inner-container" style={{ width: "100%" }}>

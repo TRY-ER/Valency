@@ -575,7 +575,6 @@ export const getActivitiesForMolecule = async (args) => {
 /**
  * @typedef {Object} ChemblFindTargetByGeneNameArgs
  * @property {string} gene_name - Gene name or symbol (e.g., 'BRCA1'). Case-insensitive contains match.
- * @property {string[]} [only_fields] - Optional list of fields (e.g., ['organism', 'pref_name']).
  */
 
 /**

@@ -1,29 +1,83 @@
 @import "../../App.css";
 
-.tab-container{
-    display:flex;
+.tab-container {
+    display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: 15px;
+    flex-wrap: wrap;
     /* overflow-y: auto; */
 }
 
-.tab-tag{
-    padding: 5px 10px;
-    border-radius: 10px;
+.tab-link {
     cursor: pointer;
-}
-
-.tab-link.active .tab-tag{
-    background-color: var(--color-success)!important;
-}
-
-.tab-link{
     text-decoration: none;
     color: var(--color-text-primary);
+    /* transition: all 0.3s ease; */
 }
 
-.tab-tag-text{
+.tab-tag {
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    background-color: var(--glassy-color) !important;
+    border: 2px solid transparent !important;
+    /* transition: all 0.3s ease !important; */
+    min-width: 120px;
+    text-align: center;
+    box-shadow: 0 4px 30px var(--shadow-color);
+}
+
+.tab-link.active .tab-tag {
+    background-color: var(--color-success) !important;
+    border: 2px solid var(--color-success) !important;
+    /* transform: translateY(-2px) !important; */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+.tab-link:hover:not(.active) .tab-tag {
+    /* transform: translateY(-1px) scale(1.02) !important; */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+    border: 2px solid var(--color-success) !important;
+    background-color: rgba(4, 120, 4, 0.1) !important;
+}
+
+.tab-tag-text {
     margin: 0;
     padding: 0;
     color: var(--color-text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.tab-link.active .tab-tag-text {
+    color: white !important;
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tab-container {
+        gap: 10px;
+    }
+    
+    .tab-tag {
+        padding: 6px 12px;
+        min-width: 100px;
+    }
+    
+    .tab-tag-text {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .tab-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .tab-tag {
+        width: 100%;
+        text-align: center;
+    }
 }

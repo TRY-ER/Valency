@@ -46,7 +46,7 @@ export const fadeInDownVariants = {
     y: 0,
     transition: {
       delay: index * 0.1, // adjust delay multiplier as needed
-      duration: 0.5,
+      duration: 0.3,
       ease: "easeOut",
     },
   }),

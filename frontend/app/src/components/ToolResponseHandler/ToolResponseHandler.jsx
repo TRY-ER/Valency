@@ -27,7 +27,7 @@ const ToolResponseHandler = ({ ToolName, ToolData }) => {
                     </h3>
                 </div> */}
                 <div className="tool-content">
-                     {ToolComponent} 
+                     <ToolComponent toolData={ToolData} />
                 </div>
             </div>
         );

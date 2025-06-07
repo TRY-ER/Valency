@@ -456,8 +456,63 @@ const ChemBLGetter = ({
 
     // Effect to handle initial data passed as props
     useEffect(() => {
-        if (toolData) {
-            setApiData(toolData);
+        if (toolData && toolData.type && toolData.content) {
+            console.log('Processing tool data:', toolData);
+            
+            // Set search type based on tool data type
+            setSearchType(toolData.type);
+            
+            if (toolData.type === "pref_name" || toolData.type === "synonym") {
+                // Handle preferred name and synonym search results
+                if (Array.isArray(toolData.content) && toolData.content.length > 0) {
+                    setMultipleCandidates(toolData.content);
+                    setSelectedCandidate(toolData.content[0]);
+                    setSelectedIndex(0);
+                    setIsSelectedCandidateValid(true);
+                    setApiData(null); // Clear single molecule data
+                    setMultipleChemblResults([]);
+                    setSelectedChemblResult(null);
+                } else if (toolData.content) {
+                    // If it's a single candidate, treat it as a single-item array for consistent UI
+                    setMultipleCandidates([toolData.content]);
+                    setSelectedCandidate(toolData.content);
+                    setSelectedIndex(0);
+                    setIsSelectedCandidateValid(true);
+                    setApiData(null); // Clear single molecule data
+                    setMultipleChemblResults([]);
+                    setSelectedChemblResult(null);
+                } else {
+                    // No candidates found
+                    setError(`No records found with ${toolData.type} search.`);
+                }
+            } else if (toolData.type === "chembl_id") {
+                // Handle single ChEMBL ID search result
+                if (toolData.content) {
+                    setApiData(toolData.content);
+                    setMultipleCandidates([]);
+                    setSelectedCandidate(null);
+                    setMultipleChemblResults([]);
+                    setSelectedChemblResult(null);
+                } else {
+                    setError("No molecule found for the provided ChEMBL ID.");
+                }
+            } else if (toolData.type === "multiple_chembl_ids") {
+                // Handle multiple ChEMBL IDs search result
+                if (Array.isArray(toolData.content) && toolData.content.length > 0) {
+                    setMultipleChemblResults(toolData.content);
+                    setSelectedChemblResult(toolData.content[0]);
+                    setSelectedChemblIndex(0);
+                    setApiData(null);
+                    setMultipleCandidates([]);
+                    setSelectedCandidate(null);
+                } else {
+                    setError("No molecules found for the provided ChEMBL IDs.");
+                }
+            }
+            
+            // Clear any existing errors
+            setError(null);
+            setValidationError(null);
         }
     }, [toolData]);
 
@@ -872,7 +927,7 @@ const ChemBLGetter = ({
                                     }}>
                                         💡 Use ↑↓ arrow keys to navigate
                                     </p>
-                                    <div>
+                                    <div className="chembl-candidates-list">
                                         {multipleCandidates.map((candidate, index) => (
                                             <div 
                                                 key={index}
@@ -987,7 +1042,7 @@ const ChemBLGetter = ({
                                     }}>
                                         💡 Use ↑↓ arrow keys to navigate
                                     </p>
-                                    <div>
+                                    <div className="chembl-candidates-list">
                                         {multipleChemblResults.map((molecule, index) => (
                                             <div 
                                                 key={index}

@@ -1,6 +1,8 @@
 import { React } from 'react';
+import { motion } from "framer-motion";
 import "./TabSection.css";
-import { NavLink} from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
+import { fadeInDownVariants } from "../animations/framerAnim";
 
 const TabContainer = ({ tabDetails, basePath = "" }) => {
     
@@ -8,16 +10,24 @@ const TabContainer = ({ tabDetails, basePath = "" }) => {
         <>
             <div className="tab-container">
                 {
-                    tabDetails.map((tab) => {
+                    tabDetails.map((tab, index) => {
                         return (
-                            <NavLink 
-                             key={tab.id} 
-                             className={({ isActive }) => `tab-link ${isActive ? "active" : ""}`}
-                            > 
-                                <div className={`tab-tag glassy-feel`}>
-                                    <p className="tab-tag-text">{tab.title}</p>
-                                </div>
-                            </NavLink>
+                            <motion.div
+                                key={tab.id}
+                                initial="hidden"
+                                animate="visible"
+                                variants={fadeInDownVariants}
+                                custom={index}
+                            >
+                                <NavLink 
+                                    className={({ isActive }) => `tab-link ${isActive ? "active" : ""}`}
+                                    to={basePath ? `${basePath}/${tab.path || tab.key || ''}` : (tab.path || tab.key || '')}
+                                > 
+                                    <div className={`tab-tag glassy-feel`}>
+                                        <p className="tab-tag-text">{tab.title}</p>
+                                    </div>
+                                </NavLink>
+                            </motion.div>
                         )
                     })
                 }

@@ -350,8 +350,93 @@ const ChemBLActivityFetcher = ({
     const [selectedMoleculeActivity, setSelectedMoleculeActivity] = useState(null);
     const [selectedMoleculeIndex, setSelectedMoleculeIndex] = useState(0);
 
+    // Ref to track if search type is being set from toolData
+    const isSettingFromToolData = useRef(false);
+
     useEffect(() => {
-        if (toolData) {
+        console.log('activity tool data received >>', toolData);
+        if (toolData && toolData.type && toolData.content) {
+            console.log('Processing activity tool data:', toolData);
+            
+            // Set flag to indicate we're setting search type from toolData
+            isSettingFromToolData.current = true;
+            
+            // Set search type based on tool data type
+            setSearchType(toolData.type);
+
+            console.log('activity tool data >>', toolData);
+            
+            if (toolData.type === "target") {
+                // Handle target search results - expecting structure with target_data and activity_data
+                if (toolData.content && typeof toolData.content === 'object' && 
+                    toolData.content.target_data && toolData.content.activity_data) {
+                    console.log('Setting target activity data from tool data:', toolData.content);
+                    setTargetData(toolData.content.target_data);
+                    setActivityMolecules(Array.isArray(toolData.content.activity_data) ? toolData.content.activity_data : []);
+                    setSelectedActivityMolecule(Array.isArray(toolData.content.activity_data) && toolData.content.activity_data.length > 0 ? toolData.content.activity_data[0] : null);
+                    setSelectedActivityIndex(0);
+                    setApiData(null); // Clear regular data display
+                    setMoleculeActivities([]);
+                    setSelectedMoleculeActivity(null);
+                    setSelectedMoleculeIndex(0);
+                    // Clear any existing errors for successful data processing
+                    setError(null);
+                } else {
+                    // No target activities found
+                    setError(`No target activities found for ${toolData.type} search.`);
+                    setTargetData(null);
+                    setActivityMolecules([]);
+                    setSelectedActivityMolecule(null);
+                    setApiData(null);
+                    setMoleculeActivities([]);
+                    setSelectedMoleculeActivity(null);
+                }
+            } else if (toolData.type === "molecule") {
+                // Handle molecule search results - expecting array of activity data
+                if (Array.isArray(toolData.content) && toolData.content.length > 0) {
+                    console.log('Setting molecule activity data from tool data:', toolData.content);
+                    setMoleculeActivities(toolData.content);
+                    setSelectedMoleculeActivity(toolData.content[0]);
+                    setSelectedMoleculeIndex(0);
+                    setApiData(null); // Clear regular data display
+                    setTargetData(null);
+                    setActivityMolecules([]);
+                    setSelectedActivityMolecule(null);
+                    setSelectedActivityIndex(0);
+                    // Clear any existing errors for successful data processing
+                    setError(null);
+                } else if (toolData.content) {
+                    // If it's a single activity, treat it as a single-item array for consistent UI
+                    setMoleculeActivities([toolData.content]);
+                    setSelectedMoleculeActivity(toolData.content);
+                    setSelectedMoleculeIndex(0);
+                    setApiData(null); // Clear regular data display
+                    setTargetData(null);
+                    setActivityMolecules([]);
+                    setSelectedActivityMolecule(null);
+                    setSelectedActivityIndex(0);
+                    // Clear any existing errors for successful data processing
+                    setError(null);
+                } else {
+                    // No molecule activities found
+                    setError(`No molecule activities found for ${toolData.type} search.`);
+                    setMoleculeActivities([]);
+                    setSelectedMoleculeActivity(null);
+                    setApiData(null);
+                    setTargetData(null);
+                    setActivityMolecules([]);
+                    setSelectedActivityMolecule(null);
+                }
+            }
+            
+            // Reset flag after state updates
+            setTimeout(() => {
+                isSettingFromToolData.current = false;
+            }, 0);
+        } else if (toolData) {
+            // Fallback for old format toolData without type/content structure
+            console.log('Processing legacy activity tool data format:', toolData);
+            
             // Extract the data array from the nested toolData structure if it exists
             // Structure: toolData.results.0.data (array)
             let extractedData = null;
@@ -400,6 +485,13 @@ const ChemBLActivityFetcher = ({
             setError(null);
         }
     }, [toolData]);
+
+    useEffect(() => {
+        console.log('activity api data updated >>', apiData);
+        console.log('target data >>', targetData);
+        console.log('activity molecules >>', activityMolecules);
+        console.log('molecule activities >>', moleculeActivities);
+    }, [apiData, targetData, activityMolecules, moleculeActivities]);
 
     // Handle input changes with real-time validation
     const handleInputChange = useCallback((value) => {
@@ -612,19 +704,22 @@ const ChemBLActivityFetcher = ({
         }
     };
 
-    // Reset validation error when search type changes
-    useEffect(() => {
-        setValidationError(null);
-        setError(null);
-        setApiData(null);
-        setTargetData(null);
-        setActivityMolecules([]);
-        setSelectedActivityMolecule(null);
-        setSelectedActivityIndex(0);
-        setMoleculeActivities([]);
-        setSelectedMoleculeActivity(null);
-        setSelectedMoleculeIndex(0);
-    }, [searchType]);
+    // Reset validation error when search type changes (but not when set from toolData)
+    // useEffect(() => {
+    //     // Only reset if the search type change is user-initiated (not from toolData)
+    //     if (!isSettingFromToolData.current) {
+    //         setValidationError(null);
+    //         setError(null);
+    //         setApiData(null);
+    //         setTargetData(null);
+    //         setActivityMolecules([]);
+    //         setSelectedActivityMolecule(null);
+    //         setSelectedActivityIndex(0);
+    //         setMoleculeActivities([]);
+    //         setSelectedMoleculeActivity(null);
+    //         setSelectedMoleculeIndex(0);
+    //     }
+    // }, [searchType]);
 
     return (
         <motion.div
@@ -949,7 +1044,7 @@ const ChemBLActivityFetcher = ({
                                             marginBottom: '10px',
                                             fontWeight: '500'
                                         }}>
-                                            Activity Records
+                                            Activity Targets 
                                         </h4>
                                         <p style={{
                                             color: 'var(--color-text-secondary)',

@@ -2,8 +2,7 @@
 
 .chembl-getter-container {
     width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
+    margin: 0;
 }
 
 .chembl-getter-row-1,
@@ -338,6 +337,36 @@
 .chembl-candidates-panel {
     flex: 4;
     min-width: 300px;
+    max-height: 500px; /* Limit the maximum height */
+    overflow-y: auto; /* Make it scrollable */
+    display: flex;
+    flex-direction: column;
+}
+
+.chembl-candidates-list {
+    flex: 1;
+    overflow-y: auto;
+    max-height: 350px; /* Set a specific max height for the list */
+    padding-right: 4px; /* Add some padding for the scrollbar */
+}
+
+/* Scrollbar styling for candidates list */
+.chembl-candidates-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chembl-candidates-list::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+    border-radius: 3px;
+}
+
+.chembl-candidates-list::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 3px;
+}
+
+.chembl-candidates-list::-webkit-scrollbar-thumb:hover {
+    background: var(--color-success);
 }
 
 .chembl-details-panel {

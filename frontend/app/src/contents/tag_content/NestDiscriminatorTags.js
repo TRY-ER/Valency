@@ -4,6 +4,7 @@ import ChemBLGetter from "../../pages/Explorer/ChemBLExplorer/ChemBLGetter";
 import ChemBLSimilarityGetter from "../../pages/Explorer/ChemBLExplorer/ChemBLSimilarityGetter";
 import ApprovedDrugsViewer from "../../pages/Explorer/ChemBLExplorer/ApprovedDrugsViewer";
 import ChemBLActivityFetcher from "../../pages/Explorer/ChemBLExplorer/ChemBLActivityFetcher";
+import ChemBLUtilities from "../../pages/Explorer/ChemBLExplorer/ChemBLUtilities";
 
 const SimilaritySearchTabContents = [
     {
@@ -79,6 +80,14 @@ const ChemBLTabContents = [
         link: 'app-drugs',
         description: `This tool uses ChemBL database to retrieve information about approved drugs.`,
         component: <ApprovedDrugsViewer />,
+        docs: null,
+    },
+    {
+        id: 5,
+        title: 'Utilities',
+        link: 'utils',
+        description: `This tool provides various utilities for working with ChemBL data including target searches by gene name, SMILES to CTAB conversion, molecular descriptor calculations, structural alerts analysis, molecule standardization, and parent molecule extraction.`,
+        component: <ChemBLUtilities />,
         docs: null,
     },
 ];

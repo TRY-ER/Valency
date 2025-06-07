@@ -227,15 +227,65 @@ const ChemBLSimilarityGetter = ({
     const [selectedMolecule, setSelectedMolecule] = useState(null);
     const [selectedIndex, setSelectedIndex] = useState(0);
 
+    // Ref to track if search type is being set from toolData
+    const isSettingFromToolData = useRef(false);
+
     useEffect(() => {
         console.log('similarity tool data received >>', toolData);
-        if (toolData) {
+        if (toolData && toolData.type && toolData.content) {
+            console.log('Processing similarity tool data:', toolData);
+            
+            // Set flag to indicate we're setting search type from toolData
+            isSettingFromToolData.current = true;
+            
+            // Set search type based on tool data type
+            setSearchType(toolData.type);
+
+            console.log('tool data >>', toolData);
+            
+            if (toolData.type === "smiles" || toolData.type === "chembl_id") {
+                // Handle similarity search results
+                if (Array.isArray(toolData.content) && toolData.content.length > 0) {
+                    console.log('Setting similar molecules from tool data:', toolData.content);
+                    setSimilarMolecules(toolData.content);
+                    setSelectedMolecule(toolData.content[0]);
+                    setSelectedIndex(0);
+                    setApiData(null); // Clear single molecule data for multiple results view
+                    // Clear any existing errors for successful data processing
+                    setError(null);
+                    setValidationError(null);
+                } else if (toolData.content) {
+                    // If it's a single molecule, treat it as a single-item array for consistent UI
+                    setSimilarMolecules([toolData.content]);
+                    setSelectedMolecule(toolData.content);
+                    setSelectedIndex(0);
+                    setApiData(null); // Clear single molecule data
+                    // Clear any existing errors for successful data processing
+                    setError(null);
+                    setValidationError(null);
+                } else {
+                    // No molecules found
+                    setError(`No similar molecules found for ${toolData.type} search.`);
+                    setSimilarMolecules([]);
+                    setSelectedMolecule(null);
+                    setApiData(null);
+                }
+            }
+            
+            // Reset flag after state updates
+            setTimeout(() => {
+                isSettingFromToolData.current = false;
+            }, 0);
+        } else if (toolData) {
+            // Fallback for old format toolData without type/content structure
             setApiData(toolData);
         }
     }, [toolData]);
 
     useEffect(() => {
         console.log('similarity api data updated >>', apiData);
+        console.log('similar molecules >>', similarMolecules);
+        console.log('active similar molecules >>', selectedMolecule);
     }, [apiData]);
 
     // Backend SMILES validation function (similar to MolExplorer)
@@ -267,6 +317,7 @@ const ChemBLSimilarityGetter = ({
 
     // Enhanced input change handler with comprehensive validation
     const handleInputChange = useCallback(async (value) => {
+        console.log('handleInputChange called with:', value, 'for searchType:', searchType);
         setInputValue(value);
         setError(null);
         setValidationError(null);
@@ -285,7 +336,9 @@ const ChemBLSimilarityGetter = ({
 
         // Validate based on search type
         if (searchType === "chembl_id") {
+            console.log('Validating ChEMBL ID:', trimmedValue);
             isValid = validateChemblId(trimmedValue);
+            console.log('ChEMBL ID validation result:', isValid);
             if (!isValid) {
                 errorMessage = "Invalid ChEMBL ID format. Must start with 'CHEMBL' followed by numbers (e.g., CHEMBL25, CHEMBL1234567).";
             }
@@ -298,7 +351,9 @@ const ChemBLSimilarityGetter = ({
             // For SMILES, use backend validation like MolExplorer
             try {
                 setValidationStatus('validating'); // Show loading state
+                console.log('Validating SMILES:', trimmedValue);
                 isValid = await validateSmilesWithBackend(trimmedValue);
+                console.log('SMILES validation result:', isValid);
                 
                 if (!isValid) {
                     errorMessage = "Invalid SMILES format. Please enter a valid SMILES string (e.g., CCO, C1=CC=CC=C1).";
@@ -320,21 +375,40 @@ const ChemBLSimilarityGetter = ({
     // Re-validate when search type changes
     useEffect(() => {
         if (inputValue.trim() !== "") {
+            // Force re-validation with the current input for the new search type
             handleInputChange(inputValue);
+        } else {
+            // If input is empty, ensure validation states are reset properly
+            setIsValidInput(false);
+            setValidationStatus('empty');
+            setValidationError(null);
         }
     }, [searchType, handleInputChange]);
 
     const handleSubmit = useCallback(async (value) => {
+        console.log('handleSubmit called with value:', value);
         const trimmedValue = value.trim();
+        console.log("valid state >>", isValidInput);
         
         if (!trimmedValue) {
             setError("Please enter a search value.");
             return;
         }
 
-        // Use the validation state that's already been set by handleInputChange
-        // No need for additional validation here since we have real-time validation
-        if (!isValidInput) {
+        // Perform immediate validation as a fallback in case the state hasn't updated yet
+        let isCurrentlyValid = isValidInput;
+        
+        if (searchType === "chembl_id") {
+            isCurrentlyValid = validateChemblId(trimmedValue);
+            console.log('Immediate ChEMBL ID validation in submit:', isCurrentlyValid);
+        } else if (searchType === "smiles") {
+            // For SMILES, trust the async validation state since we can't do sync validation
+            // But ensure we have a valid state
+            isCurrentlyValid = isValidInput && validationStatus === 'valid';
+            console.log('SMILES validation state in submit:', isCurrentlyValid, 'validationStatus:', validationStatus);
+        }
+
+        if (!isCurrentlyValid) {
             if (searchType === "chembl_id") {
                 const errorMsg = trimmedValue.toLowerCase().includes('chembl') 
                     ? "Invalid ChEMBL ID format. Ensure it follows the pattern: CHEMBL followed by numbers (e.g., CHEMBL25, CHEMBL1234567)."
@@ -408,14 +482,7 @@ const ChemBLSimilarityGetter = ({
         } finally {
             setIsLoading(false);
         }
-    }, [searchType, similarityThreshold]);
-
-    // Effect to handle initial data passed as props
-    useEffect(() => {
-        if (toolData) {
-            setApiData(toolData);
-        }
-    }, [toolData]);
+    }, [searchType, similarityThreshold, isValidInput, validationStatus]);
 
     // Effect to handle initial search value
     useEffect(() => {
@@ -447,17 +514,23 @@ const ChemBLSimilarityGetter = ({
         }
     };
 
-    // Reset states when search type changes
-    useEffect(() => {
-        setError(null);
-        setValidationError(null);
-        setInputValue("");
-        setSearchValue("");
-        setApiData(null);
-        setSimilarMolecules([]);
-        setSelectedMolecule(null);
-        setSelectedIndex(0);
-    }, [searchType]);
+    // Reset states when search type changes (but not when set from toolData)
+    // useEffect(() => {
+    //     // Only reset if the search type change is user-initiated (not from toolData)
+    //     if (!isSettingFromToolData.current) {
+    //         setError(null);
+    //         setValidationError(null);
+    //         setInputValue("");
+    //         setSearchValue("");
+    //         setApiData(null);
+    //         setSimilarMolecules([]);
+    //         setSelectedMolecule(null);
+    //         setSelectedIndex(0);
+    //         // Reset validation states for the new search type
+    //         setIsValidInput(false);
+    //         setValidationStatus('empty');
+    //     }
+    // }, [searchType]);
 
     // Keyboard navigation for similar molecules
     useEffect(() => {
@@ -490,6 +563,16 @@ const ChemBLSimilarityGetter = ({
             return () => clearTimeout(timer);
         }
     }, [error]);
+
+    useEffect(() => {
+        console.log("search type: ", searchType);
+    }, [searchType])
+
+    useEffect(() => {
+        console.log('Similar molecules updated:', similarMolecules);
+        console.log('Selected molecule changed:', selectedMolecule);
+        console.log('Selected index:', selectedIndex);
+    }, [similarMolecules, selectedMolecule, selectedIndex]);
 
     return (
         <>
@@ -614,14 +697,23 @@ const ChemBLSimilarityGetter = ({
                 )}
 
                 {/* Similar Molecules Results */}
-                {similarMolecules && similarMolecules.length > 0 && (
+                {((similarMolecules && similarMolecules.length > 0) || error) && (
                     <div className="chembl-similarity-getter-row-2" style={{ marginTop: '16px' }}>
                         <GlassyContainer>
                             <h3 style={{ marginBottom: '12px', fontWeight: '700' }}>
-                                Similar Molecules Results ({similarMolecules.length} found)
+                                {similarMolecules && similarMolecules.length > 0 
+                                    ? `Similar Molecules Results (${similarMolecules.length} found)` 
+                                    : 'Search Results'
+                                }
                             </h3>
                             
-                            <div className="chembl-similarity-results-container">
+                            {/* Show error state when there's an error and no molecules */}
+                            {error && (!similarMolecules || similarMolecules.length === 0) ? (
+                                <div className="chembl-similarity-getter-error" style={{ margin: '20px 0' }}>
+                                    <p>{error}</p>
+                                </div>
+                            ) : (
+                                <div className="chembl-similarity-results-container">
                                 {/* Left Panel - Molecule List */}
                                 <div className="chembl-similarity-candidates-panel">
                                     <h4 style={{
@@ -739,6 +831,7 @@ const ChemBLSimilarityGetter = ({
                                     )}
                                 </div>
                             </div>
+                            )}
                         </GlassyContainer>
                     </div>
                 )}
