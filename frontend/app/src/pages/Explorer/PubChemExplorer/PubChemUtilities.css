@@ -1,0 +1,504 @@
+/* PubChem Utilities Styles */
+.pubchem-utilities-container {
+    padding: 20px 0;
+}
+
+.pubchem-utilities-header {
+    margin-bottom: 20px;
+}
+
+.utilities-main-title {
+    margin: 0 0 10px 0;
+    color: var(--color-text-primary);
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+.utilities-main-description {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* Tab Navigation Styles */
+.utilities-tab-container {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.utilities-tab {
+    cursor: pointer;
+    text-decoration: none;
+    color: var(--color-text-primary);
+    transition: all 0.3s ease;
+}
+
+.utilities-tab-tag {
+    padding: 8px 16px;
+    border-radius: 10px;
+    background-color: var(--glassy-color);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    min-width: 120px;
+    text-align: center;
+}
+
+.utilities-tab.active .utilities-tab-tag {
+    background-color: var(--color-success) !important;
+    border-color: var(--color-success);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.utilities-tab:hover .utilities-tab-tag {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-accent);
+}
+
+.utilities-tab-text {
+    margin: 0;
+    padding: 0;
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.utilities-tab.active .utilities-tab-text {
+    color: white !important;
+    font-weight: 600;
+}
+
+/* Tab Description */
+.utilities-tab-description {
+    margin-bottom: 20px;
+}
+
+.utilities-tab-title {
+    margin: 0 0 10px 0;
+    color: var(--color-text-primary);
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.utilities-tab-desc {
+    margin: 0;
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+/* Content Area */
+.utilities-content {
+    min-height: 400px;
+}
+
+/* Search Section Styles for individual utility components */
+.search-section {
+    margin-bottom: 20px;
+}
+
+.search-section h3 {
+    color: var(--color-text-primary);
+    margin-bottom: 12px;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.search-section p {
+    color: var(--color-text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+/* Input Groups using app variables */
+.input-group {
+    margin-bottom: 16px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 6px;
+    color: var(--color-text-primary);
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 8px;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px rgba(var(--color-accent-rgb), 0.2);
+}
+
+.input-group input::placeholder {
+    color: var(--color-text-secondary);
+}
+
+.input-group input:disabled,
+.input-group select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.input-group select option {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+}
+
+/* Search Button using app theme */
+.search-button {
+    background: var(--color-success);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 140px;
+}
+
+.search-button:hover:not(:disabled) {
+    background: var(--color-success-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.search-button:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.search-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Error Messages using app theme */
+.error-message {
+    background: rgba(var(--color-alert-rgb), 0.1);
+    border: 1px solid var(--color-alert);
+    color: var(--color-alert);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 16px 0;
+    font-weight: 500;
+}
+
+/* Results Section */
+.results-section {
+    margin-top: 20px;
+}
+
+.results-section h4 {
+    color: var(--color-text-primary);
+    margin-bottom: 16px;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.search-info {
+    color: var(--color-text-secondary);
+    margin-bottom: 20px;
+    font-style: italic;
+    background: var(--color-bg-secondary);
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-left: 4px solid var(--color-accent);
+}
+
+/* Results Grid */
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.result-item {
+    background: var(--glassy-color);
+    border: 1px solid var(--c-light-border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.result-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-color: var(--color-accent);
+}
+
+.cid-info {
+    margin-bottom: 12px;
+}
+
+.cid-info strong {
+    color: var(--color-accent);
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.compound-image {
+    margin-top: 10px;
+}
+
+.compound-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    background: white;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.compound-image img:hover {
+    transform: scale(1.05);
+}
+
+/* Compound Preview */
+.compound-preview {
+    text-align: center;
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--color-bg-secondary);
+    border-radius: 12px;
+}
+
+.compound-preview img {
+    max-width: 250px;
+    height: auto;
+    border-radius: 8px;
+    background: white;
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.compound-preview img:hover {
+    transform: scale(1.05);
+}
+
+/* Properties Grid */
+.properties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.property-item {
+    background: var(--glassy-color);
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid var(--c-light-border);
+    transition: all 0.3s ease;
+}
+
+.property-item:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.property-label {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.property-value {
+    color: var(--color-text-primary);
+    font-weight: 600;
+    font-size: 15px;
+    word-break: break-word;
+    line-height: 1.4;
+}
+
+/* Synonyms List */
+.synonyms-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.synonyms-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.synonyms-list::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+    border-radius: 3px;
+}
+
+.synonyms-list::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 3px;
+}
+
+.synonyms-list::-webkit-scrollbar-thumb:hover {
+    background: var(--color-accent-hover);
+}
+
+.synonym-item {
+    background: var(--glassy-color);
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--c-light-border);
+    color: var(--color-text-primary);
+    font-size: 14px;
+    transition: all 0.3s ease;
+    word-break: break-word;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.synonym-item:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Results Note */
+.results-note {
+    color: var(--color-text-secondary);
+    font-style: italic;
+    text-align: center;
+    margin-top: 16px;
+    padding: 12px;
+    background: var(--color-bg-secondary);
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* No Results */
+.no-results {
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-style: italic;
+    padding: 40px 30px;
+    background: var(--color-bg-secondary);
+    border: 2px dashed var(--c-light-border);
+    border-radius: 12px;
+    margin-top: 20px;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* Loading States */
+.search-button:disabled::after {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-left: 8px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .utilities-tab-container {
+        gap: 10px;
+    }
+    
+    .utilities-tab-tag {
+        padding: 6px 12px;
+        min-width: 100px;
+    }
+    
+    .utilities-tab-text {
+        font-size: 0.8rem;
+    }
+    
+    .utilities-main-title {
+        font-size: 1.5rem;
+    }
+    
+    .utilities-tab-title {
+        font-size: 1.2rem;
+    }
+    
+    .results-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 12px;
+    }
+    
+    .properties-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .synonyms-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .compound-preview img {
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 480px) {
+    .utilities-tab-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .utilities-tab-tag {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .input-group input,
+    .input-group select {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+    
+    .search-button {
+        padding: 10px 20px;
+        font-size: 14px;
+        min-width: 120px;
+    }
+    
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .compound-preview img {
+        max-width: 180px;
+    }
+}

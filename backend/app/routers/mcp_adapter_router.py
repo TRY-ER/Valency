@@ -285,11 +285,10 @@ class PubchemGetCompoundByCidArgs(BaseModel):
 
 class PubchemGetCidsByNameArgs(BaseModel):
     name: str = Field(..., description="Name of the compound to search for.")
-    match_type: Optional[str] = Field(None, description="Type of name match (e.g., 'exact', 'contains'). Refer to PubChem PUG REST for details.")
 
 class PubchemGetCompoundPropertiesArgs(BaseModel):
     cid: str = Field(..., description="PubChem Compound ID (CID).")
-    properties: Optional[List[str]] = Field(None, description="Comma-separated string or list of properties to retrieve. Refer to PubChem PUG REST for available properties.")
+    properties: List[str] = Field(..., description="Comma-separated string or list of properties to retrieve. Refer to PubChem PUG REST for available properties.")
 
 class PubchemGetCompoundSynonymsByCidArgs(BaseModel):
     cid: str = Field(..., description="PubChem Compound ID (CID).")
@@ -300,29 +299,26 @@ class PubchemGetCompoundImagePubchemUrlArgs(BaseModel):
 
 class PubchemGetCidsBySmilesArgs(BaseModel):
     smiles: str = Field(..., description="SMILES string.")
-    search_type: Optional[str] = Field(None, description="Type of SMILES search (e.g., 'similarity', 'substructure').")
 
 class PubchemGetCidsByInchikeyArgs(BaseModel):
     inchikey: str = Field(..., description="InChIKey.")
 
 class PubchemFastIdentitySearchByCidArgs(BaseModel):
     cid: str = Field(..., description="PubChem Compound ID (CID) for query.")
-    threshold: Optional[int] = Field(None, description="Identity threshold for the search.") # e.g. 90 for 90%
 
 class PubchemFastSubstructureSearchBySmilesArgs(BaseModel):
     smiles: str = Field(..., description="SMILES string for substructure query.")
 
 class PubchemFastSimilarity2dSearchByCidArgs(BaseModel):
     cid: str = Field(..., description="PubChem Compound ID (CID) for similarity query.")
-    threshold: Optional[int] = Field(None, description="Tanimoto similarity threshold (e.g., 80 for 80%).")
 
 class PubchemGetCidsByXrefArgs(BaseModel):
-    xref: str = Field(..., description="Cross-reference ID.")
-    namespace: str = Field(..., description="Namespace of the cross-reference (e.g., 'RegistryID', 'RN', 'PubMedID').")
+    xref_type: str = Field(..., description="Namespace of the cross-reference (e.g., 'RegistryID', 'RN', 'PubMedID').")
+    xref_value: str = Field(..., description="Cross-reference ID.")
 
 class PubchemGetCidsByMassArgs(BaseModel):
-    mass: float = Field(..., description="Molecular mass for search.")
-    tolerance: Optional[float] = Field(None, description="Mass tolerance for the search.")
+    mass_type: str = Field(..., description="Type of mass to search by (e.g., 'exact', 'monoisotopic').")
+    value_or_min: float = Field(..., description="Molecular mass value to search for.")
 
 # Explicit PubChem tool endpoints
 @pubchem_router.post("/get_compound_by_cid", summary="Get Compound by CID", description="Retrieve compound details from PubChem using its Compound ID (CID).")
@@ -341,9 +337,9 @@ async def pubchem_get_compound_properties(tool_args: PubchemGetCompoundPropertie
 async def pubchem_get_compound_synonyms_by_cid(tool_args: PubchemGetCompoundSynonymsByCidArgs = Body(...)):
     return await _run_mcp_tool_handler(PUBCHEM_MCP_SERVER_URL, "get_compound_synonyms_by_cid", tool_args.model_dump(exclude_none=True)) # Pass URL
 
-@pubchem_router.post("/get_compound_image_pubchem_url", summary="Get Compound Image URL", description="Get a URL for the image of a compound from PubChem using its CID.")
-async def pubchem_get_compound_image_pubchem_url(tool_args: PubchemGetCompoundImagePubchemUrlArgs = Body(...)):
-    return await _run_mcp_tool_handler(PUBCHEM_MCP_SERVER_URL, "get_compound_image_pubchem_url", tool_args.model_dump(exclude_none=True)) # Pass URL
+# @pubchem_router.post("/get_compound_image_pubchem_url", summary="Get Compound Image URL", description="Get a URL for the image of a compound from PubChem using its CID.")
+# async def pubchem_get_compound_image_pubchem_url(tool_args: PubchemGetCompoundImagePubchemUrlArgs = Body(...)):
+#     return await _run_mcp_tool_handler(PUBCHEM_MCP_SERVER_URL, "get_compound_image_pubchem_url", tool_args.model_dump(exclude_none=True)) # Pass URL
 
 @pubchem_router.post("/get_cids_by_smiles", summary="Get CIDs by SMILES", description="Search for PubChem CIDs using a SMILES string.")
 async def pubchem_get_cids_by_smiles(tool_args: PubchemGetCidsBySmilesArgs = Body(...)):

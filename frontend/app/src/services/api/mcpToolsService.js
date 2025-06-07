@@ -857,6 +857,414 @@ export const getParentMoleculeFromSmiles = async (args) => {
   }
 };
 
+// ==================== PUBCHEM TOOLS ====================
+
+/**
+ * @typedef {Object} PubchemGetCompoundByCidArgs
+ * @property {string} cid - PubChem Compound ID (CID).
+ */
+
+/**
+ * Retrieve compound details from PubChem using its Compound ID (CID).
+ * @param {PubchemGetCompoundByCidArgs} args - The arguments for compound retrieval
+ * @returns {Promise<object>} A promise that resolves to the compound data
+ */
+export const getCompoundByCid = async (args) => {
+  if (!args || !args.cid) {
+    console.error('getCompoundByCid: cid is required');
+    return Promise.reject(new Error('PubChem Compound ID (CID) is required'));
+  }
+  
+  if (typeof args.cid !== 'string' || args.cid.trim() === '') {
+    console.error('getCompoundByCid: cid must be a non-empty string');
+    return Promise.reject(new Error('PubChem Compound ID (CID) must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/get_compound_by_cid', args);
+    console.log('PubChem compound retrieval completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get PubChem compound by CID:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemGetCidsByNameArgs
+ * @property {string} name - Name of the compound to search for.
+ */
+
+/**
+ * Search for PubChem Compound IDs (CIDs) by compound name.
+ * @param {PubchemGetCidsByNameArgs} args - The arguments for CID search by name
+ * @returns {Promise<object>} A promise that resolves to the CID search results
+ */
+export const getCidsByName = async (args) => {
+  if (!args || !args.name) {
+    console.error('getCidsByName: name is required');
+    return Promise.reject(new Error('Compound name is required'));
+  }
+  
+  if (typeof args.name !== 'string' || args.name.trim() === '') {
+    console.error('getCidsByName: name must be a non-empty string');
+    return Promise.reject(new Error('Compound name must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/get_cids_by_name', args);
+    console.log('PubChem CIDs search by name completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get PubChem CIDs by name:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemGetCompoundPropertiesArgs
+ * @property {string} cid - PubChem Compound ID (CID).
+ * @property {string[]} properties - List of properties to retrieve.
+ */
+
+/**
+ * Retrieve specific properties for a given PubChem CID.
+ * @param {PubchemGetCompoundPropertiesArgs} args - The arguments for compound properties retrieval
+ * @returns {Promise<object>} A promise that resolves to the compound properties data
+ */
+export const getCompoundProperties = async (args) => {
+  if (!args || !args.cid) {
+    console.error('getCompoundProperties: cid is required');
+    return Promise.reject(new Error('PubChem Compound ID (CID) is required'));
+  }
+  
+  if (!args.properties) {
+    console.error('getCompoundProperties: properties is required');
+    return Promise.reject(new Error('Properties list is required'));
+  }
+  
+  if (typeof args.cid !== 'string' || args.cid.trim() === '') {
+    console.error('getCompoundProperties: cid must be a non-empty string');
+    return Promise.reject(new Error('PubChem Compound ID (CID) must be a non-empty string'));
+  }
+  
+  if (!Array.isArray(args.properties) || args.properties.length === 0) {
+    console.error('getCompoundProperties: properties must be a non-empty array');
+    return Promise.reject(new Error('Properties must be a non-empty array'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/get_compound_properties', args);
+    console.log('PubChem compound properties retrieval completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get PubChem compound properties:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemGetCompoundSynonymsByCidArgs
+ * @property {string} cid - PubChem Compound ID (CID).
+ */
+
+/**
+ * Retrieve synonyms for a compound using its PubChem CID.
+ * @param {PubchemGetCompoundSynonymsByCidArgs} args - The arguments for compound synonyms retrieval
+ * @returns {Promise<object>} A promise that resolves to the compound synonyms data
+ */
+export const getCompoundSynonymsByCid = async (args) => {
+  if (!args || !args.cid) {
+    console.error('getCompoundSynonymsByCid: cid is required');
+    return Promise.reject(new Error('PubChem Compound ID (CID) is required'));
+  }
+  
+  if (typeof args.cid !== 'string' || args.cid.trim() === '') {
+    console.error('getCompoundSynonymsByCid: cid must be a non-empty string');
+    return Promise.reject(new Error('PubChem Compound ID (CID) must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/get_compound_synonyms_by_cid', args);
+    console.log('PubChem compound synonyms retrieval completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get PubChem compound synonyms by CID:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemGetCompoundImagePubchemUrlArgs
+ * @property {string} cid - PubChem Compound ID (CID).
+ * @property {string} [image_size='small'] - Desired image size (e.g., 'small', 'large').
+ */
+
+/**
+ * Get a URL for the image of a compound from PubChem using its CID.
+ * @param {PubchemGetCompoundImagePubchemUrlArgs} args - The arguments for compound image URL retrieval
+ * @returns {Promise<object>} A promise that resolves to the compound image URL data
+ */
+export const getCompoundImagePubchemUrl = async (args) => {
+  if (!args || !args.cid) {
+    console.error('getCompoundImagePubchemUrl: cid is required');
+    return Promise.reject(new Error('PubChem Compound ID (CID) is required'));
+  }
+  
+  if (typeof args.cid !== 'string' || args.cid.trim() === '') {
+    console.error('getCompoundImagePubchemUrl: cid must be a non-empty string');
+    return Promise.reject(new Error('PubChem Compound ID (CID) must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/get_compound_image_pubchem_url', args);
+    console.log('PubChem compound image URL retrieval completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get PubChem compound image URL:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemGetCidsBySmilesArgs
+ * @property {string} smiles - SMILES string.
+ */
+
+/**
+ * Search for PubChem CIDs using a SMILES string.
+ * @param {PubchemGetCidsBySmilesArgs} args - The arguments for CID search by SMILES
+ * @returns {Promise<object>} A promise that resolves to the CID search results
+ */
+export const getCidsBySmiles = async (args) => {
+  if (!args || !args.smiles) {
+    console.error('getCidsBySmiles: smiles is required');
+    return Promise.reject(new Error('SMILES string is required'));
+  }
+  
+  if (typeof args.smiles !== 'string' || args.smiles.trim() === '') {
+    console.error('getCidsBySmiles: smiles must be a non-empty string');
+    return Promise.reject(new Error('SMILES string must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/get_cids_by_smiles', args);
+    console.log('PubChem CIDs search by SMILES completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get PubChem CIDs by SMILES:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemGetCidsByInchikeyArgs
+ * @property {string} inchikey - InChIKey.
+ */
+
+/**
+ * Search for PubChem CIDs using an InChIKey.
+ * @param {PubchemGetCidsByInchikeyArgs} args - The arguments for CID search by InChIKey
+ * @returns {Promise<object>} A promise that resolves to the CID search results
+ */
+export const getCidsByInchikey = async (args) => {
+  if (!args || !args.inchikey) {
+    console.error('getCidsByInchikey: inchikey is required');
+    return Promise.reject(new Error('InChIKey is required'));
+  }
+  
+  if (typeof args.inchikey !== 'string' || args.inchikey.trim() === '') {
+    console.error('getCidsByInchikey: inchikey must be a non-empty string');
+    return Promise.reject(new Error('InChIKey must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/get_cids_by_inchikey', args);
+    console.log('PubChem CIDs search by InChIKey completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get PubChem CIDs by InChIKey:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemFastIdentitySearchByCidArgs
+ * @property {string} cid - PubChem Compound ID (CID) for query.
+ */
+
+/**
+ * Perform a fast identity search for compounds similar to a given PubChem CID.
+ * @param {PubchemFastIdentitySearchByCidArgs} args - The arguments for fast identity search
+ * @returns {Promise<object>} A promise that resolves to the identity search results
+ */
+export const fastIdentitySearchByCid = async (args) => {
+  if (!args || !args.cid) {
+    console.error('fastIdentitySearchByCid: cid is required');
+    return Promise.reject(new Error('PubChem Compound ID (CID) is required'));
+  }
+  
+  if (typeof args.cid !== 'string' || args.cid.trim() === '') {
+    console.error('fastIdentitySearchByCid: cid must be a non-empty string');
+    return Promise.reject(new Error('PubChem Compound ID (CID) must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/fast_identity_search_by_cid', args);
+    console.log('PubChem fast identity search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform PubChem fast identity search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemFastSubstructureSearchBySmilesArgs
+ * @property {string} smiles - SMILES string for substructure query.
+ */
+
+/**
+ * Perform a fast substructure search using a SMILES string.
+ * @param {PubchemFastSubstructureSearchBySmilesArgs} args - The arguments for fast substructure search
+ * @returns {Promise<object>} A promise that resolves to the substructure search results
+ */
+export const fastSubstructureSearchBySmiles = async (args) => {
+  if (!args || !args.smiles) {
+    console.error('fastSubstructureSearchBySmiles: smiles is required');
+    return Promise.reject(new Error('SMILES string is required'));
+  }
+  
+  if (typeof args.smiles !== 'string' || args.smiles.trim() === '') {
+    console.error('fastSubstructureSearchBySmiles: smiles must be a non-empty string');
+    return Promise.reject(new Error('SMILES string must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/fast_substructure_search_by_smiles', args);
+    console.log('PubChem fast substructure search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform PubChem fast substructure search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemFastSimilarity2dSearchByCidArgs
+ * @property {string} cid - PubChem Compound ID (CID) for similarity query.
+ */
+
+/**
+ * Perform a fast 2D similarity search for compounds similar to a given PubChem CID.
+ * @param {PubchemFastSimilarity2dSearchByCidArgs} args - The arguments for fast 2D similarity search
+ * @returns {Promise<object>} A promise that resolves to the similarity search results
+ */
+export const fastSimilarity2dSearchByCid = async (args) => {
+  if (!args || !args.cid) {
+    console.error('fastSimilarity2dSearchByCid: cid is required');
+    return Promise.reject(new Error('PubChem Compound ID (CID) is required'));
+  }
+  
+  if (typeof args.cid !== 'string' || args.cid.trim() === '') {
+    console.error('fastSimilarity2dSearchByCid: cid must be a non-empty string');
+    return Promise.reject(new Error('PubChem Compound ID (CID) must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/fast_similarity_2d_search_by_cid', args);
+    console.log('PubChem fast 2D similarity search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform PubChem fast 2D similarity search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemGetCidsByXrefArgs
+ * @property {string} xref_type - Namespace of the cross-reference (e.g., 'RegistryID', 'RN', 'PubMedID').
+ * @property {string} xref_value - Cross-reference ID.
+ */
+
+/**
+ * Search for PubChem CIDs using a cross-reference ID and its namespace.
+ * @param {PubchemGetCidsByXrefArgs} args - The arguments for CID search by cross-reference
+ * @returns {Promise<object>} A promise that resolves to the CID search results
+ */
+export const getCidsByXref = async (args) => {
+  if (!args || !args.xref_type) {
+    console.error('getCidsByXref: xref_type is required');
+    return Promise.reject(new Error('Cross-reference type is required'));
+  }
+  
+  if (!args.xref_value) {
+    console.error('getCidsByXref: xref_value is required');
+    return Promise.reject(new Error('Cross-reference value is required'));
+  }
+  
+  if (typeof args.xref_type !== 'string' || args.xref_type.trim() === '') {
+    console.error('getCidsByXref: xref_type must be a non-empty string');
+    return Promise.reject(new Error('Cross-reference type must be a non-empty string'));
+  }
+  
+  if (typeof args.xref_value !== 'string' || args.xref_value.trim() === '') {
+    console.error('getCidsByXref: xref_value must be a non-empty string');
+    return Promise.reject(new Error('Cross-reference value must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/get_cids_by_xref', args);
+    console.log('PubChem CIDs search by cross-reference completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get PubChem CIDs by cross-reference:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} PubchemGetCidsByMassArgs
+ * @property {string} mass_type - Type of mass to search by (e.g., 'exact', 'monoisotopic').
+ * @property {number} value_or_min - Molecular mass value to search for.
+ */
+
+/**
+ * Search for PubChem CIDs using molecular mass and an optional tolerance.
+ * @param {PubchemGetCidsByMassArgs} args - The arguments for CID search by mass
+ * @returns {Promise<object>} A promise that resolves to the CID search results
+ */
+export const getCidsByMass = async (args) => {
+  if (!args || !args.mass_type) {
+    console.error('getCidsByMass: mass_type is required');
+    return Promise.reject(new Error('Mass type is required'));
+  }
+  
+  if (args.value_or_min === undefined || args.value_or_min === null) {
+    console.error('getCidsByMass: value_or_min is required');
+    return Promise.reject(new Error('Mass value is required'));
+  }
+  
+  if (typeof args.mass_type !== 'string' || args.mass_type.trim() === '') {
+    console.error('getCidsByMass: mass_type must be a non-empty string');
+    return Promise.reject(new Error('Mass type must be a non-empty string'));
+  }
+  
+  if (typeof args.value_or_min !== 'number' || args.value_or_min <= 0) {
+    console.error('getCidsByMass: value_or_min must be a positive number');
+    return Promise.reject(new Error('Mass value must be a positive number'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/pubchem/get_cids_by_mass', args);
+    console.log('PubChem CIDs search by mass completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get PubChem CIDs by mass:', error.message);
+    throw error;
+  }
+};
+
 // ==================== GENERIC MCP TOOLS EXPORTS ====================
 
 /**

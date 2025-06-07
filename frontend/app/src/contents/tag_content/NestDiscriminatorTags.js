@@ -5,6 +5,9 @@ import ChemBLSimilarityGetter from "../../pages/Explorer/ChemBLExplorer/ChemBLSi
 import ApprovedDrugsViewer from "../../pages/Explorer/ChemBLExplorer/ApprovedDrugsViewer";
 import ChemBLActivityFetcher from "../../pages/Explorer/ChemBLExplorer/ChemBLActivityFetcher";
 import ChemBLUtilities from "../../pages/Explorer/ChemBLExplorer/ChemBLUtilities";
+import PubChemGetter from "../../pages/Explorer/PubChemExplorer/PubChemGetter";
+import PubChemSimilarityGetter from "../../pages/Explorer/PubChemExplorer/PubChemSimilarityGetter";
+import PubChemUtilities from "../../pages/Explorer/PubChemExplorer/PubChemUtilities";
 
 const SimilaritySearchTabContents = [
     {
@@ -92,7 +95,39 @@ const ChemBLTabContents = [
     },
 ];
 
+const PubChemTabContents = [
+    {
+        id: 1,
+        title: 'Getter',
+        link: '',
+        description: `This tool uses PubChem database to retrieve compound information by CID, name, SMILES, or InChI Key.
+                      It allows you to search for compounds using various identifiers and displays comprehensive molecular data
+                      including structure, properties, and synonyms.`,
+        component: <PubChemGetter />,
+        docs: null,
+    },
+    {
+        id: 2,
+        title: 'Similarity Search',
+        link: 'similarity-search',
+        description: `This tool uses PubChem database to conduct similarity searches for compounds based on CID or SMILES.
+                      Find structurally similar compounds with adjustable similarity thresholds and comprehensive results display.`,
+        component: <PubChemSimilarityGetter />,
+        docs: null,
+    },
+    {
+        id: 3,
+        title: 'Utilities',
+        link: 'utils',
+        description: `This tool provides various utilities for working with PubChem data including compound search by various identifiers,
+                      substructure search, mass-based search, cross-reference lookup, synonym retrieval, and property calculation.`,
+        component: <PubChemUtilities />,
+        docs: null,
+    },
+];
+
 export {
     SimilaritySearchTabContents,
-    ChemBLTabContents
+    ChemBLTabContents,
+    PubChemTabContents
 }

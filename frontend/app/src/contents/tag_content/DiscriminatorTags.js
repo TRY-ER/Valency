@@ -1,6 +1,7 @@
 import SSComponent from "../../pages/Discriminator/SimilaritySearch/SSearch";
-import { SimilaritySearchTabContents, ChemBLTabContents } from "./NestDiscriminatorTags";
+import { SimilaritySearchTabContents, ChemBLTabContents, PubChemTabContents } from "./NestDiscriminatorTags";
 import ChemBLComponent from "../../pages/Discriminator/ChemBL/ChemBL";
+import PubChemComponent from "../../pages/Discriminator/PubChem/PubChem";
 
 const DiscriminatorTabContents = [
     {
@@ -24,6 +25,16 @@ const DiscriminatorTabContents = [
         docs: null,
         includeDocs: true,
         subElements: ChemBLTabContents 
+    },
+    {
+        id: 3,
+        title: 'PubChem',
+        link: 'pubchem',
+        description: `This tool uses PubChem database to retrieve compound information, conduct similarity searches, and access various chemical utilities including substructure search, mass search, cross-reference lookup, and property calculation.`,
+        component: <PubChemComponent tabContent={PubChemTabContents} basePath="identification/pubchem" />,
+        docs: null,
+        includeDocs: true,
+        subElements: PubChemTabContents 
     }
 ]
 
