@@ -12,6 +12,7 @@ import MassSearch from "./UtilityComponents/MassSearch";
 import XrefSearch from "./UtilityComponents/XrefSearch";
 import CompoundSynonyms from "./UtilityComponents/CompoundSynonyms";
 import CompoundProperties from "./UtilityComponents/CompoundProperties";
+import IdentitySearch from "./UtilityComponents/IdentitySearch";
 
 // Utility tabs configuration
 const utilityTabs = [
@@ -35,6 +36,13 @@ const utilityTabs = [
         key: 'compound-properties',
         component: <CompoundProperties />,
         description: 'Get computed properties and descriptors for compounds.'
+    },
+    {
+        id: 4,
+        title: 'Identity Search',
+        key: 'identity-search',
+        component: <IdentitySearch />,
+        description: 'Search for compound identity information using PubChem CID from IdentifierList structure.'
     }
 ];
 

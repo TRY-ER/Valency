@@ -4,11 +4,11 @@ import { fadeInUpVariantStatic } from '../../../../components/animations/framerA
 import GlassyContainer from '../../../../components/glassy_container/gc';
 import { FaCheckDouble } from 'react-icons/fa';
 import { IoWarningOutline } from 'react-icons/io5';
-import { getCompoundSynonymsByCid } from '../../../../services/api/mcpToolsService';
+import { fastIdentitySearchByCid } from '../../../../services/api/mcpToolsService';
 
-const CompoundSynonyms = () => {
+const IdentitySearch = () => {
   const [cid, setCid] = useState('');
-  const [synonyms, setSynonyms] = useState([]);
+  const [identityData, setIdentityData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isValidCid, setIsValidCid] = useState(false);
@@ -25,7 +25,7 @@ const CompoundSynonyms = () => {
     if (error) setError('');
   };
 
-  const handleSynonymSearch = async () => {
+  const handleIdentitySearch = async () => {
     if (!cid.trim()) {
       setError('Please enter a Compound ID (CID).');
       return;
@@ -39,31 +39,26 @@ const CompoundSynonyms = () => {
 
     setIsLoading(true);
     setError('');
-    setSynonyms([]);
+    setIdentityData(null);
 
     try {
-      const result = await getCompoundSynonymsByCid({ cid: cid.trim() });
-      console.log("result >>", result)
-      
+      const result = await fastIdentitySearchByCid({ cid: cid.trim() });
+      console.log("result", result);
       if (result && result.status === "success") {
         let processible = result.result["0"];
         processible = JSON.parse(processible);
-        console.log("processible >>", processible)
-        
-        if (processible && processible.result.InformationList && processible.result.InformationList.Information && 
-            processible.result.InformationList.Information[0] && processible.result.InformationList.Information[0].Synonym) {
-          setSynonyms(processible.result.InformationList.Information[0].Synonym);
+        console.log("processible", processible); 
+        if (processible && processible.result.IdentifierList && processible.result.IdentifierList.CID) {
+          setIdentityData(processible.result.IdentifierList);
         } else {
-          setSynonyms([]);
+          setError('No identity data found for the given CID');
         }
       } else {
-        setError(result.message || 'No synonyms found for the given CID');
-        setSynonyms([]);
+        setError(result.message || 'No identity data found for the given CID');
       }
-    } catch (error) {
-      console.error('Error fetching synonyms:', error);
-      setError('No synonyms found for the given CID.');
-      setSynonyms([]);
+    } catch (err) {
+      console.error('Error fetching identity data:', err);
+      setError('No identity data found for the given CID.');
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +66,7 @@ const CompoundSynonyms = () => {
 
   const resetForm = () => {
     setCid('');
-    setSynonyms([]);
+    setIdentityData(null);
     setError('');
     setIsValidCid(false);
     setSearchQuery('');
@@ -79,13 +74,43 @@ const CompoundSynonyms = () => {
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter' && isValidCid && !isLoading) {
-      handleSynonymSearch();
+      handleIdentitySearch();
     }
   };
 
-  // Filter synonyms based on search query
-  const filteredSynonyms = synonyms.filter(synonym =>
-    synonym.toLowerCase().includes(searchQuery.toLowerCase())
+  // Get all identifier entries for filtering
+  const getIdentifierEntries = () => {
+    if (!identityData) return [];
+    
+    const entries = [];
+    Object.keys(identityData).forEach(key => {
+      const value = identityData[key];
+      if (value && key !== 'CID') {
+        if (Array.isArray(value)) {
+          value.forEach(item => {
+            entries.push({ type: key, value: item.toString() });
+          });
+        } else {
+          entries.push({ type: key, value: value.toString() });
+        }
+      }
+    });
+    
+    // Add CID at the beginning - but only show the number, not "CID" prefix
+    if (identityData.CID) {
+      const cidValues = Array.isArray(identityData.CID) ? identityData.CID : [identityData.CID];
+      cidValues.forEach(cidValue => {
+        entries.unshift({ type: 'CID', value: cidValue.toString(), displayValue: cidValue.toString() });
+      });
+    }
+    
+    return entries;
+  };
+
+  // Filter identity data based on search query
+  const filteredIdentifiers = getIdentifierEntries().filter(entry =>
+    entry.value.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    entry.type.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -97,9 +122,9 @@ const CompoundSynonyms = () => {
     >
       <div className="utility-input-section">
         <GlassyContainer>
-          <h3 style={{ marginBottom: '15px', fontWeight: '700' }}>Compound Synonyms</h3>
+          <h3 style={{ marginBottom: '15px', fontWeight: '700' }}>Identity Search</h3>
           <p style={{ marginBottom: '20px', color: 'var(--color-text-secondary)' }}>
-            Retrieve all available synonyms for a compound by CID.
+            Search for compound identity information using PubChem CID from IdentifierList structure.
           </p>
 
           {/* Add inline styles for input placeholder */}
@@ -162,7 +187,7 @@ const CompoundSynonyms = () => {
                   }} />
                 )}
                 <button
-                  onClick={handleSynonymSearch}
+                  onClick={handleIdentitySearch}
                   disabled={!isValidCid || isLoading}
                   style={{
                     padding: '12px 20px',
@@ -177,7 +202,7 @@ const CompoundSynonyms = () => {
                     whiteSpace: 'nowrap'
                   }}
                 >
-                  {isLoading ? 'Fetching...' : 'Get Synonyms'}
+                  {isLoading ? 'Fetching...' : 'Get Identity'}
                 </button>
               </div>
             </div>
@@ -193,7 +218,7 @@ const CompoundSynonyms = () => {
             )}
           </div>
           
-          {(synonyms.length > 0 || error) && (
+          {(identityData || error) && (
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
               <button
                 onClick={resetForm}
@@ -247,18 +272,18 @@ const CompoundSynonyms = () => {
         </div>
       )}
 
-      {synonyms.length > 0 && (
+      {identityData && (
         <div className="utility-results-section" style={{ marginTop: '20px' }}>
           <GlassyContainer>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <h4 style={{ color: 'var(--color-text-primary)', fontWeight: '600', margin: 0 }}>
-                Synonyms for CID {cid} ({filteredSynonyms.length} of {synonyms.length} shown)
+                Identity Data for CID {cid} ({filteredIdentifiers.length} identifiers)
               </h4>
-              {synonyms.length > 5 && (
+              {getIdentifierEntries().length > 5 && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: '300px' }}>
                   <input
                     type="text"
-                    placeholder="Search synonyms..."
+                    placeholder="Search identifiers..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     style={{
@@ -310,11 +335,11 @@ const CompoundSynonyms = () => {
               )}
             </div>
             
-            {filteredSynonyms.length > 0 ? (
+            {filteredIdentifiers.length > 0 ? (
               <>
                 <div style={{
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
                   gap: '12px',
                   maxHeight: '500px',
                   overflowY: 'auto',
@@ -323,7 +348,7 @@ const CompoundSynonyms = () => {
                   borderRadius: '12px',
                   border: '1px solid var(--c-light-border)'
                 }}>
-                  {filteredSynonyms.map((synonym, index) => (
+                  {filteredIdentifiers.map((identifier, index) => (
                     <div 
                       key={index}
                       style={{
@@ -340,40 +365,25 @@ const CompoundSynonyms = () => {
                         fontWeight: '500',
                         boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
                       }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = 'var(--color-bg-primary)';
-                        e.target.style.borderColor = 'var(--color-success, #28a745)';
-                        e.target.style.transform = 'translateY(-3px)';
-                        e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'var(--glassy-color)';
-                        e.target.style.borderColor = 'var(--c-light-border)';
-                        e.target.style.transform = 'translateY(0)';
-                        e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
-                      }}
+                    //   onMouseEnter={(e) => {
+                    //     e.target.style.borderColor = 'var(--color-success, #28a745)';
+                    //     e.target.style.transform = 'translateY(-3px)';
+                    //     e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
+                    //   }}
+                    //   onMouseLeave={(e) => {
+                    //     e.target.style.borderColor = 'var(--c-light-border)';
+                    //     e.target.style.transform = 'translateY(0)';
+                    //     e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                    //   }}
                       onClick={() => {
-                        navigator.clipboard.writeText(synonym);
+                        navigator.clipboard.writeText(identifier.value);
                         // Optional: Add a toast notification here
                       }}
                       title="Click to copy to clipboard"
                     >
-                      {synonym}
+                      <div>{identifier.displayValue || identifier.value}</div>
                     </div>
                   ))}
-                </div>
-                <div style={{
-                  marginTop: '15px',
-                  fontSize: '13px',
-                  color: 'var(--color-text-secondary)',
-                  textAlign: 'center',
-                  fontStyle: 'italic',
-                  backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                  padding: '12px',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(40, 167, 69, 0.2)'
-                }}>
-                  💡 Click on any synonym to copy it to clipboard
                 </div>
               </>
             ) : (
@@ -386,14 +396,14 @@ const CompoundSynonyms = () => {
                 border: '2px dashed var(--c-light-border)',
                 borderRadius: '12px'
               }}>
-                No synonyms match your search "{searchQuery}"
+                No identifiers match your search "{searchQuery}"
               </div>
             )}
           </GlassyContainer>
         </div>
       )}
 
-      {!isLoading && synonyms.length === 0 && cid && !error && (
+      {!isLoading && !identityData && cid && !error && (
         <div className="utility-results-section" style={{ marginTop: '20px' }}>
           <GlassyContainer>
             <div style={{
@@ -405,7 +415,7 @@ const CompoundSynonyms = () => {
               border: '2px dashed var(--c-light-border)',
               borderRadius: '12px'
             }}>
-              No synonyms found for the specified compound.
+              No identity data found for the specified compound.
             </div>
           </GlassyContainer>
         </div>
@@ -414,4 +424,4 @@ const CompoundSynonyms = () => {
   );
 };
 
-export default CompoundSynonyms;
+export default IdentitySearch;
