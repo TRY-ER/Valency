@@ -6,9 +6,13 @@ import MolEComponent from '../../pages/Explorer/MolExplorer/MolExplorer';
 import PolyEComponent from '../../pages/Explorer/PolyExplorer/PolyExplorer';
 import BasicProtViewer from '../../pages/Explorer/ProtExplorer/BasicProtViewer';
 import MolStarViewer from '../../pages/Explorer/ProtExplorer/MolStarViewer';
+
+// Import Alphafold Components
 import UniProtViewer from '../../pages/Explorer/ProtExplorer/UniProtViewer';
 import UniProtSummaryViewer from '../../pages/Explorer/ProtExplorer/UniProtSummaryViewer';
 import AlphafoldAnnotationsViewer from '../../pages/Explorer/ProtExplorer/AlphafoldAnnotationsViewer';
+
+// Import ChemBL Components
 import PSMILESListComponent from '../../pages/Generator/BRICS/PSMILESListComponent';
 import ChemBLGetter from '../../pages/Explorer/ChemBLExplorer/ChemBLGetter';
 import ChemBLSimilarityGetter from '../../pages/Explorer/ChemBLExplorer/ChemBLSimilarityGetter';
@@ -19,6 +23,14 @@ import ComputeMolecularDescriptor from '../../pages/Explorer/ChemBLExplorer/Util
 import ComputeStructuralAlerts from '../../pages/Explorer/ChemBLExplorer/UtilityComponents/ComputeStructuralAlerts';
 import StandardizeMolecules from '../../pages/Explorer/ChemBLExplorer/UtilityComponents/StandardizeMolecules';
 import ParentMolecule from '../../pages/Explorer/ChemBLExplorer/UtilityComponents/ParentMolecule';
+
+// Import PubChem Components
+import PubChemGetter from '../../pages/Explorer/PubChemExplorer/PubChemGetter';
+import CompoundProperties from '../../pages/Explorer/PubChemExplorer/UtilityComponents/CompoundProperties';
+import CompoundSynonyms from '../../pages/Explorer/PubChemExplorer/UtilityComponents/CompoundSynonyms';
+import IdentitySearch from '../../pages/Explorer/PubChemExplorer/UtilityComponents/IdentitySearch';
+import PubChemSimilarityGetter from '../../pages/Explorer/PubChemExplorer/PubChemSimilarityGetter';
+import SubstructureSearch from '../../pages/Explorer/PubChemExplorer/UtilityComponents/SubstructureSearch';
 
 // Import Generator Components
 import BRICSComponent from '../../pages/Generator/BRICS/PSMILESContent';
@@ -55,6 +67,16 @@ const ToolMapper = {
     "compute_structural_alerts": ComputeStructuralAlerts,
     "standardize_molecule_from_smiles": StandardizeMolecules,
     "get_parent_molecule_from_smiles": ParentMolecule,
+
+    "get_compound_by_cid": PubChemGetter,
+    "get_cids_by_name": PubChemGetter,
+    "get_cids_by_smiles": PubChemGetter,
+    "get_cids_by_inchikey": PubChemGetter,
+    "get_compound_properties": CompoundProperties,
+    "get_compound_synonyms_by_cid": CompoundSynonyms,
+    "fast_identity_search_by_cid": IdentitySearch,
+    "fast_similarity_2d_search_by_cid": PubChemSimilarityGetter,
+    "fast_substructure_search_by_smiles": SubstructureSearch, 
 
     // Utility Components
     'DataViewer': DataViewer,

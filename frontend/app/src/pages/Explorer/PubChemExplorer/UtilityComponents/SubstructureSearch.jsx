@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { fadeInUpVariantStatic } from '../../../../components/animations/framerAnim';
 import GlassyContainer from '../../../../components/glassy_container/gc';
@@ -8,7 +8,7 @@ import { call_endpoint_async } from '../../../../endpoints/caller';
 import { endpoints } from '../../../../endpoints/endpoints';
 import { fastSubstructureSearchBySmiles } from '../../../../services/api/mcpToolsService';
 
-const SubstructureSearch = () => {
+const SubstructureSearch = ({ toolData = null }) => {
   const [smiles, setSmiles] = useState('');
   const [substructureResults, setSubstructureResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -77,8 +77,10 @@ const SubstructureSearch = () => {
         processedResults = JSON.parse(processedResults);
          
         // Extract CIDs from the response structure
-        if (processedResults && processedResults.data && Array.isArray(processedResults.data)) {
-          setSubstructureResults(processedResults.data.slice(0, 100)); // Limit to first 100 results
+        if (processedResults && processedResults.result) {
+          if(processedResults.result.IdentifierList){
+            setSubstructureResults(processedResults.result.IdentifierList.CID); // Limit to first 100 results
+          }
         } else {
           setSubstructureResults([]);
         }
@@ -123,6 +125,52 @@ const SubstructureSearch = () => {
   const filteredResults = substructureResults.filter(cid =>
     cid.toString().toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Effect to handle initial data passed as props (similar to CompoundProperties pattern)
+  useEffect(() => {
+    console.log('tool data received >>', toolData);
+  }, [toolData]);
+
+  useEffect(() => {
+    console.log("substructure results updated >>", substructureResults);
+  }, [substructureResults]);
+
+  // Effect to handle initial data passed as props
+  useEffect(() => {
+    if (toolData) {
+      console.log('Processing tool data:', toolData);
+      
+      // Try to extract substructure search results and SMILES from different possible structures
+      let extractedResults = null;
+      let extractedSmiles = null;
+      
+      // Case 4: toolData might have a nested structure like the API response
+      if (toolData.result && toolData.result.IdentifierList) {
+        try {
+          extractedResults = toolData.result.IdentifierList.CID;
+        } catch (e) {
+          console.error('Error parsing nested toolData:', e);
+        }
+      }
+      
+      // Set the extracted data
+      if (extractedResults && Array.isArray(extractedResults)) {
+        setSubstructureResults(extractedResults);
+        console.log('Set substructure results from toolData:', extractedResults);
+      }
+      
+      if (extractedSmiles) {
+        setSmiles(extractedSmiles);
+        setIsValidSmiles(true); // Assume SMILES from toolData is valid
+        console.log('Set SMILES from toolData:', extractedSmiles);
+        // Validate the SMILES to be sure
+        validateSmiles(extractedSmiles);
+      }
+      
+      // Clear any existing errors when loading from toolData
+      setError('');
+    }
+  }, [toolData]);
 
   return (
     <motion.div 

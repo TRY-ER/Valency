@@ -25,6 +25,15 @@ const toolTypeMapper = {
     "compute_structural_alerts": null,
     "standardize_molecule_from_smiles": null,
     "get_parent_molecule_from_smiles": null,
+    "get_compound_by_cid": "cid",
+    "get_cids_by_name": "name",
+    "get_cids_by_smiles": "smiles",
+    "get_cids_by_inchikey": "inchikey",
+    "get_compound_properties": null,
+    "get_compound_synonyms_by_cid": null,
+    "fast_identity_search_by_cid": "cid",
+    "fast_similarity_2d_search_by_cid": "cid",
+    "fast_substructure_search_by_smiles": null
     // Add more tool mappings here as needed
     // "another_tool": "another_type",
     // "simple_tool": null,

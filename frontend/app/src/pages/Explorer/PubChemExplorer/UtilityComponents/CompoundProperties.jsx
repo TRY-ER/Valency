@@ -39,7 +39,7 @@ const AVAILABLE_PROPERTIES = [
   { key: 'ConformerCount3D', label: 'Conformers', description: 'Number of conformers in model' }
 ];
 
-const CompoundProperties = () => {
+const CompoundProperties = ({ toolData = null }) => {
   const [cid, setCid] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [properties, setProperties] = useState(null);
@@ -48,6 +48,35 @@ const CompoundProperties = () => {
   const [selectedProperties, setSelectedProperties] = useState(['MolecularWeight', 'InChIKey']);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Effect to handle initial data passed as props (similar to PubChemGetter pattern)
+  useEffect(() => {
+    console.log('tool data received >>', toolData);
+  }, [toolData]);
+
+  useEffect(() => {
+    console.log("properties updated >>", properties);
+  }, [properties]);
+
+  // Effect to handle initial data passed as props
+  useEffect(() => {
+    if (toolData) {
+      console.log('Processing tool data:', toolData);
+      
+      // toolData should contain the properties directly (no type/content structure)
+      // Set properties directly from toolData
+      // setProperties(toolData);
+      
+      // Clear any existing errors
+      setError('');
+      
+      // If toolData has CID information, extract and set it
+      if (toolData.CID) {
+        setCid(String(toolData.CID));
+        setIsValidCid(true);
+      }
+    }
+  }, [toolData]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -157,7 +186,14 @@ const CompoundProperties = () => {
     if (typeof value === 'number') {
       return value.toFixed(4);
     }
-    return value;
+    if (typeof value === 'object' && value !== null) {
+      // If the value is an object, convert it to a JSON string
+      return JSON.stringify(value);
+    }
+    if (value === null || value === undefined) {
+      return 'N/A';
+    }
+    return String(value);
   };
 
   const getPropertyLabel = (key) => {
@@ -173,6 +209,68 @@ const CompoundProperties = () => {
     setSelectedProperties(['MolecularWeight', 'InChIKey']);
     setIsDropdownOpen(false);
   };
+
+  // Effect to handle initial data passed as props (similar to PubChemGetter pattern)
+  useEffect(() => {
+    console.log('tool data received >>', toolData);
+  }, [toolData]);
+
+  useEffect(() => {
+    console.log("properties updated >>", properties);
+  }, [properties]);
+
+  // Effect to handle initial data passed as props
+  useEffect(() => {
+    if (toolData) {
+      console.log('Processing tool data:', toolData);
+      
+      // Try to extract properties from different possible structures
+      let extractedProperties = null;
+      
+      // Case 1: toolData already has the correct flat structure
+      if (toolData.MolecularWeight || toolData.MolecularFormula || toolData.SMILES) {
+        extractedProperties = toolData;
+      }
+      // Case 2: toolData has PropertyTable structure
+      else if (toolData.PropertyTable && toolData.PropertyTable.Properties && toolData.PropertyTable.Properties[0]) {
+        extractedProperties = toolData.PropertyTable.Properties[0];
+      }
+      // Case 3: toolData has result.PropertyTable structure (similar to API response)
+      else if (toolData.result && toolData.result.PropertyTable && toolData.result.PropertyTable.Properties && toolData.result.PropertyTable.Properties[0]) {
+        extractedProperties = toolData.result.PropertyTable.Properties[0];
+      }
+      // Case 4: toolData might have a nested structure like the API response
+      else if (toolData.result && toolData.result["0"]) {
+        try {
+          const parsed = typeof toolData.result["0"] === 'string' ? JSON.parse(toolData.result["0"]) : toolData.result["0"];
+          if (parsed.result && parsed.result.PropertyTable && parsed.result.PropertyTable.Properties && parsed.result.PropertyTable.Properties[0]) {
+            extractedProperties = parsed.result.PropertyTable.Properties[0];
+          }
+        } catch (e) {
+          console.error('Error parsing nested toolData:', e);
+        }
+      }
+      
+      if (extractedProperties) {
+        setProperties(extractedProperties);
+        // Clear any existing errors
+        setError('');
+        
+        // If toolData has CID information, extract and set it
+        if (toolData.CID) {
+          setCid(String(toolData.CID));
+          setIsValidCid(true);
+        } else if (extractedProperties.CID) {
+          setCid(String(extractedProperties.CID));
+          setIsValidCid(true);
+        }
+      } else {
+        console.warn('Could not extract properties from toolData:', toolData);
+        // Set the raw toolData but it might not render properly
+        setProperties(toolData);
+      }
+    }
+  }, [toolData]);
 
   return (
     <motion.div

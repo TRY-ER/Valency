@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { fadeInUpVariantStatic } from '../../../../components/animations/framerAnim';
 import GlassyContainer from '../../../../components/glassy_container/gc';
@@ -6,13 +6,82 @@ import { FaCheckDouble } from 'react-icons/fa';
 import { IoWarningOutline } from 'react-icons/io5';
 import { fastIdentitySearchByCid } from '../../../../services/api/mcpToolsService';
 
-const IdentitySearch = () => {
+const IdentitySearch = ({ toolData = null }) => {
   const [cid, setCid] = useState('');
   const [identityData, setIdentityData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isValidCid, setIsValidCid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Effect to handle initial data passed as props (similar to CompoundProperties pattern)
+  useEffect(() => {
+    console.log('tool data received >>', toolData);
+  }, [toolData]);
+
+  useEffect(() => {
+    console.log("identity data updated >>", identityData);
+  }, [identityData]);
+
+  // Effect to handle initial data passed as props
+  useEffect(() => {
+    if (toolData) {
+      console.log('Processing tool data:', toolData);
+      
+      // Try to extract identity data from different possible structures
+      let extractedIdentityData = null;
+      let extractedCid = null;
+      
+      // Case 1: toolData already has the correct IdentifierList structure
+      if (toolData.CID && (toolData.SMILES || toolData.InChI || toolData.InChIKey)) {
+        extractedIdentityData = toolData;
+        extractedCid = toolData.CID;
+      }
+      // Case 2: toolData has IdentifierList structure
+      else if (toolData.IdentifierList && toolData.IdentifierList.CID) {
+        extractedIdentityData = toolData.IdentifierList;
+        extractedCid = toolData.IdentifierList.CID;
+      }
+      // Case 3: toolData has result.IdentifierList structure (similar to API response)
+      else if (toolData.result && toolData.result.IdentifierList && toolData.result.IdentifierList.CID) {
+        extractedIdentityData = toolData.result.IdentifierList;
+        extractedCid = toolData.result.IdentifierList.CID;
+      }
+      // Case 4: toolData might have a nested structure like the API response
+      else if (toolData.result && toolData.result["0"]) {
+        try {
+          const parsed = typeof toolData.result["0"] === 'string' ? JSON.parse(toolData.result["0"]) : toolData.result["0"];
+          if (parsed.result && parsed.result.IdentifierList && parsed.result.IdentifierList.CID) {
+            extractedIdentityData = parsed.result.IdentifierList;
+            extractedCid = parsed.result.IdentifierList.CID;
+          }
+        } catch (e) {
+          console.error('Error parsing nested toolData:', e);
+        }
+      }
+      // Case 5: toolData has CID property that we can use to populate the input
+      else if (toolData.CID) {
+        extractedCid = toolData.CID;
+      }
+      
+      // Set the extracted data
+      if (extractedIdentityData) {
+        setIdentityData(extractedIdentityData);
+        console.log('Set identity data from toolData:', extractedIdentityData);
+      }
+      
+      if (extractedCid) {
+        // Handle both single CID and array of CIDs
+        const cidToSet = Array.isArray(extractedCid) ? extractedCid[0] : extractedCid;
+        setCid(String(cidToSet));
+        setIsValidCid(true);
+        console.log('Set CID from toolData:', cidToSet);
+      }
+      
+      // Clear any existing errors when loading from toolData
+      setError('');
+    }
+  }, [toolData]);
 
   const validateCid = (value) => {
     const cidValue = parseInt(value.trim());

@@ -217,6 +217,8 @@ const ChatInterface = () => {
                         }
                         setComponents(conversations);
                         console.log('Created conversation components from event state:', conversations);
+                        // Trigger scroll to bottom after loading session data
+                        setBottomScroller(true);
                     } else {
                         console.warn('Event state is empty or not an array:', eventState);
                     }

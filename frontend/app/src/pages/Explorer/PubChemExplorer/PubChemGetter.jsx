@@ -8,14 +8,14 @@ import TwoDViewer from "../../../components/UI/TwoDViewer/TwoDViewer";
 import { motion } from "framer-motion";
 import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";
 import GlassyContainer from "../../../components/glassy_container/gc";
-import { 
-    getCompoundByCid, 
-    getCidsByName, 
-    getCidsBySmiles, 
+import {
+    getCompoundByCid,
+    getCidsByName,
+    getCidsBySmiles,
     getCidsByInchikey,
     getCidsByXref,
     getCidsByMass,
-    getCompoundProperties 
+    getCompoundProperties
 } from "../../../services/api/mcpToolsService";
 
 // Standalone Portal Dropdown Menu for PubChem (adapted from ChemBLActivityFetcher.jsx)
@@ -294,11 +294,11 @@ const PubChemGetter = ({
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [validationError, setValidationError] = useState(null);
-    
+
     // Additional states for xref and mass searches
     const [xrefType, setXrefType] = useState('RegistryID');
     const [massType, setMassType] = useState('exact_mass'); // Corrected initial value
-    
+
     // States for multiple candidates (name/SMILES/InChIKey search that might return multiple CIDs)
     const [multipleCandidates, setMultipleCandidates] = useState([]);
     const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -374,14 +374,14 @@ const PubChemGetter = ({
             } else if (searchType === "inchikey") {
                 result = await getCidsByInchikey({ inchikey: trimmedValue });
             } else if (searchType === "xref") {
-                result = await getCidsByXref({ 
-                    xref_type: xrefType, 
-                    xref_value: trimmedValue 
+                result = await getCidsByXref({
+                    xref_type: xrefType,
+                    xref_value: trimmedValue
                 });
             } else if (searchType === "mass") {
-                result = await getCidsByMass({ 
-                    mass_type: massType, 
-                    value_or_min: parseFloat(trimmedValue) 
+                result = await getCidsByMass({
+                    mass_type: massType,
+                    value_or_min: parseFloat(trimmedValue)
                 });
             }
 
@@ -400,7 +400,7 @@ const PubChemGetter = ({
                         setSelectedCandidate(null);
                         return; // Exit early if parsing fails
                     }
-                    
+
                     console.log('Processible', processible);
 
                     // Check for the error structure within the parsed 'processible' object
@@ -418,7 +418,7 @@ const PubChemGetter = ({
                         // Original logic for handling successful data
                         if (searchType === "cid") {
                             // For CID search, we expect a single compound
-                            if (processible.result){
+                            if (processible.result) {
                                 setApiData(processible.result);
                                 setSearchValue(trimmedValue);
                                 // Clear multiple candidates for single compound view
@@ -440,7 +440,7 @@ const PubChemGetter = ({
                                         // Multiple CIDs found - we need to fetch compound data for each
                                         const cids = processible.result.slice(0, 10); // Limit to first 10 results
                                         const compounds = [];
-                                        
+
                                         for (const cid of cids) {
                                             try {
                                                 const compoundResult = await getCompoundByCid({ cid: cid.toString() });
@@ -457,7 +457,7 @@ const PubChemGetter = ({
                                                 console.error(`Error fetching compound for CID ${cid}:`, err);
                                             }
                                         }
-                                        
+
                                         if (compounds.length > 0) {
                                             setMultipleCandidates(compounds);
                                             setSelectedCandidate(compounds[0]);
@@ -482,9 +482,9 @@ const PubChemGetter = ({
                                 } else {
                                     // Result is an object - could be direct data or needs further processing
                                     console.log('Processing object result:', processible.result);
-                                    
+
                                     // Check if it's a number (single CID)
-                                    if (typeof processible.result === 'number' || 
+                                    if (typeof processible.result === 'number' ||
                                         (typeof processible.result === 'string' && !isNaN(processible.result))) {
                                         // Single CID found
                                         try {
@@ -561,41 +561,44 @@ const PubChemGetter = ({
     useEffect(() => {
         if (toolData && toolData.type && toolData.content) {
             console.log('Processing tool data:', toolData);
-            
+
             // Set search type based on tool data type
             setSearchType(toolData.type);
-            
-            if (toolData.type === "name" || toolData.type === "smiles" || toolData.type === "inchikey" || 
+
+            if (toolData.type === "name" || toolData.type === "smiles" || toolData.type === "inchikey" ||
                 toolData.type === "xref" || toolData.type === "mass") {
-                // Handle search results that might return multiple compounds
-                if (Array.isArray(toolData.content) && toolData.content.length > 0) {
-                    setMultipleCandidates(toolData.content);
-                    setSelectedCandidate(toolData.content[0]);
-                    setSelectedIndex(0);
-                    setIsSelectedCandidateValid(true);
-                    setApiData(null); // Clear single compound data
-                } else if (toolData.content) {
-                    // If it's a single candidate, treat it as a single-item array for consistent UI
-                    setMultipleCandidates([toolData.content]);
-                    setSelectedCandidate(toolData.content);
-                    setSelectedIndex(0);
-                    setIsSelectedCandidateValid(true);
-                    setApiData(null); // Clear single compound data
-                } else {
-                    // No candidates found
-                    setError(`No records found with ${toolData.type} search.`);
+                if (toolData.content && toolData.type === "name" || toolData.type === "smiles" || toolData.type === "inchikey") {
+                    setApiData(toolData.content.result.IdentifierList); // Clear single compound data
                 }
+                // Handle search results that might return multiple compounds
+                // if (Array.isArray(toolData.content) && toolData.content.length > 0) {
+                //     // setMultipleCandidates(toolData.content);
+                //     // setSelectedCandidate(toolData.content[0]);
+                //     // setSelectedIndex(0);
+                //     // setIsSelectedCandidateValid(true);
+                //     setApiData(toolData.content); // Clear single compound data
+                // } else if (toolData.content) {
+                //     // If it's a single candidate, treat it as a single-item array for consistent UI
+                //     // setMultipleCandidates([toolData.content]);
+                //     // setSelectedCandidate(toolData.content);
+                //     // setSelectedIndex(0);
+                //     // setIsSelectedCandidateValid(true);
+                //     setApiData([toolData.content]); // Clear single compound data
+                // } else {
+                //     // No candidates found
+                //     setError(`No records found with ${toolData.type} search.`);
+                // }
             } else if (toolData.type === "cid") {
                 // Handle single CID search result
                 if (toolData.content) {
-                    setApiData(toolData.content);
+                    setApiData(toolData.content.result.PC_Compounds);
                     setMultipleCandidates([]);
                     setSelectedCandidate(null);
                 } else {
                     setError("No compound found for the provided CID.");
                 }
             }
-            
+
             // Clear any existing errors
             setError(null);
             setValidationError(null);
@@ -624,10 +627,10 @@ const PubChemGetter = ({
             case "inchikey":
                 return "Try InChIKey: BSYNRYMUTXBXSQ-UHFFFAOYSA-N";
             case "xref":
-                return `Enter ${xrefType === 'RegistryID' ? 'Registry ID' : 
-                              xrefType === 'RN' ? 'Registry Number' : 
-                              xrefType === 'PubMedID' ? 'PubMed ID' : 
-                              xrefType} value`;
+                return `Enter ${xrefType === 'RegistryID' ? 'Registry ID' :
+                    xrefType === 'RN' ? 'Registry Number' :
+                        xrefType === 'PubMedID' ? 'PubMed ID' :
+                            xrefType} value`;
             case "mass":
                 return `Enter molecular mass in Da (e.g., 180.16)`;
             default:
@@ -646,10 +649,10 @@ const PubChemGetter = ({
             case "inchikey":
                 return "Enter InChIKey";
             case "xref":
-                return `Enter ${xrefType === 'RegistryID' ? 'Registry ID' : 
-                              xrefType === 'RN' ? 'Registry Number' : 
-                              xrefType === 'PubMedID' ? 'PubMed ID' : 
-                              xrefType}`;
+                return `Enter ${xrefType === 'RegistryID' ? 'Registry ID' :
+                    xrefType === 'RN' ? 'Registry Number' :
+                        xrefType === 'PubMedID' ? 'PubMed ID' :
+                            xrefType}`;
             case "mass":
                 if (massType === 'exact_mass') return "Enter Exact Mass";
                 if (massType === 'monoisotopic_mass') return "Enter Monoisotopic Mass";
@@ -695,7 +698,7 @@ const PubChemGetter = ({
     }, [multipleCandidates]);
 
     useEffect(() => {
-        console.log("Error state changed:", error);    
+        console.log("Error state changed:", error);
     }, [error])
 
     return (
@@ -762,10 +765,10 @@ const PubChemGetter = ({
 
                             {/* Display validation or general errors */}
                             {(validationError || error) && (
-                                <div className="pubchem-getter-error" style={{ 
-                                    color: 'var(--color-alert)', 
-                                    marginTop: '8px', 
-                                    fontSize: '0.9rem' 
+                                <div className="pubchem-getter-error" style={{
+                                    color: 'var(--color-alert)',
+                                    marginTop: '8px',
+                                    fontSize: '0.9rem'
                                 }}>
                                     {validationError || error}
                                 </div>
@@ -781,17 +784,17 @@ const PubChemGetter = ({
                             <h3 style={{ marginBottom: '15px', fontWeight: '700' }}>Compound Structure Visualization</h3>
                             <div style={{ display: 'flex', gap: '20px' }}>
                                 <div style={{ flex: '1' }}>
-                                    <InfoBox 
-                                        activeMol={apiData.canonical_smiles || ""} 
-                                        isValidMol={true} 
-                                        infoType={"MOL"} 
+                                    <InfoBox
+                                        activeMol={apiData.canonical_smiles || ""}
+                                        isValidMol={true}
+                                        infoType={"MOL"}
                                     />
                                 </div>
                                 <div style={{ flex: '1' }}>
-                                    <TwoDViewer 
-                                        activeMol={apiData.canonical_smiles || ""} 
-                                        isValidMol={true} 
-                                        visType={"MOL"} 
+                                    <TwoDViewer
+                                        activeMol={apiData.canonical_smiles || ""}
+                                        isValidMol={true}
+                                        visType={"MOL"}
                                     />
                                 </div>
                             </div>
@@ -806,7 +809,7 @@ const PubChemGetter = ({
                             <h3 style={{ marginBottom: '15px', fontWeight: '700' }}>
                                 Compound Candidates {multipleCandidates.length > 0 ? `(${multipleCandidates.length} found)` : ''}
                             </h3>
-                            
+
                             <div className="pubchem-results-container">
                                 {/* Left Panel - Candidate List */}
                                 <div className="pubchem-candidates-panel">
@@ -828,7 +831,7 @@ const PubChemGetter = ({
                                     </p>
                                     <div className="pubchem-candidates-list">
                                         {multipleCandidates.map((candidate, index) => (
-                                            <div 
+                                            <div
                                                 key={index}
                                                 onClick={() => {
                                                     setSelectedCandidate(candidate);
@@ -866,34 +869,34 @@ const PubChemGetter = ({
                                                     margin: '0',
                                                     fontWeight: '500'
                                                 }}>
-                                                    Selected ({selectedIndex + 1}/{multipleCandidates.length}): <span style={{ 
-                                                        fontFamily: 'monospace', 
+                                                    Selected ({selectedIndex + 1}/{multipleCandidates.length}): <span style={{
+                                                        fontFamily: 'monospace',
                                                         color: 'var(--color-accent)',
-                                                        fontWeight: '600' 
+                                                        fontWeight: '600'
                                                     }}>
                                                         {selectedCandidate.iupac_name || selectedCandidate.title || `CID: ${selectedCandidate.cid}` || 'Unknown'}
                                                     </span>
                                                 </h4>
                                             </div>
-                                            
+
                                             {/* Show visualization only if we have SMILES data */}
                                             {selectedCandidate.canonical_smiles ? (
                                                 <div className="pubchem-details-row">
                                                     {/* InfoBox */}
                                                     <div style={{ flex: '4' }}>
-                                                        <InfoBox 
-                                                            activeMol={selectedCandidate.canonical_smiles} 
-                                                            isValidMol={isSelectedCandidateValid} 
-                                                            infoType={"MOL"} 
+                                                        <InfoBox
+                                                            activeMol={selectedCandidate.canonical_smiles}
+                                                            isValidMol={isSelectedCandidateValid}
+                                                            infoType={"MOL"}
                                                         />
                                                     </div>
-                                                    
+
                                                     {/* TwoDViewer */}
                                                     <div style={{ flex: '6' }}>
-                                                        <TwoDViewer 
-                                                            activeMol={selectedCandidate.canonical_smiles} 
-                                                            isValidMol={isSelectedCandidateValid} 
-                                                            visType={"MOL"} 
+                                                        <TwoDViewer
+                                                            activeMol={selectedCandidate.canonical_smiles}
+                                                            isValidMol={isSelectedCandidateValid}
+                                                            visType={"MOL"}
                                                         />
                                                     </div>
                                                 </div>
@@ -925,11 +928,10 @@ const PubChemGetter = ({
                         <div className="pubchem-getter-row-3" style={{ marginTop: '20px' }}>
                             <DataViewer
                                 data={dataToPass}
-                                title={`PubChem Compound Data${searchValue ? ` for "${searchValue}"` : ''}${
-                                    searchType !== "cid" && selectedCandidate ? 
-                                    ` - ${selectedCandidate.iupac_name || selectedCandidate.title || `CID: ${selectedCandidate.cid}` || 'Unknown'}` : 
-                                    ''
-                                }`}
+                                title={`PubChem Compound Data${searchValue ? ` for "${searchValue}"` : ''}${searchType !== "cid" && selectedCandidate ?
+                                        ` - ${selectedCandidate.iupac_name || selectedCandidate.title || `CID: ${selectedCandidate.cid}` || 'Unknown'}` :
+                                        ''
+                                    }`}
                                 initiallyExpanded={false}
                             />
                         </div>

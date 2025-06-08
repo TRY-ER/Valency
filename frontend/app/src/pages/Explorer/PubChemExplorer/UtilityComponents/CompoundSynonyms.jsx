@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { fadeInUpVariantStatic } from '../../../../components/animations/framerAnim';
 import GlassyContainer from '../../../../components/glassy_container/gc';
@@ -6,13 +6,86 @@ import { FaCheckDouble } from 'react-icons/fa';
 import { IoWarningOutline } from 'react-icons/io5';
 import { getCompoundSynonymsByCid } from '../../../../services/api/mcpToolsService';
 
-const CompoundSynonyms = () => {
+const CompoundSynonyms = ({ toolData = null }) => {
   const [cid, setCid] = useState('');
   const [synonyms, setSynonyms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isValidCid, setIsValidCid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Effect to handle initial data passed as props (similar to CompoundProperties pattern)
+  useEffect(() => {
+    console.log('tool data received >>', toolData);
+  }, [toolData]);
+
+  useEffect(() => {
+    console.log("synonyms updated >>", synonyms);
+  }, [synonyms]);
+
+  // Effect to handle initial data passed as props
+  useEffect(() => {
+    if (toolData) {
+      console.log('Processing tool data:', toolData);
+      
+      // Try to extract synonyms from different possible structures
+      let extractedSynonyms = null;
+      let extractedCid = null;
+      
+      // Case 1: toolData already has the correct synonyms structure (array of strings)
+      if (Array.isArray(toolData) && toolData.length > 0 && typeof toolData[0] === 'string') {
+        extractedSynonyms = toolData;
+      }
+      // Case 2: toolData has InformationList structure
+      else if (toolData.InformationList && toolData.InformationList.Information && 
+               toolData.InformationList.Information[0] && toolData.InformationList.Information[0].Synonym) {
+        extractedSynonyms = toolData.InformationList.Information[0].Synonym;
+        extractedCid = toolData.InformationList.Information[0].CID || null;
+      }
+      // Case 3: toolData has result.InformationList structure (similar to API response)
+      else if (toolData.result && toolData.result.InformationList && 
+               toolData.result.InformationList.Information && 
+               toolData.result.InformationList.Information[0] && 
+               toolData.result.InformationList.Information[0].Synonym) {
+        extractedSynonyms = toolData.result.InformationList.Information[0].Synonym;
+        extractedCid = toolData.result.InformationList.Information[0].CID || null;
+      }
+      // Case 4: toolData might have a nested structure like the API response
+      else if (toolData.result && toolData.result["0"]) {
+        try {
+          const parsed = typeof toolData.result["0"] === 'string' ? JSON.parse(toolData.result["0"]) : toolData.result["0"];
+          if (parsed.result && parsed.result.InformationList && 
+              parsed.result.InformationList.Information && 
+              parsed.result.InformationList.Information[0] && 
+              parsed.result.InformationList.Information[0].Synonym) {
+            extractedSynonyms = parsed.result.InformationList.Information[0].Synonym;
+            extractedCid = parsed.result.InformationList.Information[0].CID || null;
+          }
+        } catch (e) {
+          console.error('Error parsing nested toolData:', e);
+        }
+      }
+      // Case 5: toolData has CID property that we can use to populate the input
+      else if (toolData.CID) {
+        extractedCid = toolData.CID;
+      }
+      
+      // Set the extracted data
+      if (extractedSynonyms && Array.isArray(extractedSynonyms)) {
+        setSynonyms(extractedSynonyms);
+        console.log('Set synonyms from toolData:', extractedSynonyms);
+      }
+      
+      if (extractedCid) {
+        setCid(String(extractedCid));
+        setIsValidCid(true);
+        console.log('Set CID from toolData:', extractedCid);
+      }
+      
+      // Clear any existing errors when loading from toolData
+      setError('');
+    }
+  }, [toolData]);
 
   const validateCid = (value) => {
     const cidValue = parseInt(value.trim());
