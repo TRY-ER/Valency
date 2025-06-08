@@ -11,25 +11,18 @@ const CompoundSynonyms = () => {
   const [synonyms, setSynonyms] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [isValidCid, setIsValidCid] = useState(null);
+  const [isValidCid, setIsValidCid] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const validateCid = (cidValue) => {
-    if (!cidValue.trim()) {
-      setIsValidCid(null);
-      return;
-    }
-
-    const trimmedCid = cidValue.trim();
-    // CID should be a positive integer
-    const isValid = /^\d+$/.test(trimmedCid) && parseInt(trimmedCid) > 0;
-    setIsValidCid(isValid);
+  const validateCid = (value) => {
+    const cidValue = parseInt(value.trim());
+    return !isNaN(cidValue) && cidValue > 0;
   };
 
-  const handleCidChange = (e) => {
-    const value = e.target.value;
+  const handleCidChange = (value) => {
     setCid(value);
-    setError('');
-    validateCid(value);
+    setIsValidCid(validateCid(value));
+    if (error) setError('');
   };
 
   const handleSynonymSearch = async () => {
@@ -38,8 +31,9 @@ const CompoundSynonyms = () => {
       return;
     }
 
-    if (isValidCid === false) {
-      setError('Please enter a valid CID (positive integer).');
+    const cidValue = parseInt(cid.trim());
+    if (isNaN(cidValue) || cidValue <= 0) {
+      setError('Please enter a valid positive CID number');
       return;
     }
 
@@ -53,6 +47,7 @@ const CompoundSynonyms = () => {
         throw new Error('Synonym search failed');
       }
       const data = await response.json();
+      console.log("data recieved >>", data)
       if (data.InformationList && data.InformationList.Information[0] && data.InformationList.Information[0].Synonym) {
         setSynonyms(data.InformationList.Information[0].Synonym);
       } else {
@@ -70,209 +65,342 @@ const CompoundSynonyms = () => {
     setCid('');
     setSynonyms([]);
     setError('');
-    setIsValidCid(null);
-  };
-
-  const getValidationIcon = () => {
-    if (isValidCid === true) {
-      return <FaCheckDouble style={{ color: 'var(--success-color)', fontSize: '14px' }} />;
-    }
-    if (isValidCid === false) {
-      return <IoWarningOutline style={{ color: 'var(--error-color)', fontSize: '16px' }} />;
-    }
-    return null;
+    setIsValidCid(false);
+    setSearchQuery('');
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && isValidCid && !isLoading) {
       handleSynonymSearch();
     }
   };
+
+  // Filter synonyms based on search query
+  const filteredSynonyms = synonyms.filter(synonym =>
+    synonym.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <motion.div 
       className="utility-component-container"
       variants={fadeInUpVariantStatic}
-      initial="hidden"
-      animate="visible"
+      initial="initial"
+      animate="animate"
     >
-      <GlassyContainer>
-        <h3>Compound Synonyms</h3>
-        <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <input
-            type="text"
-            value={cid}
-            onChange={handleCidChange}
-            placeholder="Enter Compound ID (CID), e.g., 2244"
-            disabled={isLoading}
-            style={{
-              flex: 1,
-              padding: '12px 45px 12px 15px',
-              border: `2px solid ${isValidCid === false ? 'var(--error-color)' : 
-                       isValidCid === true ? 'var(--success-color)' : 'var(--border-color)'}`,
-              borderRadius: '8px',
-              fontSize: '16px',
-              backgroundColor: 'var(--input-bg)',
-              color: 'var(--text-color)',
-              transition: 'all 0.3s ease',
-              outline: 'none'
-            }}
-            onFocus={(e) => {
-              e.target.style.borderColor = 'var(--primary-color)';
-              e.target.style.boxShadow = '0 0 0 3px rgba(var(--primary-color-rgb), 0.1)';
-            }}
-            onBlur={(e) => {
-              e.target.style.borderColor = isValidCid === false ? 'var(--error-color)' : 
-                                         isValidCid === true ? 'var(--success-color)' : 'var(--border-color)';
-              e.target.style.boxShadow = 'none';
-            }}
-          />
-          <div style={{ 
-            position: 'absolute', 
-            right: '15px', 
-            top: '50%', 
-            transform: 'translateY(-50%)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px'
-          }}>
-            {getValidationIcon()}
+      <div className="utility-input-section">
+        <GlassyContainer>
+          <h3 style={{ marginBottom: '15px', fontWeight: '700' }}>Compound Synonyms</h3>
+          <p style={{ marginBottom: '20px', color: 'var(--color-text-secondary)' }}>
+            Retrieve all available synonyms for a compound by CID.
+          </p>
+
+          {/* Add inline styles for input placeholder */}
+          <style>
+            {`
+              .cid-input::placeholder {
+                color: var(--color-text-secondary);
+                font-weight: 400;
+              }
+              .cid-input:focus {
+                outline: none;
+                background-color: var(--glassy-color);
+              }
+            `}
+          </style>
+
+          {/* Custom CID Input with Validation */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '20px', width: '100%' }}>
+              <h4 style={{ fontWeight: '600', color: 'var(--color-text-primary)', margin: 0, minWidth: '180px' }}>
+                Enter CID:
+              </h4>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+                <input
+                  type="number"
+                  className="cid-input"
+                  value={cid}
+                  onChange={(e) => handleCidChange(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Enter CID (e.g., 2244)"
+                  disabled={isLoading}
+                  style={{
+                    flexGrow: 1,
+                    padding: '12px',
+                    height: 'auto',
+                    borderRadius: '15px',
+                    border: 'none',
+                    outline: 'none',
+                    backgroundColor: 'var(--glassy-color)',
+                    color: 'var(--color-text-primary)',
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    minHeight: '30px',
+                    transition: 'background-color 0.2s ease'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.backgroundColor = 'var(--glassy-color)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.backgroundColor = 'var(--glassy-color)';
+                  }}
+                />
+                {/* Validation Icon */}
+                {isValidCid ? (
+                  <FaCheckDouble style={{ fontSize: '2rem', color: 'var(--color-success)' }} />
+                ) : (
+                  <IoWarningOutline style={{
+                    fontSize: '2rem',
+                    color: cid.length > 0 ? 'var(--color-alert)' : 'var(--glassy-color)'
+                  }} />
+                )}
+                <button
+                  onClick={handleSynonymSearch}
+                  disabled={!isValidCid || isLoading}
+                  style={{
+                    padding: '12px 20px',
+                    borderRadius: '15px',
+                    border: 'none',
+                    backgroundColor: (!isValidCid || isLoading) ? 'var(--color-disabled, #6c757d)' : 'var(--color-success, #28a745)',
+                    color: '#fff',
+                    cursor: (!isValidCid || isLoading) ? 'not-allowed' : 'pointer',
+                    fontSize: '1em',
+                    fontWeight: '500',
+                    minHeight: '54px',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {isLoading ? 'Fetching...' : 'Get Synonyms'}
+                </button>
+              </div>
+            </div>
+            {/* Validation message for CID */}
+            {cid.length > 0 && !isValidCid && (
+              <p style={{
+                color: 'var(--color-alert, #ff6b6b)',
+                fontSize: '0.9em',
+                margin: '5px 0 0 0'
+              }}>
+                Please enter a valid positive CID number
+              </p>
+            )}
           </div>
-        </div>
-        
-        <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
-          <button 
-            onClick={handleSynonymSearch} 
-            disabled={isLoading || !cid.trim() || isValidCid === false}
-            style={{
-              flex: 1,
-              padding: '12px 20px',
-              border: 'none',
-              borderRadius: '8px',
-              backgroundColor: 'var(--primary-color)',
-              color: 'white',
-              cursor: isLoading || !cid.trim() || isValidCid === false ? 'not-allowed' : 'pointer',
-              opacity: isLoading || !cid.trim() || isValidCid === false ? 0.6 : 1,
-              transition: 'all 0.3s ease',
-              fontSize: '16px',
-              fontWeight: '500'
-            }}
-          >
-            {isLoading ? 'Fetching...' : 'Get Synonyms'}
-          </button>
           
-          <button 
-            onClick={resetForm}
-            style={{
-              padding: '12px 20px',
-              border: '2px solid var(--border-color)',
-              borderRadius: '8px',
-              backgroundColor: 'transparent',
-              color: 'var(--text-color)',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              fontSize: '16px',
-              fontWeight: '500'
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = 'var(--hover-bg)';
-              e.target.style.borderColor = 'var(--primary-color)';
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'transparent';
-              e.target.style.borderColor = 'var(--border-color)';
-            }}
-          >
-            Reset
-          </button>
-        </div>
-      </GlassyContainer>
+          {(synonyms.length > 0 || error) && (
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <button
+                onClick={resetForm}
+                style={{
+                  padding: '12px 24px',
+                  backgroundColor: 'var(--color-error, #dc3545)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  fontSize: '0.95em',
+                  fontWeight: '600',
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = 'var(--color-error-dark, #c82333)';
+                  e.target.style.transform = 'translateY(-1px)';
+                  e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'var(--color-error, #dc3545)';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
+                }}
+              >
+                Reset All
+              </button>
+            </div>
+          )}
+        </GlassyContainer>
+      </div>
 
       {error && (
-        <div style={{
-          marginTop: '20px',
-          padding: '15px',
-          backgroundColor: 'rgba(var(--error-color-rgb), 0.1)',
-          border: '1px solid var(--error-color)',
-          borderRadius: '8px',
-          color: 'var(--error-color)',
-          fontSize: '14px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <IoWarningOutline />
-          {error}
+        <div className="utility-results-section" style={{ marginTop: '20px' }}>
+          <GlassyContainer>
+            <div style={{
+              padding: '16px',
+              backgroundColor: 'rgba(255, 71, 87, 0.1)',
+              borderRadius: '8px',
+              border: '1px solid rgba(255, 71, 87, 0.3)'
+            }}>
+              <h4 style={{ marginBottom: '8px', color: 'var(--color-error, #ff6b6b)', margin: '0 0 8px 0' }}>
+                ✗ Error
+              </h4>
+              <p style={{ color: 'var(--color-error, #ff6b6b)', margin: 0 }}>
+                {error}
+              </p>
+            </div>
+          </GlassyContainer>
         </div>
       )}
 
       {synonyms.length > 0 && (
-        <motion.div 
-          className="synonyms-results"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          style={{ marginTop: '20px' }}
-        >
-          <h4>Synonyms for CID {cid} ({synonyms.length} found)</h4>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-            gap: '12px',
-            marginTop: '15px',
-            maxHeight: '400px',
-            overflowY: 'auto',
-            padding: '15px',
-            backgroundColor: 'var(--card-bg)',
-            borderRadius: '8px',
-            border: '1px solid var(--border-color)'
-          }}>
-            {synonyms.map((synonym, index) => (
-              <div 
-                key={index}
-                style={{
-                  padding: '12px 15px',
-                  backgroundColor: 'var(--input-bg)',
+        <div className="utility-results-section" style={{ marginTop: '20px' }}>
+          <GlassyContainer>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h4 style={{ color: 'var(--color-text-primary)', fontWeight: '600', margin: 0 }}>
+                Synonyms for CID {cid} ({filteredSynonyms.length} of {synonyms.length} shown)
+              </h4>
+              {synonyms.length > 5 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: '300px' }}>
+                  <input
+                    type="text"
+                    placeholder="Search synonyms..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    style={{
+                      flex: 1,
+                      padding: '8px 12px',
+                      borderRadius: '10px',
+                      border: 'none',
+                      outline: 'none',
+                      backgroundColor: 'var(--glassy-color)',
+                      color: 'var(--color-text-primary)',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      transition: 'background-color 0.2s ease'
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.backgroundColor = 'var(--color-bg-primary)';
+                      e.target.style.boxShadow = '0 0 0 2px rgba(40, 167, 69, 0.3)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.backgroundColor = 'var(--glassy-color)';
+                      e.target.style.boxShadow = 'none';
+                    }}
+                  />
+                  {searchQuery && (
+                    <button
+                      onClick={() => setSearchQuery('')}
+                      style={{
+                        padding: '8px',
+                        backgroundColor: 'var(--color-error, #dc3545)',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        transition: 'all 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = 'var(--color-error-dark, #c82333)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'var(--color-error, #dc3545)';
+                      }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+            
+            {filteredSynonyms.length > 0 ? (
+              <>
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gap: '12px',
+                  maxHeight: '500px',
+                  overflowY: 'auto',
+                  padding: '15px',
+                  backgroundColor: 'var(--color-bg-secondary)',
+                  borderRadius: '12px',
+                  border: '1px solid var(--c-light-border)'
+                }}>
+                  {filteredSynonyms.map((synonym, index) => (
+                    <div 
+                      key={index}
+                      style={{
+                        padding: '16px',
+                        backgroundColor: 'var(--glassy-color)',
+                        borderRadius: '12px',
+                        border: '1px solid var(--c-light-border)',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s ease',
+                        fontSize: '14px',
+                        lineHeight: '1.5',
+                        wordBreak: 'break-word',
+                        color: 'var(--color-text-primary)',
+                        fontWeight: '500',
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = 'var(--color-bg-primary)';
+                        e.target.style.borderColor = 'var(--color-success, #28a745)';
+                        e.target.style.transform = 'translateY(-3px)';
+                        e.target.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.15)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'var(--glassy-color)';
+                        e.target.style.borderColor = 'var(--c-light-border)';
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                      }}
+                      onClick={() => {
+                        navigator.clipboard.writeText(synonym);
+                        // Optional: Add a toast notification here
+                      }}
+                      title="Click to copy to clipboard"
+                    >
+                      {synonym}
+                    </div>
+                  ))}
+                </div>
+                <div style={{
+                  marginTop: '15px',
+                  fontSize: '13px',
+                  color: 'var(--color-text-secondary)',
+                  textAlign: 'center',
+                  fontStyle: 'italic',
+                  backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                  padding: '12px',
                   borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  fontSize: '14px',
-                  lineHeight: '1.4',
-                  wordBreak: 'break-word'
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = 'var(--hover-bg)';
-                  e.target.style.borderColor = 'var(--primary-color)';
-                  e.target.style.transform = 'translateY(-2px)';
-                  e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'var(--input-bg)';
-                  e.target.style.borderColor = 'var(--border-color)';
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = 'none';
-                }}
-                onClick={() => {
-                  navigator.clipboard.writeText(synonym);
-                  // Optional: Add a toast notification here
-                }}
-                title="Click to copy to clipboard"
-              >
-                {synonym}
+                  border: '1px solid rgba(40, 167, 69, 0.2)'
+                }}>
+                  💡 Click on any synonym to copy it to clipboard
+                </div>
+              </>
+            ) : (
+              <div style={{
+                textAlign: 'center',
+                color: 'var(--color-text-secondary)',
+                fontStyle: 'italic',
+                padding: '40px 20px',
+                background: 'var(--color-bg-secondary)',
+                border: '2px dashed var(--c-light-border)',
+                borderRadius: '12px'
+              }}>
+                No synonyms match your search "{searchQuery}"
               </div>
-            ))}
-          </div>
-          <div style={{
-            marginTop: '10px',
-            fontSize: '12px',
-            color: 'var(--text-secondary)',
-            textAlign: 'center',
-            fontStyle: 'italic'
-          }}>
-            Click on any synonym to copy it to clipboard
-          </div>
-        </motion.div>
+            )}
+          </GlassyContainer>
+        </div>
+      )}
+
+      {!isLoading && synonyms.length === 0 && cid && !error && (
+        <div className="utility-results-section" style={{ marginTop: '20px' }}>
+          <GlassyContainer>
+            <div style={{
+              textAlign: 'center',
+              color: 'var(--color-text-secondary)',
+              fontStyle: 'italic',
+              padding: '40px 20px',
+              background: 'var(--color-bg-secondary)',
+              border: '2px dashed var(--c-light-border)',
+              borderRadius: '12px'
+            }}>
+              No synonyms found for the specified compound.
+            </div>
+          </GlassyContainer>
+        </div>
       )}
     </motion.div>
   );

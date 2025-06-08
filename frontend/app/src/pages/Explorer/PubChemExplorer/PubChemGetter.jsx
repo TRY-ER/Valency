@@ -13,8 +13,107 @@ import {
     getCidsByName, 
     getCidsBySmiles, 
     getCidsByInchikey,
+    getCidsByXref,
+    getCidsByMass,
     getCompoundProperties 
 } from "../../../services/api/mcpToolsService";
+
+// Standalone Portal Dropdown Menu for PubChem (adapted from ChemBLActivityFetcher.jsx)
+const StandalonePubChemPortalDropdownMenu = ({
+    isOpen,
+    options,
+    currentValue,
+    onOptionClick,
+    dropdownPosition,
+    dropdownRef
+}) => {
+    if (!isOpen || !options || options.length === 0) return null;
+
+    return createPortal(
+        <div
+            ref={dropdownRef}
+            className="pubchem-search-dropdown-portal" // Adapted class name
+            style={{
+                position: 'fixed',
+                top: `${dropdownPosition.top}px`,
+                left: `${dropdownPosition.left}px`,
+                width: `${dropdownPosition.width}px`,
+                zIndex: 10000,
+                backgroundColor: 'var(--color-bg-primary)',
+                border: '1px solid var(--color-accent)',
+                borderTop: 'none',
+                borderRadius: '0 0 8px 8px',
+                boxShadow: '0 4px 16px var(--shadow-color)',
+                maxHeight: '300px', // Matched from ChemBL
+                overflowY: 'auto'
+            }}
+        >
+            {options.map((option) => (
+                <div
+                    key={option.value}
+                    className={`pubchem-selector-option ${option.value === currentValue ? 'selected' : ''}`} // Adapted class name
+                    onClick={() => onOptionClick(option.value)}
+                    role="option"
+                    aria-selected={option.value === currentValue}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'flex-start', // Changed from center to flex-start to match ChemBL
+                        justifyContent: 'space-between',
+                        padding: '12px 14px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        borderBottom: '1px solid var(--c-light-border)',
+                        backgroundColor: option.value === currentValue ? 'var(--color-accent)' : 'transparent',
+                        color: option.value === currentValue ? 'white' : 'var(--color-text-primary)',
+                        minHeight: '48px', // Matched from ChemBL
+                        flexShrink: 0
+                    }}
+                    onMouseEnter={(e) => {
+                        if (option.value !== currentValue) {
+                            e.currentTarget.style.backgroundColor = 'var(--color-bg-hover)';
+                        }
+                    }}
+                    onMouseLeave={(e) => {
+                        if (option.value !== currentValue) {
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                        }
+                    }}
+                >
+                    <div style={{ // Added wrapper for label to match ChemBL structure
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2px',
+                        flex: '1',
+                        minWidth: 0
+                    }}>
+                        <span className="option-label" style={{
+                            fontSize: '0.85rem',
+                            fontWeight: '500',
+                            color: 'inherit', // Inherits color from parent
+                            lineHeight: '1.2'
+                        }}>
+                            {option.label}
+                        </span>
+                        {/* PubChem options do not have descriptions, so this part is omitted */}
+                    </div>
+                    {option.value === currentValue && (
+                        <span className="check-icon" style={{
+                            color: 'white', // Explicitly white as in ChemBL
+                            fontWeight: 'bold',
+                            marginLeft: '8px',
+                            flexShrink: 0
+                        }}>
+                            <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor">
+                                <path d="M13 1L5 9L1 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </span>
+                    )}
+                </div>
+            ))}
+        </div>,
+        document.body
+    );
+};
 
 // PubChem CID Validator
 const validateCid = (cid) => {
@@ -30,9 +129,9 @@ const PubChemSearchTypeSelector = ({ value, onChange, options, disabled = false 
     const dropdownRef = useRef(null);
     const triggerRef = useRef(null);
 
-    // Update dropdown position when opened
+    // Update dropdown position when opened - Matched with ChemBLActivityFetcher's logic
     const updateDropdownPosition = useCallback(() => {
-        if (triggerRef.current && isOpen) {
+        if (isOpen && triggerRef.current) {
             const rect = triggerRef.current.getBoundingClientRect();
             setDropdownPosition({
                 top: rect.bottom,
@@ -40,22 +139,23 @@ const PubChemSearchTypeSelector = ({ value, onChange, options, disabled = false 
                 width: rect.width
             });
         }
-    }, [isOpen]);
+    }, [isOpen]); // Added isOpen dependency
 
-    // Update position when dropdown opens or on scroll/resize
+    // Update position when dropdown opens or on scroll/resize - Replaced with ChemBLActivityFetcher's exact logic
     useEffect(() => {
         if (isOpen) {
-            updateDropdownPosition();
+            updateDropdownPosition(); // Initial position update
 
-            const handleScroll = () => updateDropdownPosition();
-            const handleResize = () => updateDropdownPosition();
+            const handleScrollResize = () => { // Explicit function block as in ChemBLActivityFetcher
+                updateDropdownPosition();
+            };
 
-            window.addEventListener('scroll', handleScroll, true);
-            window.addEventListener('resize', handleResize);
+            window.addEventListener('scroll', handleScrollResize, true); // Capture phase for scroll
+            window.addEventListener('resize', handleScrollResize);
 
             return () => {
-                window.removeEventListener('scroll', handleScroll, true);
-                window.removeEventListener('resize', handleResize);
+                window.removeEventListener('scroll', handleScrollResize, true);
+                window.removeEventListener('resize', handleScrollResize);
             };
         }
     }, [isOpen, updateDropdownPosition]);
@@ -96,51 +196,8 @@ const PubChemSearchTypeSelector = ({ value, onChange, options, disabled = false 
 
     const selectedOption = options.find(option => option.value === value);
 
-    // Portal dropdown component
-    const PortalDropdown = () => {
-        if (!isOpen || disabled) return null;
-
-        return createPortal(
-            <div
-                ref={dropdownRef}
-                className="selector-options-portal"
-                style={{
-                    position: 'fixed',
-                    top: `${dropdownPosition.top}px`,
-                    left: `${dropdownPosition.left}px`,
-                    width: `${dropdownPosition.width}px`,
-                    zIndex: 10000,
-                    backgroundColor: 'var(--color-bg-primary)',
-                    border: '1px solid var(--color-accent)',
-                    borderTop: 'none',
-                    borderRadius: '0 0 8px 8px',
-                    boxShadow: '0 4px 16px var(--shadow-color)',
-                    maxHeight: '200px',
-                    overflowY: 'auto'
-                }}
-            >
-                {options.map((option) => (
-                    <div
-                        key={option.value}
-                        className={`selector-option ${option.value === value ? 'selected' : ''}`}
-                        onClick={() => handleOptionClick(option.value)}
-                        role="option"
-                        aria-selected={option.value === value}
-                    >
-                        <span className="option-label">{option.label}</span>
-                        {option.value === value && (
-                            <span className="check-icon">
-                                <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor">
-                                    <path d="M13 1L5 9L1 5" />
-                                </svg>
-                            </span>
-                        )}
-                    </div>
-                ))}
-            </div>,
-            document.body
-        );
-    };
+    // Portal dropdown component - This will be removed and replaced by StandalonePubChemPortalDropdownMenu
+    // const PortalDropdown = () => { ... existing PortalDropdown code ... };
 
     return (
         <>
@@ -179,7 +236,15 @@ const PubChemSearchTypeSelector = ({ value, onChange, options, disabled = false 
                     </span>
                 </div>
             </div>
-            <PortalDropdown />
+            {/* <PortalDropdown /> */} {/* Old portal dropdown call removed */}
+            <StandalonePubChemPortalDropdownMenu
+                isOpen={isOpen}
+                options={options}
+                currentValue={value}
+                onOptionClick={handleOptionClick}
+                dropdownPosition={dropdownPosition}
+                dropdownRef={dropdownRef}
+            />
         </>
     );
 };
@@ -189,7 +254,31 @@ const searchTypeOptions = [
     { value: "cid", label: "PubChem CID" },
     { value: "name", label: "Compound Name" },
     { value: "smiles", label: "SMILES String" },
-    { value: "inchikey", label: "InChIKey" }
+    { value: "inchikey", label: "InChIKey" },
+    { value: "xref", label: "Cross-Reference" },
+    { value: "mass", label: "Molecular Mass" }
+];
+
+// Options for Cross-Reference Type dropdown
+const xrefTypeOptions = [
+    { value: "RegistryID", label: "Registry ID" },
+    { value: "RN", label: "Registry Number" },
+    { value: "PubMedID", label: "PubMed ID" },
+    { value: "MMDBID", label: "MMDB ID" },
+    { value: "ProteinGI", label: "Protein GI" },
+    { value: "NucleotideGI", label: "Nucleotide GI" },
+    { value: "TaxonomyID", label: "Taxonomy ID" },
+    { value: "MIMID", label: "MIM ID" },
+    { value: "GeneID", label: "Gene ID" },
+    { value: "ProbeID", label: "Probe ID" },
+    { value: "PatentID", label: "Patent ID" }
+];
+
+// Options for Mass Type dropdown
+const massTypeOptions = [
+    { value: "exact_mass", label: "Exact Mass" },
+    { value: "monoisotopic_mass", label: "Monoisotopic Mass" },
+    { value: "molecular_weight", label: "Molecular Weight" }
 ];
 
 const PubChemGetter = ({
@@ -205,6 +294,10 @@ const PubChemGetter = ({
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [validationError, setValidationError] = useState(null);
+    
+    // Additional states for xref and mass searches
+    const [xrefType, setXrefType] = useState('RegistryID');
+    const [massType, setMassType] = useState('exact_mass'); // Corrected initial value
     
     // States for multiple candidates (name/SMILES/InChIKey search that might return multiple CIDs)
     const [multipleCandidates, setMultipleCandidates] = useState([]);
@@ -227,10 +320,17 @@ const PubChemGetter = ({
         // Clear previous validation errors
         setValidationError(null);
 
-        // Only validate if there's a value and search type is CID
-        if (value && value.trim() && searchType === "cid") {
-            if (!validateCid(value.trim())) {
-                setValidationError("Invalid CID format. Must be a positive integer.");
+        // Only validate if there's a value and search type is CID or mass
+        if (value && value.trim()) {
+            if (searchType === "cid") {
+                if (!validateCid(value.trim())) {
+                    setValidationError("Invalid CID format. Must be a positive integer.");
+                }
+            } else if (searchType === "mass") {
+                const massValue = parseFloat(value.trim());
+                if (isNaN(massValue) || massValue <= 0) {
+                    setValidationError("Invalid mass format. Must be a positive number.");
+                }
             }
         }
     }, [searchType]);
@@ -250,6 +350,12 @@ const PubChemGetter = ({
                 setError("Invalid CID format. CID must be a positive integer (e.g., 2244, 5988).");
                 return;
             }
+        } else if (searchType === "mass") {
+            const massValue = parseFloat(trimmedValue);
+            if (isNaN(massValue) || massValue <= 0) {
+                setError("Invalid mass format. Mass must be a positive number (e.g., 180.16).");
+                return;
+            }
         }
 
         setIsLoading(true);
@@ -267,118 +373,172 @@ const PubChemGetter = ({
                 result = await getCidsBySmiles({ smiles: trimmedValue });
             } else if (searchType === "inchikey") {
                 result = await getCidsByInchikey({ inchikey: trimmedValue });
+            } else if (searchType === "xref") {
+                result = await getCidsByXref({ 
+                    xref_type: xrefType, 
+                    xref_value: trimmedValue 
+                });
+            } else if (searchType === "mass") {
+                result = await getCidsByMass({ 
+                    mass_type: massType, 
+                    value_or_min: parseFloat(trimmedValue) 
+                });
             }
+
+            console.log('API result:', result);
 
             if (result) {
                 if (result.status === "success") {
-                    var processible = result.result["0"]
-                    processible = JSON.parse(processible);
+                    let processible; // Changed var to let
+                    try {
+                        processible = JSON.parse(result.result["0"]);
+                    } catch (parseError) {
+                        console.error('Error parsing API response:', parseError);
+                        setError("Failed to parse API response. The data might be malformed.");
+                        setApiData(null);
+                        setMultipleCandidates([]);
+                        setSelectedCandidate(null);
+                        return; // Exit early if parsing fails
+                    }
                     
                     console.log('Processible', processible);
 
-                    if (searchType === "cid") {
-                        // For CID search, we expect a single compound
-                        if (processible.data){
-                            setApiData(processible.data);
-                            setSearchValue(trimmedValue);
-                            // Clear multiple candidates for single compound view
-                            setMultipleCandidates([]);
-                            setSelectedCandidate(null);
-                        } else {
-                            // No data found for CID
-                            setError(`No compound found for CID "${trimmedValue}"`);
-                            setApiData(null);
-                            setMultipleCandidates([]);
-                            setSelectedCandidate(null);
-                        }
+                    // Check for the error structure within the parsed 'processible' object
+                    if (processible && processible.Fault && processible.Fault.Message) {
+                        setError(processible.Fault.Message);
+                        setApiData(null);
+                        setMultipleCandidates([]);
+                        setSelectedCandidate(null);
+                    } else if (processible && processible.error && processible.error.details && processible.error.details.Fault && processible.error.details.Fault.Message) {
+                        setError(processible.error.details.Fault.Message);
+                        setApiData(null);
+                        setMultipleCandidates([]);
+                        setSelectedCandidate(null);
                     } else {
-                        // For name/SMILES/InChIKey search, we might get multiple CIDs
-                        if (processible.data && Array.isArray(processible.data) && processible.data.length > 0) {
-                            // Multiple CIDs found - we need to fetch compound data for each
-                            const cids = processible.data.slice(0, 10); // Limit to first 10 results
-                            const compounds = [];
-                            
-                            for (const cid of cids) {
-                                try {
-                                    const compoundResult = await getCompoundByCid({ cid: cid.toString() });
-                                    if (compoundResult && compoundResult.status === "success") {
-                                        const compoundData = JSON.parse(compoundResult.result["0"]);
-                                        if (compoundData.data) {
-                                            compounds.push({
-                                                ...compoundData.data,
-                                                cid: cid
-                                            });
-                                        }
-                                    }
-                                } catch (err) {
-                                    console.error(`Error fetching compound for CID ${cid}:`, err);
-                                }
-                            }
-                            
-                            if (compounds.length > 0) {
-                                setMultipleCandidates(compounds);
-                                setSelectedCandidate(compounds[0]);
-                                setSelectedIndex(0);
-                                setIsSelectedCandidateValid(true);
-                                setApiData(null); // Clear single compound data
+                        // Original logic for handling successful data
+                        if (searchType === "cid") {
+                            // For CID search, we expect a single compound
+                            if (processible.result){
+                                setApiData(processible.result);
                                 setSearchValue(trimmedValue);
-                            } else {
-                                setError(`No compound data found for search "${trimmedValue}"`);
+                                // Clear multiple candidates for single compound view
                                 setMultipleCandidates([]);
                                 setSelectedCandidate(null);
+                            } else {
+                                // No data found for CID
+                                setError(`No compound found for CID "${trimmedValue}"`);
                                 setApiData(null);
+                                setMultipleCandidates([]);
+                                setSelectedCandidate(null);
                             }
-                        } else if (processible.data && Array.isArray(processible.data) && processible.data.length === 0) {
-                            // Empty array - no records found
-                            console.log(`No records found for ${searchType} search "${trimmedValue}"`);
-                            setError(`No records found with ${searchType} search "${trimmedValue}"`);
-                            setMultipleCandidates([]);
-                            setSelectedCandidate(null);
-                            setApiData(null);
-                        } else if (processible.data) {
-                            // Single CID found
-                            try {
-                                const compoundResult = await getCompoundByCid({ cid: processible.data.toString() });
-                                if (compoundResult && compoundResult.status === "success") {
-                                    const compoundData = JSON.parse(compoundResult.result["0"]);
-                                    if (compoundData.data) {
-                                        setApiData({
-                                            ...compoundData.data,
-                                            cid: processible.data
-                                        });
+                        } else {
+                            // For name/SMILES/InChIKey search, we might get multiple CIDs or an object with data
+                            if (processible.result) {
+                                // Check if result is an array (multiple CIDs)
+                                if (Array.isArray(processible.result)) {
+                                    if (processible.result.length > 0) {
+                                        // Multiple CIDs found - we need to fetch compound data for each
+                                        const cids = processible.result.slice(0, 10); // Limit to first 10 results
+                                        const compounds = [];
+                                        
+                                        for (const cid of cids) {
+                                            try {
+                                                const compoundResult = await getCompoundByCid({ cid: cid.toString() });
+                                                if (compoundResult && compoundResult.status === "success") {
+                                                    const compoundData = JSON.parse(compoundResult.result["0"]);
+                                                    if (compoundData.result) {
+                                                        compounds.push({
+                                                            ...compoundData.result,
+                                                            cid: cid
+                                                        });
+                                                    }
+                                                }
+                                            } catch (err) {
+                                                console.error(`Error fetching compound for CID ${cid}:`, err);
+                                            }
+                                        }
+                                        
+                                        if (compounds.length > 0) {
+                                            setMultipleCandidates(compounds);
+                                            setSelectedCandidate(compounds[0]);
+                                            setSelectedIndex(0);
+                                            setIsSelectedCandidateValid(true);
+                                            setApiData(null); // Clear single compound data
+                                            setSearchValue(trimmedValue);
+                                        } else {
+                                            setError(`No compound data found for search "${trimmedValue}"`);
+                                            setMultipleCandidates([]);
+                                            setSelectedCandidate(null);
+                                            setApiData(null);
+                                        }
+                                    } else {
+                                        // Empty array - no records found
+                                        console.log(`No records found for ${searchType} search "${trimmedValue}"`);
+                                        setError(`No records found with ${searchType} search "${trimmedValue}"`);
+                                        setMultipleCandidates([]);
+                                        setSelectedCandidate(null);
+                                        setApiData(null);
+                                    }
+                                } else {
+                                    // Result is an object - could be direct data or needs further processing
+                                    console.log('Processing object result:', processible.result);
+                                    
+                                    // Check if it's a number (single CID)
+                                    if (typeof processible.result === 'number' || 
+                                        (typeof processible.result === 'string' && !isNaN(processible.result))) {
+                                        // Single CID found
+                                        try {
+                                            const compoundResult = await getCompoundByCid({ cid: processible.result.toString() });
+                                            if (compoundResult && compoundResult.status === "success") {
+                                                const compoundData = JSON.parse(compoundResult.result["0"]);
+                                                if (compoundData.result) {
+                                                    setApiData({
+                                                        ...compoundData.result,
+                                                        cid: processible.result
+                                                    });
+                                                    setSearchValue(trimmedValue);
+                                                    setMultipleCandidates([]);
+                                                    setSelectedCandidate(null);
+                                                } else {
+                                                    setError(`No compound data found for search "${trimmedValue}"`);
+                                                    setApiData(null);
+                                                    setMultipleCandidates([]);
+                                                    setSelectedCandidate(null);
+                                                }
+                                            } else {
+                                                setError(`Failed to fetch compound data for search "${trimmedValue}"`);
+                                                setApiData(null);
+                                                setMultipleCandidates([]);
+                                                setSelectedCandidate(null);
+                                            }
+                                        } catch (err) {
+                                            console.error(`Error fetching compound:`, err);
+                                            setError(`Error fetching compound data for search "${trimmedValue}"`);
+                                            setApiData(null);
+                                            setMultipleCandidates([]);
+                                            setSelectedCandidate(null);
+                                        }
+                                    } else {
+                                        // Result is an object with direct data - use it directly
+                                        setApiData(processible.result);
                                         setSearchValue(trimmedValue);
                                         setMultipleCandidates([]);
                                         setSelectedCandidate(null);
-                                    } else {
-                                        setError(`No compound data found for search "${trimmedValue}"`);
-                                        setApiData(null);
-                                        setMultipleCandidates([]);
-                                        setSelectedCandidate(null);
                                     }
-                                } else {
-                                    setError(`Failed to fetch compound data for search "${trimmedValue}"`);
-                                    setApiData(null);
-                                    setMultipleCandidates([]);
-                                    setSelectedCandidate(null);
                                 }
-                            } catch (err) {
-                                console.error(`Error fetching compound:`, err);
-                                setError(`Error fetching compound data for search "${trimmedValue}"`);
-                                setApiData(null);
+                            } else {
+                                // No data found
+                                setError(`No records found with ${searchType} search "${trimmedValue}"`);
                                 setMultipleCandidates([]);
                                 setSelectedCandidate(null);
+                                setApiData(null);
                             }
-                        } else {
-                            // No data found
-                            setError(`No records found with ${searchType} search "${trimmedValue}"`);
-                            setMultipleCandidates([]);
-                            setSelectedCandidate(null);
-                            setApiData(null);
                         }
                     }
                 } else {
-                    // API returned non-success status
-                    setError(result.message || `Search failed for "${trimmedValue}". Please try again.`);
+                    // API returned non-success status (e.g., network error or non-200 HTTP status)
+                    // This handles cases where the overall request failed before we could get a processible JSON payload.
+                    setError(result.message || `Search request failed. Please try again.`);
                     setApiData(null);
                     setMultipleCandidates([]);
                     setSelectedCandidate(null);
@@ -395,7 +555,7 @@ const PubChemGetter = ({
         } finally {
             setIsLoading(false);
         }
-    }, [searchType]);
+    }, [searchType, xrefType, massType]);
 
     // Effect to handle initial data passed as props
     useEffect(() => {
@@ -405,7 +565,8 @@ const PubChemGetter = ({
             // Set search type based on tool data type
             setSearchType(toolData.type);
             
-            if (toolData.type === "name" || toolData.type === "smiles" || toolData.type === "inchikey") {
+            if (toolData.type === "name" || toolData.type === "smiles" || toolData.type === "inchikey" || 
+                toolData.type === "xref" || toolData.type === "mass") {
                 // Handle search results that might return multiple compounds
                 if (Array.isArray(toolData.content) && toolData.content.length > 0) {
                     setMultipleCandidates(toolData.content);
@@ -452,7 +613,7 @@ const PubChemGetter = ({
         }
     }, [initialSearchValue, toolData, handleSubmit]);
 
-    const getPlaceholderText = () => {
+    const getPlaceholderText = useCallback(() => {
         switch (searchType) {
             case "cid":
                 return "Format: positive integer (e.g., 2244, 5988)";
@@ -462,12 +623,19 @@ const PubChemGetter = ({
                 return "Try SMILES: CC(=O)OC1=CC=CC=C1C(=O)O";
             case "inchikey":
                 return "Try InChIKey: BSYNRYMUTXBXSQ-UHFFFAOYSA-N";
+            case "xref":
+                return `Enter ${xrefType === 'RegistryID' ? 'Registry ID' : 
+                              xrefType === 'RN' ? 'Registry Number' : 
+                              xrefType === 'PubMedID' ? 'PubMed ID' : 
+                              xrefType} value`;
+            case "mass":
+                return `Enter molecular mass in Da (e.g., 180.16)`;
             default:
                 return "Enter search value";
         }
-    };
+    }, [searchType, xrefType, massType]);
 
-    const getHeaderText = () => {
+    const getHeaderText = useCallback(() => {
         switch (searchType) {
             case "cid":
                 return "Enter PubChem CID";
@@ -477,15 +645,27 @@ const PubChemGetter = ({
                 return "Enter SMILES String";
             case "inchikey":
                 return "Enter InChIKey";
+            case "xref":
+                return `Enter ${xrefType === 'RegistryID' ? 'Registry ID' : 
+                              xrefType === 'RN' ? 'Registry Number' : 
+                              xrefType === 'PubMedID' ? 'PubMed ID' : 
+                              xrefType}`;
+            case "mass":
+                if (massType === 'exact_mass') return "Enter Exact Mass";
+                if (massType === 'monoisotopic_mass') return "Enter Monoisotopic Mass";
+                if (massType === 'molecular_weight') return "Enter Molecular Weight";
+                return "Enter Mass"; // Fallback
             default:
                 return "Enter Search Value";
         }
-    };
+    }, [searchType, xrefType, massType]);
 
     useEffect(() => {
         console.log("Search type changed:", searchType);
         // Clear validation errors when search type changes, but keep existing errors
         setValidationError(null);
+        // Clear input when search type changes
+        setInputValue("");
     }, [searchType])
 
     // Keyboard navigation for multiple candidates
@@ -539,6 +719,32 @@ const PubChemGetter = ({
                                         disabled={isLoading}
                                     />
                                 </div>
+
+                                {/* Additional dropdown for xref type */}
+                                {searchType === "xref" && (
+                                    <div className="pubchem-getter-dropdown-section">
+                                        <h3 className="pubchem-getter-dropdown-header">Cross-Reference Type</h3>
+                                        <PubChemSearchTypeSelector
+                                            value={xrefType}
+                                            onChange={(e) => setXrefType(e.target.value)}
+                                            options={xrefTypeOptions}
+                                            disabled={isLoading}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Additional dropdown for mass type */}
+                                {searchType === "mass" && (
+                                    <div className="pubchem-getter-dropdown-section">
+                                        <h3 className="pubchem-getter-dropdown-header">Mass Type</h3>
+                                        <PubChemSearchTypeSelector
+                                            value={massType}
+                                            onChange={(e) => setMassType(e.target.value)}
+                                            options={massTypeOptions}
+                                            disabled={isLoading}
+                                        />
+                                    </div>
+                                )}
 
                                 <div className="pubchem-getter-input-section">
                                     <SimpleInputBox
@@ -709,22 +915,26 @@ const PubChemGetter = ({
                 )}
 
                 {/* DataViewer - show single compound data or selected candidate data */}
-                {(apiData || selectedCandidate) && (
-                    <div className="pubchem-getter-row-3" style={{ marginTop: '20px' }}>
-                        <DataViewer
-                            data={
-                                searchType === "cid" ? apiData : 
-                                selectedCandidate
-                            }
-                            title={`PubChem Compound Data${searchValue ? ` for "${searchValue}"` : ''}${
-                                searchType !== "cid" && selectedCandidate ? 
-                                ` - ${selectedCandidate.iupac_name || selectedCandidate.title || `CID: ${selectedCandidate.cid}` || 'Unknown'}` : 
-                                ''
-                            }`}
-                            initiallyExpanded={true}
-                        />
-                    </div>
-                )}
+                {(apiData || selectedCandidate) && (() => {
+                    const dataToPass = apiData;
+                    console.log('DataViewer - apiData:', apiData);
+                    console.log('DataViewer - selectedCandidate:', selectedCandidate);
+                    console.log('DataViewer - searchType:', searchType);
+                    console.log('DataViewer - dataToPass:', dataToPass);
+                    return (
+                        <div className="pubchem-getter-row-3" style={{ marginTop: '20px' }}>
+                            <DataViewer
+                                data={dataToPass}
+                                title={`PubChem Compound Data${searchValue ? ` for "${searchValue}"` : ''}${
+                                    searchType !== "cid" && selectedCandidate ? 
+                                    ` - ${selectedCandidate.iupac_name || selectedCandidate.title || `CID: ${selectedCandidate.cid}` || 'Unknown'}` : 
+                                    ''
+                                }`}
+                                initiallyExpanded={false}
+                            />
+                        </div>
+                    );
+                })()}
             </motion.div>
         </>
     );

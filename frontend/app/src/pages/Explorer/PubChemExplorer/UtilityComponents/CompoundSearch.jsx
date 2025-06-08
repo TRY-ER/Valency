@@ -87,9 +87,9 @@ const CompoundSearch = ({ toolData = null, initialSearchValue = "", initialSearc
             if (response && response.status === "success") {
                 const data = JSON.parse(response.result["0"]);
                 
-                if (data.data && Array.isArray(data.data) && data.data.length > 0) {
+                if (data.result && Array.isArray(data.result) && data.result.length > 0) {
                     // Get detailed compound information for the first few CIDs
-                    const cidList = data.data.slice(0, 10); // Limit to first 10 for performance
+                    const cidList = data.result.slice(0, 10); // Limit to first 10 for performance
                     const compoundDetails = [];
                     
                     for (const cid of cidList) {
@@ -97,10 +97,10 @@ const CompoundSearch = ({ toolData = null, initialSearchValue = "", initialSearc
                             const compoundResponse = await getCompoundByCid({ cid: parseInt(cid, 10) });
                             if (compoundResponse && compoundResponse.status === "success") {
                                 const compoundData = JSON.parse(compoundResponse.result["0"]);
-                                if (compoundData.data) {
+                                if (compoundData.result) {
                                     compoundDetails.push({
                                         cid: cid,
-                                        ...compoundData.data
+                                        ...compoundData.result
                                     });
                                 }
                             }
@@ -112,8 +112,8 @@ const CompoundSearch = ({ toolData = null, initialSearchValue = "", initialSearc
                     setResults({
                         search_type: searchType,
                         search_value: trimmedValue,
-                        total_found: data.data.length,
-                        cids: data.data,
+                        total_found: data.result.length,
+                        cids: data.result,
                         compound_details: compoundDetails
                     });
                 } else {

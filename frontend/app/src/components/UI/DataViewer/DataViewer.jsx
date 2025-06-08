@@ -75,6 +75,8 @@ const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, ini
                         collectKeys(item, itemPath);
                     } else if (typeof item === 'string' && item.length > 50) {
                         allStringPaths.add(`${itemPath}_string`);
+                    } else if (typeof item === 'number' && Number.isInteger(item) && Math.abs(item) >= 1000000 && item.toString().length > 12) {
+                        allStringPaths.add(`${itemPath}_number`);
                     }
                 });
             } else if (typeof obj === 'object' && obj !== null) {
@@ -88,6 +90,8 @@ const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, ini
                         collectKeys(obj[key], fullPath);
                     } else if (typeof obj[key] === 'string' && obj[key].length > 50) {
                         allStringPaths.add(`${fullPath}_string`);
+                    } else if (typeof obj[key] === 'number' && Number.isInteger(obj[key]) && Math.abs(obj[key]) >= 1000000 && obj[key].toString().length > 12) {
+                        allStringPaths.add(`${fullPath}_number`);
                     }
                 });
             }
@@ -264,9 +268,59 @@ const DataViewer = ({ data, title = "Research Data Explorer", maxDepth = 10, ini
         }
 
         if (typeof value === 'number') {
-            const isLargeNumber = Math.abs(value) >= 1000000 || (Math.abs(value) < 0.001 && value !== 0);
-            const formattedValue = isLargeNumber ? value.toExponential(2) : value.toString();
-            return <span className={`value-number ${isLargeNumber ? 'scientific' : ''}`}>{formattedValue}</span>;
+            const isInteger = Number.isInteger(value);
+            const isLargeInteger = isInteger && Math.abs(value) >= 1000000;
+            const isVerySmallFloat = !isInteger && Math.abs(value) < 0.001 && value !== 0;
+            const isVeryLargeFloat = !isInteger && Math.abs(value) >= 1000000;
+            
+            // For large integers (likely IDs), show full number with formatting
+            if (isLargeInteger) {
+                const numberString = value.toString();
+                const isExpanded = expandedStrings.has(`${keyPath}_number`);
+                const shouldTruncate = numberString.length > 12;
+                const displayValue = shouldTruncate && !isExpanded 
+                    ? `${numberString.substring(0, 9)}...` 
+                    : numberString;
+                const isCopied = copiedItems.has(`${keyPath}_number`);
+                
+                return (
+                    <div className="number-value-container">
+                        <span 
+                            className={`value-number value-id ${shouldTruncate && !isExpanded ? 'truncated' : ''}`}
+                            title={shouldTruncate && !isExpanded ? `Full ID: ${numberString}` : `ID: ${numberString}`}
+                        >
+                            {displayValue}
+                        </span>
+                        {shouldTruncate && (
+                            <div className="number-controls">
+                                <button 
+                                    className="string-control-btn expand-btn"
+                                    onClick={() => toggleStringExpansion(`${keyPath}_number`)}
+                                    title={isExpanded ? "Collapse" : "Show full ID"}
+                                >
+                                    {isExpanded ? "▲" : "▼"}
+                                </button>
+                                <button 
+                                    className={`string-control-btn copy-btn ${isCopied ? 'copied' : ''}`}
+                                    onClick={() => copyToClipboard(numberString, `${keyPath}_number`)}
+                                    title={isCopied ? "Copied!" : "Copy ID to clipboard"}
+                                >
+                                    {isCopied ? "✓" : "📋"}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                );
+            }
+            
+            // For very small floats or very large floats, use scientific notation
+            if (isVerySmallFloat || isVeryLargeFloat) {
+                const formattedValue = value.toExponential(2);
+                return <span className="value-number scientific" title={`Scientific notation: ${formattedValue} (exact: ${value})`}>{formattedValue}</span>;
+            }
+            
+            // For regular numbers, show as-is
+            return <span className="value-number">{value.toString()}</span>;
         }
 
         if (typeof value === 'boolean') {

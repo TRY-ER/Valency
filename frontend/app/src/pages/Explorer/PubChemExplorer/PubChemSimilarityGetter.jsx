@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import "./PubChemSimilarityGetter.css";
 import SimpleInputBox from "../../../components/UI/SimpleInputBox/SimpleInputBox";
 import DataViewer from "../../../components/UI/DataViewer/DataViewer";
-import InfoBox from "../../../components/UI/InfoBox/InfoBox";
+
 import TwoDViewer from "../../../components/UI/TwoDViewer/TwoDViewer";
 import { motion } from "framer-motion";
 import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";
@@ -16,7 +16,8 @@ import { endpoints } from "../../../endpoints/endpoints";
 
 // Enhanced CID Validator
 const validateCid = (cid) => {
-    if (!cid || typeof cid !== 'string') {
+    // Add extra safety checks
+    if (cid === null || cid === undefined || typeof cid !== 'string') {
         return false;
     }
     
@@ -196,7 +197,6 @@ const PubChemSimilaritySearchTypeSelector = ({ value, onChange, options, disable
 // Search type options for the dropdown
 const similaritySearchTypeOptions = [
     { value: "cid", label: "PubChem CID" },
-    { value: "smiles", label: "SMILES String" }
 ];
 
 const PubChemSimilarityGetter = ({
@@ -206,9 +206,9 @@ const PubChemSimilarityGetter = ({
     initialSimilarityThreshold = 90,
     hideInputBox = false
 }) => {
-    const [searchValue, setSearchValue] = useState(initialSearchValue);
-    const [inputValue, setInputValue] = useState(initialSearchValue);
-    const [searchType, setSearchType] = useState(initialSearchType);
+    const [searchValue, setSearchValue] = useState(initialSearchValue || ""); // Ensure string
+    const [inputValue, setInputValue] = useState(initialSearchValue || ""); // Ensure string
+    const [searchType, setSearchType] = useState("cid"); // Default to CID
     const [similarityThreshold, setSimilarityThreshold] = useState(initialSimilarityThreshold);
     const [apiData, setApiData] = useState(toolData);
     const [isLoading, setIsLoading] = useState(false);
@@ -218,12 +218,10 @@ const PubChemSimilarityGetter = ({
     // Enhanced validation states
     const [isValidInput, setIsValidInput] = useState(false);
     const [validationStatus, setValidationStatus] = useState('empty'); // 'empty', 'valid', 'invalid'
-    const [isValidatingSmiles, setIsValidatingSmiles] = useState(false); // For backend validation loading state
     
     // States for multiple similar molecules
     const [similarMolecules, setSimilarMolecules] = useState([]);
     const [selectedMolecule, setSelectedMolecule] = useState(null);
-    const [selectedIndex, setSelectedIndex] = useState(0);
 
     // Ref to track if search type is being set from toolData
     const isSettingFromToolData = useRef(false);
@@ -237,17 +235,16 @@ const PubChemSimilarityGetter = ({
             isSettingFromToolData.current = true;
             
             // Set search type based on tool data type
-            setSearchType(toolData.type);
+            setSearchType(toolData.type === "smiles" ? "cid" : toolData.type); // Force to CID if smiles
 
             console.log('tool data >>', toolData);
             
-            if (toolData.type === "cid" || toolData.type === "smiles") {
+            if (toolData.type === "cid") { // Only handle CID
                 // Handle similarity search results
                 if (Array.isArray(toolData.content) && toolData.content.length > 0) {
                     console.log('Setting similar molecules from tool data:', toolData.content);
                     setSimilarMolecules(toolData.content);
                     setSelectedMolecule(toolData.content[0]);
-                    setSelectedIndex(0);
                     setApiData(null); // Clear single molecule data for multiple results view
                     // Clear any existing errors for successful data processing
                     setError(null);
@@ -256,7 +253,6 @@ const PubChemSimilarityGetter = ({
                     // If it's a single molecule, treat it as a single-item array for consistent UI
                     setSimilarMolecules([toolData.content]);
                     setSelectedMolecule(toolData.content);
-                    setSelectedIndex(0);
                     setApiData(null); // Clear single molecule data
                     // Clear any existing errors for successful data processing
                     setError(null);
@@ -286,49 +282,24 @@ const PubChemSimilarityGetter = ({
         console.log('active similar molecules >>', selectedMolecule);
     }, [apiData]);
 
-    // Backend SMILES validation function
-    const validateSmilesWithBackend = useCallback(async (smiles) => {
-        if (!smiles || smiles.trim() === '') {
-            return false;
-        }
-
-        try {
-            setIsValidatingSmiles(true);
-            const payload = {
-                type: "MOL",
-                value: smiles.trim()
-            };
-            
-            const response = await call_endpoint_async(endpoints.validate, payload);
-            
-            if (response.data.status === "success") {
-                return response.data.valid;
-            }
-            return false;
-        } catch (error) {
-            console.log('SMILES validation error:', error);
-            return false;
-        } finally {
-            setIsValidatingSmiles(false);
-        }
-    }, []);
-
     // Enhanced input change handler with comprehensive validation
     const handleInputChange = useCallback(async (value) => {
         console.log('handleInputChange called with:', value, 'for searchType:', searchType);
-        setInputValue(value);
+        
+        const currentInputString = typeof value === 'string' ? value : '';
+        setInputValue(currentInputString);
         setError(null);
         setValidationError(null);
 
         // Handle empty input
-        if (value.trim() === "") {
+        if (currentInputString.trim() === "") {
             setValidationError(null);
             setIsValidInput(false);
             setValidationStatus('empty');
             return;
         }
 
-        const trimmedValue = value.trim();
+        const trimmedValue = currentInputString.trim(); // Safe to trim now
         let isValid = false;
         let errorMessage = "";
 
@@ -345,34 +316,36 @@ const PubChemSimilarityGetter = ({
             setIsValidInput(isValid);
             setValidationStatus(isValid ? 'valid' : 'invalid');
             setValidationError(isValid ? null : errorMessage);
-        } else if (searchType === "smiles") {
+        } 
+        // else if (searchType === "smiles") { // REMOVING SMILES VALIDATION LOGIC
             // For SMILES, use backend validation
-            try {
-                setValidationStatus('validating'); // Show loading state
-                console.log('Validating SMILES:', trimmedValue);
-                isValid = await validateSmilesWithBackend(trimmedValue);
-                console.log('SMILES validation result:', isValid);
+            // try {
+            //     setValidationStatus('validating'); // Show loading state
+            //     console.log('Validating SMILES:', trimmedValue);
+            //     isValid = await validateSmilesWithBackend(trimmedValue);
+            //     console.log('SMILES validation result:', isValid);
                 
-                if (!isValid) {
-                    errorMessage = "Invalid SMILES format. Please enter a valid SMILES string (e.g., CCO, C1=CC=CC=C1).";
-                }
+            //     if (!isValid) {
+            //         errorMessage = "Invalid SMILES format. Please enter a valid SMILES string (e.g., CCO, C1=CC=CC=C1).";
+            //     }
                 
-                // Update validation states after backend validation
-                setIsValidInput(isValid);
-                setValidationStatus(isValid ? 'valid' : 'invalid');
-                setValidationError(isValid ? null : errorMessage);
-            } catch (error) {
-                console.error('SMILES validation error:', error);
-                setIsValidInput(false);
-                setValidationStatus('invalid');
-                setValidationError("Error validating SMILES. Please check your input.");
-            }
-        }
-    }, [searchType, validateSmilesWithBackend]);
+            //     // Update validation states after backend validation
+            //     setIsValidInput(isValid);
+            //     setValidationStatus(isValid ? 'valid' : 'invalid');
+            //     setValidationError(isValid ? null : errorMessage);
+            // } catch (error) {
+            //     console.error('SMILES validation error:', error);
+            //     setIsValidInput(false);
+            //     setValidationStatus('invalid');
+            //     setValidationError("Error validating SMILES. Please check your input.");
+            // }
+        // }
+    }, [searchType]); // Removed validateSmilesWithBackend from dependencies
 
-    // Re-validate when search type changes
+    // Re-validate when search type changes - This might be less relevant now or simplify
     useEffect(() => {
-        if (inputValue.trim() !== "") {
+        const safeInputValue = inputValue || '';
+        if (safeInputValue.trim() !== "") {
             // Force re-validation with the current input for the new search type
             handleInputChange(inputValue);
         } else {
@@ -381,11 +354,15 @@ const PubChemSimilarityGetter = ({
             setValidationStatus('empty');
             setValidationError(null);
         }
-    }, [searchType, handleInputChange]);
+    }, [searchType, handleInputChange, inputValue]); // Added inputValue to dependencies
 
     const handleSubmit = useCallback(async (value) => {
         console.log('handleSubmit called with value:', value);
-        const trimmedValue = value.trim();
+        
+        // Ensure value is a string before calling trim
+        const valueString = value != null ? String(value) : '';
+        const trimmedValue = valueString.trim(); 
+        
         console.log("valid state >>", isValidInput);
         
         if (!trimmedValue) {
@@ -395,23 +372,25 @@ const PubChemSimilarityGetter = ({
 
         // Perform immediate validation as a fallback in case the state hasn't updated yet
         let isCurrentlyValid = isValidInput;
-        
+        console.log('validating cid >>', validateCid(trimmedValue)); 
         if (searchType === "cid") {
             isCurrentlyValid = validateCid(trimmedValue);
             console.log('Immediate CID validation in submit:', isCurrentlyValid);
-        } else if (searchType === "smiles") {
+        } 
+        // else if (searchType === "smiles") { // REMOVING SMILES SUBMIT LOGIC
             // For SMILES, trust the async validation state since we can't do sync validation
             // But ensure we have a valid state
-            isCurrentlyValid = isValidInput && validationStatus === 'valid';
-            console.log('SMILES validation state in submit:', isCurrentlyValid, 'validationStatus:', validationStatus);
-        }
+            // isCurrentlyValid = isValidInput && validationStatus === 'valid';
+            // console.log('SMILES validation state in submit:', isCurrentlyValid, 'validationStatus:', validationStatus);
+        // }
 
         if (!isCurrentlyValid) {
             if (searchType === "cid") {
                 setError("Invalid CID format. CID must be a positive integer (e.g., 2244, 5281804).");
-            } else if (searchType === "smiles") {
-                setError("Invalid SMILES format. Please enter a valid SMILES string (e.g., CCO, C1=CC=CC=C1).");
-            }
+            } 
+            // else if (searchType === "smiles") { // REMOVING SMILES ERROR
+                // setError("Invalid SMILES format. Please enter a valid SMILES string (e.g., CCO, C1=CC=CC=C1).");
+            // }
             return;
         }
 
@@ -425,17 +404,19 @@ const PubChemSimilarityGetter = ({
             if (searchType === "cid") {
                 // For CID-based similarity search, use the PubChem fast similarity service
                 result = await fastSimilarity2dSearchByCid({
-                    cid: parseInt(trimmedValue, 10),
-                    threshold: similarityThreshold / 100 // Convert percentage to decimal
+                    cid: trimmedValue, 
                 });
-            } else if (searchType === "smiles") {
+            } 
+            // else if (searchType === "smiles") { // REMOVING SMILES API CALL
                 // For SMILES, we would need a different API call
                 // Since PubChem API doesn't have direct SMILES similarity search in our service,
                 // we can show a message or implement it differently
-                setError("SMILES-based similarity search is not yet implemented for PubChem. Please use CID-based search.");
-                return;
-            }
+                // setError("SMILES-based similarity search is not yet implemented for PubChem. Please use CID-based search.");
+                // setIsLoading(false); // Ensure loading is stopped
+                // return;
+            // }
 
+            console.log("result >>", result )
             if (result) {
                 if (result.status === "success") {
                     var processible = result.result["0"];
@@ -443,47 +424,58 @@ const PubChemSimilarityGetter = ({
                     
                     console.log('PubChem similarity search processible', processible);
 
-                    if (processible.data && Array.isArray(processible.data) && processible.data.length > 0) {
-                        // For each similar CID, get the full compound data
-                        const similarCompounds = [];
-                        
-                        for (const cidData of processible.data.slice(0, 20)) { // Limit to first 20 for performance
-                            try {
-                                const compoundResult = await getCompoundByCid({ cid: cidData.cid });
-                                if (compoundResult && compoundResult.status === "success") {
-                                    const compoundData = JSON.parse(compoundResult.result["0"]);
-                                    if (compoundData.data) {
-                                        // Add similarity score to the compound data
-                                        compoundData.data.similarity_score = cidData.similarity;
-                                        compoundData.data.similar_cid = cidData.cid;
-                                        similarCompounds.push(compoundData.data);
+                    if (processible.result) {
+                        // Check if result is an array (multiple similar compounds)
+                        if (Array.isArray(processible.result)) {
+                            if (processible.result.length > 0) {
+                                // For each similar CID, get the full compound data
+                                const similarCompounds = [];
+                                
+                                for (const cidData of processible.result.slice(0, 20)) { // Limit to first 20 for performance
+                                    try {
+                                        const compoundResult = await getCompoundByCid({ cid: cidData.cid });
+                                        if (compoundResult && compoundResult.status === "success") {
+                                            const compoundData = JSON.parse(compoundResult.result["0"]);
+                                            if (compoundData.result) {
+                                                // Add similarity score to the compound data
+                                                compoundData.result.similarity_score = cidData.similarity;
+                                                compoundData.result.similar_cid = cidData.cid;
+                                                similarCompounds.push(compoundData.result);
+                                            }
+                                        }
+                                    } catch (error) {
+                                        console.warn(`Failed to get compound data for CID ${cidData.cid}:`, error);
                                     }
                                 }
-                            } catch (error) {
-                                console.warn(`Failed to get compound data for CID ${cidData.cid}:`, error);
-                            }
-                        }
 
-                        if (similarCompounds.length > 0) {
-                            setSimilarMolecules(similarCompounds);
-                            setSelectedMolecule(similarCompounds[0]);
-                            setSelectedIndex(0);
+                                if (similarCompounds.length > 0) {
+                                    setSimilarMolecules(similarCompounds);
+                                    setSelectedMolecule(similarCompounds[0]);
+                                    setApiData(null); // Clear single molecule data
+                                    setSearchValue(trimmedValue);
+                                } else {
+                                    setError(`No compound data found for similar molecules of "${trimmedValue}"`);
+                                    setSimilarMolecules([]);
+                                    setSelectedMolecule(null);
+                                    setApiData(null);
+                                }
+                            } else {
+                                // Empty array - no similar molecules found
+                                setError(`No similar molecules found for CID "${trimmedValue}" with similarity threshold ${similarityThreshold}%`);
+                                setSimilarMolecules([]);
+                                setSelectedMolecule(null);
+                                setApiData(null);
+                            }
+                        } else {
+                            // Result is an object - use it directly as similarity data
+                            console.log('Processing object result for similarity search:', processible.result);
+                            setSimilarMolecules([processible.result]);
+                            setSelectedMolecule(processible.result);
                             setApiData(null); // Clear single molecule data
                             setSearchValue(trimmedValue);
-                        } else {
-                            setError(`No compound data found for similar molecules of "${trimmedValue}"`);
-                            setSimilarMolecules([]);
-                            setSelectedMolecule(null);
-                            setApiData(null);
                         }
-                    } else if (processible.data && Array.isArray(processible.data) && processible.data.length === 0) {
-                        // No similar molecules found
-                        setError(`No similar molecules found for CID "${trimmedValue}" with similarity threshold ${similarityThreshold}%`);
-                        setSimilarMolecules([]);
-                        setSelectedMolecule(null);
-                        setApiData(null);
                     } else {
-                        // Unexpected data format
+                        // No data found
                         setError(`No similar molecules found for "${trimmedValue}"`);
                         setSimilarMolecules([]);
                         setSelectedMolecule(null);
@@ -499,65 +491,54 @@ const PubChemSimilarityGetter = ({
         } catch (error) {
             console.error('PubChem similarity search error:', error);
             setError(error.message || "An error occurred while searching for similar molecules");
-            setSimilarMolecules([]);
-            setSelectedMolecule(null);
-            setApiData(null);
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); // Ensure loading is stopped in finally
         }
     }, [searchType, similarityThreshold, isValidInput, validationStatus]);
 
     // Effect to handle initial search value
     useEffect(() => {
         if (initialSearchValue && !toolData) {
-            setInputValue(initialSearchValue);
-            handleSubmit(initialSearchValue);
+            // Automatically submit if there's an initial search value and no toolData
+            // This ensures that if the component is loaded with a search term, it executes
+            setInputValue(initialSearchValue); // Set input value for display
+            // Validate before submitting
+            if (searchType === "cid") {
+                if (validateCid(initialSearchValue)) {
+                    setIsValidInput(true);
+                    setValidationStatus('valid');
+                    handleSubmit(initialSearchValue);
+                } else {
+                    setIsValidInput(false);
+                    setValidationStatus('invalid');
+                    setValidationError("Initial CID is invalid.");
+                }
+            }
+            // Add SMILES validation here if it were still supported
         }
-    }, [initialSearchValue, toolData, handleSubmit]);
+    }, [initialSearchValue, toolData, handleSubmit, searchType]); // Added searchType
 
     const getPlaceholderText = () => {
         switch (searchType) {
             case "cid":
-                return "Enter PubChem CID (e.g., 2244, 5281804)";
-            case "smiles":
-                return "Enter SMILES string (e.g., CCO, C1=CC=CC=C1)";
+                return "Enter PubChem CID (e.g., 2244)";
+            // case "smiles": // Removed SMILES
+            //     return "Enter SMILES string (e.g., CCO)";
             default:
-                return "Enter search value";
+                return "Enter search term";
         }
     };
 
     const getHeaderText = () => {
         switch (searchType) {
             case "cid":
-                return "CID-based Similarity Search";
-            case "smiles":
-                return "SMILES-based Similarity Search";
+                return "PubChem CID Similarity Search";
+            // case "smiles": // Removed SMILES
+            //     return "SMILES Similarity Search";
             default:
-                return "Similarity Search";
+                return "PubChem Similarity Search";
         }
     };
-
-    // Keyboard navigation for similar molecules
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (!similarMolecules || similarMolecules.length === 0) return;
-            
-            if (event.key === 'ArrowDown') {
-                event.preventDefault();
-                const nextIndex = (selectedIndex + 1) % similarMolecules.length;
-                setSelectedIndex(nextIndex);
-                setSelectedMolecule(similarMolecules[nextIndex]);
-            } else if (event.key === 'ArrowUp') {
-                event.preventDefault();
-                const prevIndex = selectedIndex === 0 ? similarMolecules.length - 1 : selectedIndex - 1;
-                setSelectedIndex(prevIndex);
-                setSelectedMolecule(similarMolecules[prevIndex]);
-            }
-        };
-
-        window.addEventListener('keydown', handleKeyDown);
-        return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedIndex, similarMolecules]);
 
     // Clear error message after some time
     useEffect(() => {
@@ -570,293 +551,84 @@ const PubChemSimilarityGetter = ({
     }, [error]);
 
     useEffect(() => {
-        console.log("search type: ", searchType);
-    }, [searchType])
+        // This effect might be for re-validating or other actions when searchType changes.
+        // If inputValue exists, re-validate it.
+        if (inputValue) {
+            handleInputChange(inputValue);
+        }
+    }, [searchType]) // Removed handleInputChange from dep array if it causes loops, ensure it's stable or manage carefully
 
     useEffect(() => {
-        console.log('Similar molecules updated:', similarMolecules);
-        console.log('Selected molecule changed:', selectedMolecule);
-        console.log('Selected index:', selectedIndex);
-    }, [similarMolecules, selectedMolecule, selectedIndex]);
+        console.log('PubChem similarity states updated:');
+        console.log('  similarMolecules:', similarMolecules);
+        console.log('  selectedMolecule:', selectedMolecule);
+        // console.log('  selectedIndex:', selectedIndex); // REMOVED
+    }, [similarMolecules, selectedMolecule]);
+
 
     return (
-        <>
-            <motion.div 
-                initial="hidden"
-                animate="visible"
-                variants={fadeInUpVariantStatic}
-                className="pubchem-similarity-getter-container"
-            >
+        <GlassyContainer>
+            <div className="pubchem-similarity-getter">
                 {!hideInputBox && (
-                    <div className="pubchem-similarity-getter-row-1">
-                        <GlassyContainer>
-                            <h3 style={{ marginBottom: '16px', fontWeight: '700' }}>
-                                {getHeaderText()}
-                            </h3>
-                            
-                            <div className="pubchem-similarity-getter-search-controls">
-                                {/* Row 1: Search Type and Similarity Threshold */}
-                                <div className="pubchem-similarity-getter-controls-row-1">
-                                    {/* Search Type Dropdown */}
-                                    <div className="pubchem-similarity-getter-dropdown-section">
-                                        <h4 className="pubchem-similarity-getter-dropdown-header">Search Type:</h4>
-                                        <div className="pubchem-similarity-getter-dropdown">
-                                            <PubChemSimilaritySearchTypeSelector
-                                                value={searchType}
-                                                onChange={setSearchType}
-                                                options={similaritySearchTypeOptions}
-                                                disabled={isLoading}
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Similarity Threshold Input */}
-                                    <div className="pubchem-similarity-getter-threshold-section">
-                                        <h4 className="pubchem-similarity-getter-dropdown-header">Similarity:</h4>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            max="100"
-                                            value={similarityThreshold}
-                                            onChange={(e) => setSimilarityThreshold(parseInt(e.target.value) || 90)}
-                                            className="pubchem-similarity-getter-threshold-input"
-                                            disabled={isLoading}
-                                            placeholder="90"
-                                        />
-                                        <span className="pubchem-similarity-getter-threshold-help">
-                                            %
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Row 2: Search Input with Validation */}
-                                <div className="pubchem-similarity-getter-controls-row-2">
-                                    <div className="pubchem-similarity-getter-input-section">
-                                        <div className="pubchem-similarity-input-row">
-                                            <h4 className="pubchem-similarity-getter-dropdown-header">Search Value:</h4>
-                                            <div className="pubchem-similarity-input-with-validation">
-                                                <input
-                                                    type="text"
-                                                    value={inputValue}
-                                                    onChange={(e) => handleInputChange(e.target.value)}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter' && isValidInput && !isLoading) {
-                                                            handleSubmit(inputValue);
-                                                        }
-                                                    }}
-                                                    placeholder={getPlaceholderText()}
-                                                    disabled={isLoading}
-                                                    className={`pubchem-similarity-search-input ${validationStatus}`}
-                                                />
-                                                <div className="pubchem-similarity-validation-icons">
-                                                    {validationStatus === 'valid' && (
-                                                        <FaCheckDouble className="validation-icon success" />
-                                                    )}
-                                                    {validationStatus === 'invalid' && (
-                                                        <IoWarningOutline className="validation-icon fail" />
-                                                    )}
-                                                    {validationStatus === 'validating' && (
-                                                        <div className="validation-icon validating">⏳</div>
-                                                    )}
-                                                    {validationStatus === 'empty' && inputValue.length > 0 && (
-                                                        <IoWarningOutline className="validation-icon empty" />
-                                                    )}
-                                                </div>
-                                            </div>
-                                            
-                                            {/* Submit button */}
-                                            <button
-                                                onClick={() => handleSubmit(inputValue)}
-                                                disabled={!isValidInput || isLoading}
-                                                className={`pubchem-similarity-submit-btn ${!isValidInput || isLoading ? 'disabled' : 'enabled'}`}
-                                            >
-                                                {isLoading ? 'Searching...' : 'Search'}
-                                            </button>
-                                        </div>
-                                        
-                                        {/* Validation Error Message - now properly below the input row */}
-                                        {validationError && (
-                                            <div className="pubchem-similarity-validation-error">
-                                                <p>{validationError}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Error Display */}
-                            {error && (
-                                <div className="pubchem-similarity-getter-error">
-                                    <p>{error}</p>
-                                </div>
-                            )}
-
-                            {/* Loading State */}
-                            {isLoading && (
-                                <div className="pubchem-similarity-getter-loading">
-                                    <p>Searching for similar molecules...</p>
-                                </div>
-                            )}
-                        </GlassyContainer>
-                    </div>
-                )}
-
-                {/* Similar Molecules Results */}
-                {((similarMolecules && similarMolecules.length > 0) || error) && (
-                    <div className="pubchem-similarity-getter-row-2" style={{ marginTop: '16px' }}>
-                        <GlassyContainer>
-                            <h3 style={{ marginBottom: '12px', fontWeight: '700' }}>
-                                {similarMolecules && similarMolecules.length > 0 
-                                    ? `Similar Molecules Results (${similarMolecules.length} found)` 
-                                    : 'Search Results'
-                                }
-                            </h3>
-                            
-                            {/* Show error state when there's an error and no molecules */}
-                            {error && (!similarMolecules || similarMolecules.length === 0) ? (
-                                <div className="pubchem-similarity-getter-error" style={{ margin: '20px 0' }}>
-                                    <p>{error}</p>
-                                </div>
-                            ) : (
-                                <div className="pubchem-similarity-results-container">
-                                {/* Left Panel - Molecule List */}
-                                <div className="pubchem-similarity-candidates-panel">
-                                    <h4 style={{
-                                        color: 'var(--color-text-primary)',
-                                        fontSize: '1rem',
-                                        marginBottom: '10px',
-                                        fontWeight: '500'
-                                    }}>
-                                        Similar Molecules
-                                    </h4>
-                                    <p style={{
-                                        color: 'var(--color-text-secondary)',
-                                        fontSize: '0.8rem',
-                                        marginBottom: '12px',
-                                        fontStyle: 'italic'
-                                    }}>
-                                        💡 Use ↑↓ arrow keys to navigate
-                                    </p>
-                                    <div>
-                                        {similarMolecules.map((molecule, index) => (
-                                            <div 
-                                                key={index}
-                                                onClick={() => {
-                                                    setSelectedMolecule(molecule);
-                                                    setSelectedIndex(index);
-                                                }}
-                                                className={`pubchem-similarity-candidate-item ${selectedMolecule === molecule ? 'selected' : ''}`}
-                                            >
-                                                <span className="pubchem-similarity-candidate-number">
-                                                    {index + 1}.
-                                                </span>
-                                                <div className="pubchem-similarity-candidate-info">
-                                                    <span className="pubchem-similarity-candidate-id">
-                                                        CID: {molecule.similar_cid || molecule.cid || 'Unknown'}
-                                                    </span>
-                                                    {molecule.similarity_score && (
-                                                        <span className="pubchem-similarity-candidate-score">
-                                                            {(molecule.similarity_score * 100).toFixed(1)}%
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Right Panel - Info and 2D Viewer */}
-                                <div className="pubchem-similarity-details-panel">
-                                    {selectedMolecule ? (
-                                        <>
-                                            {/* Selected molecule header */}
-                                            <div style={{
-                                                backgroundColor: 'var(--color-bg-primary)',
-                                                borderRadius: '6px',
-                                                border: '1px solid var(--c-light-border)',
-                                                padding: '10px 12px',
-                                                marginBottom: '8px'
-                                            }}>
-                                                <h4 style={{
-                                                    color: 'var(--color-text-primary)',
-                                                    fontSize: '0.9rem',
-                                                    margin: '0',
-                                                    fontWeight: '500'
-                                                }}>
-                                                    Selected ({selectedIndex + 1}/{similarMolecules.length}): <span style={{ 
-                                                        fontFamily: 'monospace', 
-                                                        color: 'var(--color-accent)',
-                                                        fontWeight: '600' 
-                                                    }}>
-                                                        CID {selectedMolecule.similar_cid || selectedMolecule.cid || 'Unknown'}
-                                                    </span>
-                                                    {selectedMolecule.similarity_score && (
-                                                        <span style={{
-                                                            color: 'var(--color-success)',
-                                                            fontWeight: '600',
-                                                            marginLeft: '8px'
-                                                        }}>
-                                                            ({(selectedMolecule.similarity_score * 100).toFixed(1)}% similar)
-                                                        </span>
-                                                    )}
-                                                </h4>
-                                            </div>
-                                            
-                                            {/* Show visualization only if we have SMILES data */}
-                                            {selectedMolecule.isomeric_smiles || selectedMolecule.canonical_smiles ? (
-                                                <div className="pubchem-similarity-details-row">
-                                                    {/* InfoBox */}
-                                                    <div style={{ flex: '4' }}>
-                                                        <InfoBox 
-                                                            activeMol={selectedMolecule.isomeric_smiles || selectedMolecule.canonical_smiles} 
-                                                            isValidMol={true} 
-                                                            infoType={"MOL"} 
-                                                        />
-                                                    </div>
-                                                    
-                                                    {/* TwoDViewer */}
-                                                    <div style={{ flex: '6' }}>
-                                                        <TwoDViewer 
-                                                            activeMol={selectedMolecule.isomeric_smiles || selectedMolecule.canonical_smiles} 
-                                                            isValidMol={true} 
-                                                            visType={"MOL"} 
-                                                        />
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="pubchem-similarity-placeholder">
-                                                    No structure data available for this molecule
-                                                </div>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <div className="pubchem-similarity-placeholder">
-                                            Select a molecule from the left panel to view details
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                            )}
-                        </GlassyContainer>
-                    </div>
-                )}
-
-                {/* DataViewer - show selected molecule data */}
-                {selectedMolecule && (
-                    <div className="pubchem-similarity-getter-row-3" style={{ marginTop: '20px' }}>
-                        <DataViewer
-                            data={selectedMolecule}
-                            title={`Similar Molecule Data${searchValue ? ` for "${searchValue}"` : ''}${
-                                selectedMolecule ? 
-                                ` - CID ${selectedMolecule.similar_cid || selectedMolecule.cid || 'Unknown'}` : 
-                                ''
-                            }`}
-                            initiallyExpanded={true}
+                    <motion.div variants={fadeInUpVariantStatic} className="input-section">
+                        <div className="header-title">{getHeaderText()}</div>
+                        {/* PubChemSimilaritySearchTypeSelector was removed in a previous step implicitly by only supporting CID */}
+                        <SimpleInputBox
+                            value={inputValue || ''}
+                            onChange={handleInputChange}
+                            onSubmit={() => handleSubmit(inputValue)}
+                            placeholder={getPlaceholderText()}
+                            buttonText="Search Similar"
+                            isLoading={isLoading}
+                            error={validationError}
+                            disabled={isLoading}
                         />
-                    </div>
+                        {/* Threshold slider can be added here if needed */}
+                    </motion.div>
                 )}
-            </motion.div>
-        </>
+
+                {isLoading && <p>Loading...</p>}
+
+                {/* MODIFIED RESULTS DISPLAY SECTION */}
+                {(selectedMolecule || apiData) && !isLoading && !error && !validationError ? (
+                    <motion.div variants={fadeInUpVariantStatic} className="results-display-unified">
+                        <DataViewer 
+                            data={selectedMolecule || apiData} 
+                            // Pass a title or let DataViewer decide.
+                            // Example: title={selectedMolecule ? `Details for CID: ${selectedMolecule.cid}` : "Compound Information"}
+                        />
+                    </motion.div>
+                ) : (
+                    !isLoading && !error && !validationError && similarMolecules.length === 0 && ( // Show only if no results and not loading/error
+                        <div style={{
+                            padding: '16px 20px',
+                            backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                            borderRadius: '8px',
+                            border: '1px solid rgba(66, 153, 225, 0.3)',
+                            textAlign: 'center',
+                            color: 'var(--color-text-primary)',
+                            margin: '20px 0'
+                        }}>
+                            <h4 style={{ 
+                                marginBottom: '8px', 
+                                color: 'var(--color-text-primary)', 
+                                margin: '0 0 8px 0',
+                                fontWeight: '600'
+                            }}>
+                                ℹ️ No Data Available
+                            </h4>
+                            <p style={{ 
+                                color: 'var(--color-text-secondary)', 
+                                margin: 0,
+                                fontSize: '0.9rem'
+                            }}>
+                                No data to display. Perform a search or check your input.
+                            </p>
+                        </div>
+                    )
+                )}
+            </div>
+        </GlassyContainer>
     );
 };
 

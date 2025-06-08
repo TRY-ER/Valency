@@ -17,41 +17,20 @@ import CompoundProperties from "./UtilityComponents/CompoundProperties";
 const utilityTabs = [
     {
         id: 1,
-        title: 'Compound Search',
-        key: 'compound-search',
-        component: <CompoundSearch />,
-        description: 'Search for compounds by various identifiers in PubChem database.'
-    },
-    {
-        id: 2,
         title: 'Substructure Search',
         key: 'substructure-search',
         component: <SubstructureSearch />,
         description: 'Find compounds containing specific substructures using SMILES patterns.'
     },
     {
-        id: 3,
-        title: 'Mass Search',
-        key: 'mass-search',
-        component: <MassSearch />,
-        description: 'Search for compounds by molecular mass with tolerance ranges.'
-    },
-    {
-        id: 4,
-        title: 'Cross-Reference Search',
-        key: 'xref-search',
-        component: <XrefSearch />,
-        description: 'Find compounds using external database cross-references.'
-    },
-    {
-        id: 5,
+        id: 2,
         title: 'Compound Synonyms',
         key: 'compound-synonyms',
         component: <CompoundSynonyms />,
         description: 'Retrieve synonyms and alternative names for PubChem compounds.'
     },
     {
-        id: 6,
+        id: 3,
         title: 'Compound Properties',
         key: 'compound-properties',
         component: <CompoundProperties />,

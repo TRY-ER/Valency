@@ -17,8 +17,9 @@ const SimpleInputBox = ({
     };
 
     const handleSubmit = () => {
-        if (onSubmit && value && value.trim() !== "") {
-            onSubmit(value.trim());
+        const safeValue = value || '';
+        if (onSubmit && safeValue && safeValue.trim() !== "") {
+            onSubmit(safeValue.trim());
         }
     };
 
@@ -43,7 +44,7 @@ const SimpleInputBox = ({
                 />
                 <button 
                     onClick={handleSubmit} 
-                    disabled={isLoading || disabled || !value.trim()}
+                    disabled={isLoading || disabled || !value || !(value && value.trim())}
                     className="simple-input-box-button"
                 >
                     {isLoading ? 'Loading...' : buttonText}

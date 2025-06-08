@@ -204,11 +204,11 @@ const ApprovedDrugsViewer = ({
                 const processible = JSON.parse(result.result["0"]);
                 console.log('Approved drugs results:', processible);
 
-                if (processible.data && Array.isArray(processible.data) && processible.data.length > 0) {
-                    setDrugsList(processible.data);
-                    setSelectedDrug(processible.data[0]);
+                if (processible.result && Array.isArray(processible.result) && processible.result.length > 0) {
+                    setDrugsList(processible.result);
+                    setSelectedDrug(processible.result[0]);
                     setSelectedIndex(0);
-                    setApiData(processible.data[0]);
+                    setApiData(processible.result[0]);
                 } else {
                     setError("No approved drugs found.");
                     setDrugsList([]);

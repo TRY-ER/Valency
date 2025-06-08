@@ -430,6 +430,42 @@
     100% { transform: scale(1); }
 }
 
+/* Number Value Controls */
+.number-value-container {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 8px;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    vertical-align: top;
+}
+
+.number-controls {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.value-number.value-id {
+    font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+    font-weight: 600;
+    background: var(--color-bg-secondary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--c-light-border);
+}
+
+.value-number.value-id.truncated {
+    border-style: dashed;
+    color: var(--color-warning);
+}
+
+.value-number.scientific {
+    font-style: italic;
+    color: var(--color-text-secondary);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .data-viewer-header {

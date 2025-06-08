@@ -923,34 +923,42 @@ export const getCidsByName = async (args) => {
 
 /**
  * @typedef {Object} PubchemGetCompoundPropertiesArgs
- * @property {string} cid - PubChem Compound ID (CID).
- * @property {string[]} properties - List of properties to retrieve.
+ * @property {string[]} cids - PubChem Compound ID (CID).
+ * @property {string[]} properties_list - List of properties to retrieve.
  */
 
 /**
- * Retrieve specific properties for a given PubChem CID.
+ * Retrieve specific properties for given PubChem CIDs.
  * @param {PubchemGetCompoundPropertiesArgs} args - The arguments for compound properties retrieval
  * @returns {Promise<object>} A promise that resolves to the compound properties data
  */
 export const getCompoundProperties = async (args) => {
-  if (!args || !args.cid) {
-    console.error('getCompoundProperties: cid is required');
-    return Promise.reject(new Error('PubChem Compound ID (CID) is required'));
+  if (!args || !args.cids) {
+    console.error('getCompoundProperties: cids is required');
+    return Promise.reject(new Error('PubChem Compound IDs (CIDs) are required'));
   }
   
-  if (!args.properties) {
-    console.error('getCompoundProperties: properties is required');
+  if (!args.properties_list || !Array.isArray(args.properties_list)) {
+    console.error('getCompoundProperties: properties_list is required');
     return Promise.reject(new Error('Properties list is required'));
   }
   
-  if (typeof args.cid !== 'string' || args.cid.trim() === '') {
-    console.error('getCompoundProperties: cid must be a non-empty string');
-    return Promise.reject(new Error('PubChem Compound ID (CID) must be a non-empty string'));
+  if (!Array.isArray(args.cids) || args.cids.length === 0) {
+    console.error('getCompoundProperties: cids must be a non-empty array');
+    return Promise.reject(new Error('PubChem Compound IDs (CIDs) must be a non-empty array'));
   }
   
-  if (!Array.isArray(args.properties) || args.properties.length === 0) {
-    console.error('getCompoundProperties: properties must be a non-empty array');
-    return Promise.reject(new Error('Properties must be a non-empty array'));
+  // Validate each CID is a string
+  for (const cid of args.cids) {
+    if (typeof cid !== 'string' || cid.trim() === '') {
+      console.error('getCompoundProperties: each cid must be a non-empty string');
+      return Promise.reject(new Error('Each PubChem Compound ID (CID) must be a non-empty string'));
+    }
+  }
+  
+  if (args.properties_list.length === 0) {
+    console.error('getCompoundProperties: properties_list must not be empty');
+    return Promise.reject(new Error('Properties list must not be empty'));
   }
   
   try {

@@ -263,9 +263,9 @@ const ChemBLGetter = ({
                     const processible = JSON.parse(result.result["0"]);
                     console.log('Multiple ChEMBL results:', processible);
 
-                    if (processible.data && Array.isArray(processible.data) && processible.data.length > 0) {
-                        setMultipleChemblResults(processible.data);
-                        setSelectedChemblResult(processible.data[0]);
+                    if (processible.result && Array.isArray(processible.result) && processible.result.length > 0) {
+                        setMultipleChemblResults(processible.result);
+                        setSelectedChemblResult(processible.result[0]);
                         setSelectedChemblIndex(0);
                         setApiData(null); // Clear single molecule data
                         setMultipleCandidates([]);
@@ -331,8 +331,8 @@ const ChemBLGetter = ({
 
                     if (searchType === "chembl_id") {
                         // For ChEMBL ID search, we expect a single molecule
-                        if (processible.data){
-                            setApiData(processible.data);
+                        if (processible.result){
+                            setApiData(processible.result);
                             setSearchValue(trimmedValue);
                             // Clear multiple candidates for single molecule view
                             setMultipleCandidates([]);
@@ -350,17 +350,17 @@ const ChemBLGetter = ({
                         }
                     } else if (searchType === "pref_name") {
                         // For preferred name search, we might get multiple candidates
-                        if (processible.data && Array.isArray(processible.data) && processible.data.length > 0) {
+                        if (processible.result && Array.isArray(processible.result) && processible.result.length > 0) {
                             // Multiple candidates found
-                            setMultipleCandidates(processible.data);
-                            setSelectedCandidate(processible.data[0]);
+                            setMultipleCandidates(processible.result);
+                            setSelectedCandidate(processible.result[0]);
                             setSelectedIndex(0);
                             setIsSelectedCandidateValid(true);
                             setApiData(null); // Clear single molecule data
                             setSearchValue(trimmedValue);
                             setMultipleChemblResults([]);
                             setSelectedChemblResult(null);
-                        } else if (processible.data && Array.isArray(processible.data) && processible.data.length === 0) {
+                        } else if (processible.result && Array.isArray(processible.result) && processible.result.length === 0) {
                             // Empty array - no records found
                             console.log(`No records found for preference search "${trimmedValue}"`);
                             setError(`No records found with preference search "${trimmedValue}"`);
@@ -370,9 +370,9 @@ const ChemBLGetter = ({
                             setMultipleChemblResults([]);
                             setSelectedChemblResult(null);
                             // Don't set searchValue when there's an error to ensure error displays properly
-                        } else if (processible.data) {
+                        } else if (processible.result) {
                             // Single candidate found (non-array data)
-                            setApiData(processible.data);
+                            setApiData(processible.result);
                             setSearchValue(trimmedValue);
                             setMultipleCandidates([]);
                             setSelectedCandidate(null);
@@ -390,17 +390,17 @@ const ChemBLGetter = ({
                         }
                     } else if (searchType === "synonym") {
                         // For synonym search, we might get multiple candidates
-                        if (processible.data && Array.isArray(processible.data) && processible.data.length > 0) {
+                        if (processible.result && Array.isArray(processible.result) && processible.result.length > 0) {
                             // Multiple candidates found
-                            setMultipleCandidates(processible.data);
-                            setSelectedCandidate(processible.data[0]);
+                            setMultipleCandidates(processible.result);
+                            setSelectedCandidate(processible.result[0]);
                             setSelectedIndex(0);
                             setIsSelectedCandidateValid(true);
                             setApiData(null); // Clear single molecule data
                             setSearchValue(trimmedValue);
                             setMultipleChemblResults([]);
                             setSelectedChemblResult(null);
-                        } else if (processible.data && Array.isArray(processible.data) && processible.data.length === 0) {
+                        } else if (processible.result && Array.isArray(processible.result) && processible.result.length === 0) {
                             // Empty array - no records found
                             console.log(`No records found for synonym search "${trimmedValue}"`);
                             setError(`No records found with synonym search "${trimmedValue}"`);
@@ -410,9 +410,9 @@ const ChemBLGetter = ({
                             setMultipleChemblResults([]);
                             setSelectedChemblResult(null);
                             // Don't set searchValue when there's an error to ensure error displays properly
-                        } else if (processible.data) {
+                        } else if (processible.result) {
                             // Single candidate found (non-array data)
-                            setApiData(processible.data);
+                            setApiData(processible.result);
                             setSearchValue(trimmedValue);
                             setMultipleCandidates([]);
                             setSelectedCandidate(null);

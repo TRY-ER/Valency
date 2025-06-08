@@ -287,8 +287,8 @@ class PubchemGetCidsByNameArgs(BaseModel):
     name: str = Field(..., description="Name of the compound to search for.")
 
 class PubchemGetCompoundPropertiesArgs(BaseModel):
-    cid: str = Field(..., description="PubChem Compound ID (CID).")
-    properties: List[str] = Field(..., description="Comma-separated string or list of properties to retrieve. Refer to PubChem PUG REST for available properties.")
+    cids: list[str] = Field(..., description="list of PubChem Compound IDs (CIDs).")
+    properties_list: List[str] = Field(..., description="Comma-separated string or list of properties to retrieve. Refer to PubChem PUG REST for available properties.")
 
 class PubchemGetCompoundSynonymsByCidArgs(BaseModel):
     cid: str = Field(..., description="PubChem Compound ID (CID).")

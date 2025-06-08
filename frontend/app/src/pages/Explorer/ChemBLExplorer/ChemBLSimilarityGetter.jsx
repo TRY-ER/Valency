@@ -446,14 +446,14 @@ const ChemBLSimilarityGetter = ({
                     
                     console.log('Similarity search processible', processible);
 
-                    if (processible.data && Array.isArray(processible.data) && processible.data.length > 0) {
+                    if (processible.result && Array.isArray(processible.result) && processible.result.length > 0) {
                         // Multiple similar molecules found
-                        setSimilarMolecules(processible.data);
-                        setSelectedMolecule(processible.data[0]);
+                        setSimilarMolecules(processible.result);
+                        setSelectedMolecule(processible.result[0]);
                         setSelectedIndex(0);
                         setApiData(null); // Clear single molecule data
                         setSearchValue(trimmedValue);
-                    } else if (processible.data && Array.isArray(processible.data) && processible.data.length === 0) {
+                    } else if (processible.result && Array.isArray(processible.result) && processible.result.length === 0) {
                         // No similar molecules found
                         setError(`No similar molecules found for "${trimmedValue}" with similarity threshold ${similarityThreshold}%`);
                         setSimilarMolecules([]);
