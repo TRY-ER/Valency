@@ -546,6 +546,34 @@ async def rxn_set_current_project(tool_args: RxnSetCurrentProjectArgs = Body(...
 async def rxn_get_current_project_id(): # No arguments
     return await _run_mcp_tool_handler(RXN_MCP_SERVER_URL, "rxn_get_current_project_id", {})
 
+# --- UniProt MCP Server Configuration ---
+UNIPROT_MCP_HOST = os.getenv("UNIPROT_MCP_HOST", "localhost") # Default from uniprot_mcp_server.py was 0.0.0.0
+UNIPROT_MCP_PORT = os.getenv("UNIPROT_MCP_PORT", "8060")     # Default from uniprot_mcp_server.py
+UNIPROT_MCP_SERVER_URL = f"http://{UNIPROT_MCP_HOST}:{UNIPROT_MCP_PORT}/sse"
+uniprot_router = APIRouter(prefix="/mcp/uniprot", tags=["UniProt MCP Tools"])
+
+# Pydantic Models for UniProt tool arguments
+class UniprotSearchUniprotkbArgs(BaseModel):
+    query_string: str = Field(..., description="The UniProt query string.")
+    result_format: str = Field("json", description="Desired format ('json', 'tsv', 'fasta', 'xml', 'txt', 'list', 'gff', 'obo', 'rdf', 'xlsx'). Defaults to 'json'.")
+    fields: str = Field("", description="Comma-separated list of column names to retrieve (applies to tsv, xlsx, json). E.g., 'id,xref_pdb,gene_names'.")
+    size: int = Field(30, description="Number of results to retrieve per page (max 30 recommended). Defaults to 30.")
+    cursor: str = Field("", description="Cursor for pagination to retrieve the next page of results.")
+    include_isoform: bool = Field(False, description="Whether to include isoforms in the search results. Defaults to False.")
+
+class UniprotGetUniprotkbEntryArgs(BaseModel):
+    uniprot_id: str = Field(..., description="The UniProtKB ID (e.g., 'P12345', 'SPIKE_SARS2').")
+    result_format: str = Field("json", description="Desired format ('json', 'fasta', 'txt', 'xml', 'rdf', 'gff'). Defaults to 'json'.")
+
+# Explicit UniProt tool endpoints
+@uniprot_router.post("/search_uniprotkb", summary="Search UniProtKB Database", description="Search the UniProtKB database with various query options and filters.")
+async def uniprot_search_uniprotkb(tool_args: UniprotSearchUniprotkbArgs = Body(...)):
+    return await _run_mcp_tool_handler(UNIPROT_MCP_SERVER_URL, "search_uniprotkb", tool_args.model_dump(exclude_none=True))
+
+@uniprot_router.post("/get_uniprotkb_entry", summary="Get UniProtKB Entry by ID", description="Retrieve a specific UniProtKB entry by its ID.")
+async def uniprot_get_uniprotkb_entry(tool_args: UniprotGetUniprotkbEntryArgs = Body(...)):
+    return await _run_mcp_tool_handler(UNIPROT_MCP_SERVER_URL, "get_uniprotkb_entry", tool_args.model_dump(exclude_none=True))
+
 # --- BRICS MCP Server Configuration ---
 BRICS_MCP_HOST = os.getenv("BRICS_MCP_HOST", "localhost") # Default from brics_mcp_server.py was 0.0.0.0
 BRICS_MCP_PORT = os.getenv("BRICS_MCP_PORT", "8058")     # Default from brics_mcp_server.py
@@ -676,6 +704,9 @@ class RcsbPdbCountQueryResultsArgs(BaseModel):
     query_params: Dict[str, Any] = Field(..., description="Parameters for the specified query type.")
     return_content_type: Optional[List[str]] = Field(None, description="Optional list to specify content types like [\"computational\", \"experimental\"].")
 
+class RcsbPdbGetProteinDetailsByIdArgs(BaseModel):
+    pdb_id_string: str = Field(..., description="The PDB ID of the protein (e.g., '6M0J', '1TIM').")
+
 # --- RCSB PDB MCP Server Configuration ---
 RCSB_MCP_HOST = os.getenv("RCSB_HOST", "localhost")
 RCSB_MCP_PORT = os.getenv("RCSB_PORT", "8052")
@@ -708,13 +739,17 @@ async def rcsb_sequence_motif_search(tool_args: RcsbPdbSequenceMotifSearchArgs =
 async def rcsb_structure_similarity_by_entry_id(tool_args: RcsbPdbStructSimilarityEntryIdArgs = Body(...)):
     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "structure_similarity_by_entry_id", tool_args.model_dump(exclude_none=True)) # Pass URL
 
-# @rcsb_router.post("/structure_similarity_by_file_url", summary="Structure Similarity by File URL", description="Find structures similar to a structure provided via a URL.")
-# async def rcsb_structure_similarity_by_file_url(tool_args: RcsbPdbStructSimilarityFileUrlArgs = Body(...)):
-#     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "structure_similarity_by_file_url", tool_args.model_dump(exclude_none=True)) # Pass URL
+@rcsb_router.post("/structure_similarity_by_file_url", summary="Structure Similarity by File URL", description="Find structures similar to a structure provided via a URL.")
+async def rcsb_structure_similarity_by_file_url(tool_args: RcsbPdbStructSimilarityFileUrlArgs = Body(...)):
+    return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "structure_similarity_by_file_url", tool_args.model_dump(exclude_none=True)) # Pass URL
 
-@rcsb_router.post("/structure_motif_search_by_entry_id", summary="Structure Motif Search by Entry ID", description="Search for 3D structural motifs using a PDB entry as reference.")
-async def rcsb_structure_motif_search_by_entry_id(tool_args: RcsbPdbStructMotifEntryIdArgs = Body(...)):
-    return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "structure_motif_search_by_entry_id", tool_args.model_dump(exclude_none=True)) # Pass URL
+@rcsb_router.post("/get_protein_details_by_id_pypdb", summary="Get Protein Details by ID (PyPDB)", description="Retrieves detailed information about a specific protein from its PDB ID using pypdb. Complements the rcsbsearchapi tools by providing a different set of details.")
+async def rcsb_get_protein_details_by_id_pypdb(tool_args: RcsbPdbGetProteinDetailsByIdArgs = Body(...)):
+    return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "get_protein_details_by_id_pypdb", tool_args.model_dump(exclude_none=True)) # Pass URL
+
+# @rcsb_router.post("/structure_motif_search_by_entry_id", summary="Structure Motif Search by Entry ID", description="Search for 3D structural motifs using a PDB entry as reference.")
+# async def rcsb_structure_motif_search_by_entry_id(tool_args: RcsbPdbStructMotifEntryIdArgs = Body(...)):
+#     return await _run_mcp_tool_handler(RCSB_MCP_SERVER_URL, "structure_motif_search_by_entry_id", tool_args.model_dump(exclude_none=True)) # Pass URL
 
 # @rcsb_router.post("/get_term_facets", summary="Get Term Facets", description="Perform a query and get term-based aggregations (facets).")
 # async def rcsb_get_term_facets(tool_args: RcsbPdbGetTermFacetsArgs = Body(...)):
@@ -743,5 +778,6 @@ all_mcp_routers = [
     pubchem_router,
     rcsb_router,
     rxn_router,
+    uniprot_router,
     brics_router
 ]

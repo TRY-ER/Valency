@@ -139,8 +139,8 @@
 .input-group input:focus,
 .input-group select:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
     background: rgba(255, 255, 255, 0.15);
 }
 
@@ -156,7 +156,7 @@
 
 /* Search Button */
 .search-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -170,7 +170,6 @@
 
 .search-button:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
 .search-button:disabled {
@@ -230,7 +229,7 @@
 .result-item:hover {
     transform: translateY(-4px);
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    border-color: rgba(102, 126, 234, 0.3);
+    border-color: rgba(34, 197, 94, 0.3);
 }
 
 .cid-info {
@@ -238,7 +237,7 @@
 }
 
 .cid-info strong {
-    color: #667eea;
+    color: #22c55e;
     font-size: 14px;
 }
 
@@ -325,7 +324,7 @@
 
 .property-item:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(102, 126, 234, 0.3);
+    border-color: rgba(34, 197, 94, 0.3);
 }
 
 .property-label {
@@ -365,7 +364,7 @@
 
 .synonym-item:hover {
     background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(102, 126, 234, 0.3);
+    border-color: rgba(34, 197, 94, 0.3);
 }
 
 /* Results Note */

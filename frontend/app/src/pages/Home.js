@@ -1,574 +1,991 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useTheme } from '../contexts/ThemeContext';
-import { fadeInUpVariants, fadeInRightVariants, fadeInLeftVariants } from '../components/animations/framerAnim';
-import DnaViewer from '../components/DnaViewer';
-import '../styles/Home.css';
-import CanvasSample from '../components/sample_3d_viewer';
+import { useNavigate } from 'react-router-dom';
+import {
+  FaCompass,
+  FaBalanceScale,
+  FaFlask,
+  FaUserSecret,
+  FaTasks,
+  FaChevronDown,
+  FaChevronUp,
+  FaDna,
+  FaCubes as FaMolecule,
+  FaFlask as FaLab,
+  FaSearch,
+  FaRobot,
+  FaChartLine,
+  FaDatabase,
+  FaUsers,
+  FaGraduationCap,
+  FaLightbulb,
+  FaAtom,
+  FaCog,
+  FaPlay,
+  FaBrain,
+  FaNetworkWired,
+  FaMicrochip,
+  FaFingerprint,
+  FaCubes,
+  FaInfinity,
+  FaChartPie,
+  FaBullseye,
+  FaLock,
+  FaRocket,
+  FaGlobeAmericas,
+  FaStopwatch,
+  FaShieldAlt,
+  FaCheckCircle,
+  FaSyncAlt,
+  FaEye,
+  FaCodeBranch,
+  FaMagic,
+  FaUpload,
+  FaArrowUp
+} from 'react-icons/fa';
+import GlassyContainer from '../components/glassy_container/gc';
+import { fadeInUpVariantStatic, fadeInDownVariants, fadeInLeftVariants } from '../components/animations/framerAnim';
+import './Home.css';
 
-function Home() {
-  const { theme } = useTheme();
+// New Infographic Components
+const StatsCircle = ({ value, label, color, maxValue = 100 }) => {
+  const [animatedValue, setAnimatedValue] = useState(0);
+  const percentage = typeof value === 'string' ? 100 : (value / maxValue) * 100;
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedValue(percentage);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [percentage]);
+
+  return (
+    <div className="stats-circle">
+      <svg viewBox="0 0 100 100" className="circular-chart">
+        <circle
+          className="circle-bg"
+          cx="50"
+          cy="50"
+          r="40"
+        />
+        <circle
+          className="circle"
+          cx="50"
+          cy="50"
+          r="40"
+          style={{
+            '--circle-color': color,
+            strokeDasharray: `${animatedValue * 2.51}, 251.2`,
+            transition: 'stroke-dasharray 1.5s ease-in-out'
+          }}
+        />
+        <text
+          x="50"
+          y="45"
+          className="circle-text-value"
+          textAnchor="middle"
+          dominantBaseline="middle"
+        >
+          {value}
+        </text>
+        <text
+          x="50"
+          y="60"
+          className="circle-text-label"
+          textAnchor="middle"
+          dominantBaseline="middle"
+        >
+          {label}
+        </text>
+      </svg>
+    </div>
+  );
+};
+
+const ProgressBar = ({ label, percentage, color, icon }) => {
+  const [animatedWidth, setAnimatedWidth] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimatedWidth(percentage);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [percentage]);
+
+  return (
+    <div className="progress-bar-container">
+      <div className="progress-bar-header">
+        <div className="progress-bar-icon" style={{ color: color }}>
+          {icon}
+        </div>
+        <span className="progress-bar-label">{label}</span>
+        <span className="progress-bar-percentage">{percentage}%</span>
+      </div>
+      <div className="progress-bar-track">
+        <div
+          className="progress-bar-fill"
+          style={{
+            width: `${animatedWidth}%`,
+            backgroundColor: color,
+            transition: 'width 1.5s ease-in-out'
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+const ProcessFlow = ({ steps }) => {
+  return (
+    <div className="process-flow">
+      {steps.map((step, index) => (
+        <motion.div
+          key={index}
+          className="process-step"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.2 }}
+        >
+          <div className="process-step-number">{index + 1}</div>
+          <div className="process-step-icon" style={{ color: step.color }}>
+            {step.icon}
+          </div>
+          <div className="process-step-content">
+            <h6 className="process-step-title">{step.title}</h6>
+            <p className="process-step-description">{step.description}</p>
+          </div>
+          {index < steps.length - 1 && (
+            <div className="process-connector">
+              <FaChevronDown />
+            </div>
+          )}
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+const NetworkGraph = ({ nodes }) => {
+  return (
+    <div className="network-graph">
+      <svg viewBox="0 0 400 300" className="network-svg">
+        {/* Connection lines */}
+        <g className="connections">
+          <line x1="200" y1="150" x2="100" y2="80" className="connection-line" />
+          <line x1="200" y1="150" x2="300" y2="80" className="connection-line" />
+          <line x1="200" y1="150" x2="100" y2="220" className="connection-line" />
+          <line x1="200" y1="150" x2="300" y2="220" className="connection-line" />
+          <line x1="100" y1="80" x2="300" y2="80" className="connection-line" />
+          <line x1="100" y1="220" x2="300" y2="220" className="connection-line" />
+        </g>
+
+        {/* Central node */}
+        <circle cx="200" cy="150" r="30" className="network-node central" />
+        <text x="200" y="155" textAnchor="middle" className="node-text">AI Core</text>
+
+        {/* Peripheral nodes */}
+        <circle cx="100" cy="80" r="20" className="network-node" />
+        <text x="100" y="85" textAnchor="middle" className="node-text-small">Drug</text>
+
+        <circle cx="300" cy="80" r="20" className="network-node" />
+        <text x="300" y="85" textAnchor="middle" className="node-text-small">Protein</text>
+
+        <circle cx="100" cy="220" r="20" className="network-node" />
+        <text x="100" y="225" textAnchor="middle" className="node-text-small">ADMET</text>
+
+        <circle cx="300" cy="220" r="20" className="network-node" />
+        <text x="300" y="225" textAnchor="middle" className="node-text-small">Optimize</text>
+      </svg>
+    </div>
+  );
+};
+
+const Home = () => {
+  const navigate = useNavigate();
+  const [expandedSections, setExpandedSections] = useState(new Set(['overview']));
+  const [activeFeature, setActiveFeature] = useState(null);
+
+  // Timeline state and refs
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeSection, setActiveSection] = useState('hero');
+  const timelineRef = useRef(null);
+  const heroRef = useRef(null);
+  const quickActionsRef = useRef(null);
+  const platformRef = useRef(null);
+  const ctaRef = useRef(null);
+
+  // Scroll handler for timeline progress and active section
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      setScrollProgress(progress);
+
+      // Determine active section based on scroll position
+      const sections = [
+        { id: 'hero', ref: heroRef },
+        { id: 'quick-actions', ref: quickActionsRef },
+        { id: 'platform', ref: platformRef },
+        { id: 'cta', ref: ctaRef }
+      ];
+
+      let currentActive = 'hero';
+      sections.forEach(section => {
+        if (section.ref.current) {
+          const rect = section.ref.current.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+            currentActive = section.id;
+          }
+        }
+      });
+
+      setActiveSection(currentActive);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial call
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const toggleSection = (sectionId) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(sectionId)) {
+      newExpanded.delete(sectionId);
+    } else {
+      newExpanded.add(sectionId);
+    }
+    setExpandedSections(newExpanded);
+  };
+
+  // Enhanced platform sections with infographics
+  const platformSections = [
+    {
+      id: 'overview',
+      title: 'Platform Overview',
+      icon: <FaLightbulb />,
+      color: '#22c55e',
+      description: 'Comprehensive drug discovery and molecular analysis platform',
+      content: {
+        subtitle: 'Advanced AI-Powered Drug Discovery Toolkit',
+        features: [
+          'Integrated molecular analysis and visualization',
+          'AI-driven optimization and generation algorithms',
+          'Comprehensive database integration (ChEMBL, PubChem, UniProt)',
+          'Real-time ADMET property prediction',
+          'Protein structure analysis and prediction',
+          'Interactive 3D molecular visualization'
+        ],
+        stats: [
+          { label: 'Molecular Databases', value: '3+', icon: <FaDatabase /> },
+          { label: 'Analysis Tools', value: '15+', icon: <FaCog /> },
+          { label: 'AI Agents', value: '4', icon: <FaRobot /> },
+          { label: 'Research Areas', value: '∞', icon: <FaGraduationCap /> }
+        ],
+        infographics: {
+          circularStats: [
+            { value: '95%', label: 'Accuracy', color: '#22c55e', maxValue: 100 },
+            { value: '99.9%', label: 'Uptime', color: '#16a34a', maxValue: 100 },
+            { value: '24/7', label: 'Support', color: '#15803d', maxValue: 100 }
+          ],
+          processSteps: [
+            {
+              title: 'Data Input',
+              description: 'Submit molecular structures or targets',
+              icon: <FaUpload />,
+              color: '#22c55e'
+            },
+            {
+              title: 'AI Processing',
+              description: 'Advanced algorithms analyze your data',
+              icon: <FaBrain />,
+              color: '#16a34a'
+            },
+            {
+              title: 'Results',
+              description: 'Get comprehensive insights and predictions',
+              icon: <FaChartLine />,
+              color: '#15803d'
+            }
+          ]
+        }
+      }
+    },
+    {
+      id: 'master-agent',
+      title: 'Master Agent System',
+      icon: <FaUserSecret />,
+      color: '#22c55e',
+      description: 'Intelligent AI orchestrator for complex drug discovery workflows',
+      content: {
+        subtitle: 'Your AI Research Assistant',
+        features: [
+          'Natural language query processing',
+          'Multi-agent coordination and delegation',
+          'Context-aware task routing',
+          'Specialized sub-agents for different domains',
+          'Real-time workflow management',
+          'Interactive conversational interface'
+        ],
+        agents: [
+          { name: 'DrugAgent', specialty: 'Database searches & exploration', icon: <FaSearch /> },
+          { name: 'DrugOptimizationAgent', specialty: 'ADMET & molecular generation', icon: <FaFlask /> },
+          { name: 'ProteinAgent', specialty: 'Protein analysis & structure', icon: <FaDna /> }
+        ],
+        infographics: {
+          networkGraph: true,
+          agentMetrics: [
+            { label: 'Response Time', percentage: 98, color: '#22c55e', icon: <FaStopwatch /> },
+            { label: 'Query Accuracy', percentage: 94, color: '#16a34a', icon: <FaBullseye /> },
+            { label: 'Task Success', percentage: 96, color: '#15803d', icon: <FaCheckCircle /> }
+          ]
+        }
+      }
+    },
+    {
+      id: 'structure-analysis',
+      title: 'Structure Analysis',
+      icon: <FaCompass />,
+      color: '#22c55e',
+      description: 'Advanced molecular and protein structure exploration tools',
+      content: {
+        subtitle: 'Comprehensive Structural Analysis Suite',
+        features: [
+          'Molecular structure visualization and analysis',
+          'Protein sequence and structure exploration',
+          'Polymer characterization and analysis',
+          'Interactive 3D structure viewers',
+          'Chemical property calculations',
+          'Structure-activity relationship analysis'
+        ],
+        tools: [
+          { name: 'Molecule Explorer', description: 'SMILES-based molecular analysis', icon: <FaMolecule /> },
+          { name: 'Protein Explorer', description: 'UniProt & PDB structure analysis', icon: <FaDna /> },
+          { name: 'Polymer Explorer', description: 'Polymer structure characterization', icon: <FaAtom /> }
+        ],
+        infographics: {
+          analysisMetrics: [
+            { value: '2M+', label: 'Structures', color: '#22c55e' },
+            { value: '50ms', label: 'Avg Time', color: '#16a34a' },
+            { value: '15+', label: 'Properties', color: '#15803d' }
+          ],
+          capabilityFlow: [
+            {
+              title: 'Input Structure',
+              description: 'SMILES, PDB, or draw molecular structures',
+              icon: <FaMolecule />,
+              color: '#22c55e'
+            },
+            {
+              title: 'Analyze Properties',
+              description: 'Calculate physicochemical properties',
+              icon: <FaAtom />,
+              color: '#16a34a'
+            },
+            {
+              title: 'Visualize Results',
+              description: '3D visualization and interactive exploration',
+              icon: <FaEye />,
+              color: '#15803d'
+            }
+          ]
+        }
+      }
+    },
+    {
+      id: 'identification',
+      title: 'Molecular Identification',
+      icon: <FaBalanceScale />,
+      color: '#22c55e',
+      description: 'Powerful identification and similarity search capabilities',
+      content: {
+        subtitle: 'Advanced Molecular Recognition',
+        features: [
+          'Similarity search algorithms',
+          'Substructure matching',
+          'Chemical fingerprint comparison',
+          'Cross-database identification',
+          'Tanimoto coefficient calculations',
+          'Multi-parameter similarity analysis'
+        ],
+        databases: [
+          { name: 'ChEMBL', compounds: '2M+', icon: <FaDatabase /> },
+          { name: 'PubChem', compounds: '100M+', icon: <FaDatabase /> },
+          { name: 'Custom Sets', compounds: 'Unlimited', icon: <FaUsers /> }
+        ],
+        infographics: {
+          searchMetrics: [
+            { label: 'Search Speed', percentage: 95, color: '#ff9a56', icon: <FaRocket /> },
+            { label: 'Match Accuracy', percentage: 92, color: '#ffad7a', icon: <FaFingerprint /> },
+            { label: 'Database Coverage', percentage: 89, color: '#ffc09f', icon: <FaGlobeAmericas /> }
+          ],
+          databaseStats: [
+            { value: '100M+', label: 'Compounds', color: '#ff9a56' },
+            { value: '3', label: 'Databases', color: '#ffad7a' },
+            { value: '<1s', label: 'Search Time', color: '#ffc09f' }
+          ]
+        }
+      }
+    },
+    {
+      id: 'optimization',
+      title: 'Drug Optimization',
+      icon: <FaFlask />,
+      color: '#22c55e',
+      description: 'AI-powered molecular optimization and generation',
+      content: {
+        subtitle: 'Next-Generation Drug Design',
+        features: [
+          'ADMET property prediction',
+          'BRICS-based molecular generation',
+          'LSTM neural network optimization',
+          'Structure-based drug design',
+          'Lead compound optimization',
+          'Synthetic accessibility prediction'
+        ],
+        algorithms: [
+          { name: 'BRICS', description: 'Fragment-based generation', accuracy: '85%' },
+          { name: 'LSTM', description: 'Neural network optimization', accuracy: '92%' },
+          { name: 'ADMET-AI', description: 'Property prediction', accuracy: '88%' }
+        ],
+        infographics: {
+          optimizationMetrics: [
+            { label: 'ADMET Accuracy', percentage: 88, color: '#a8edea', icon: <FaShieldAlt /> },
+            { label: 'Generation Speed', percentage: 92, color: '#d299c2', icon: <FaMagic /> },
+            { label: 'Drug-likeness', percentage: 85, color: '#fed6e3', icon: <FaBullseye /> }
+          ],
+          mlProgress: [
+            {
+              title: 'Input Molecule',
+              description: 'Provide target molecule or constraints',
+              icon: <FaMolecule />,
+              color: '#a8edea'
+            },
+            {
+              title: 'AI Processing',
+              description: 'LSTM and BRICS algorithms optimize',
+              icon: <FaBrain />,
+              color: '#d299c2'
+            },
+            {
+              title: 'Optimized Output',
+              description: 'Enhanced molecules with better properties',
+              icon: <FaArrowUp />,
+              color: '#fed6e3'
+            }
+          ]
+        }
+      }
+    },
+    {
+      id: 'activities',
+      title: 'Workflow Management',
+      icon: <FaTasks />,
+      color: '#fed6e3',
+      description: 'Comprehensive project and workflow management',
+      content: {
+        subtitle: 'Streamlined Research Management',
+        features: [
+          'Project workflow tracking',
+          'Task dependency management',
+          'Progress visualization',
+          'Result organization',
+          'Collaborative workspaces',
+          'Automated reporting'
+        ],
+        capabilities: [
+          'Multi-step workflow design',
+          'Real-time progress tracking',
+          'Automated quality checks',
+          'Export and sharing tools'
+        ],
+        infographics: {
+          workflowMetrics: [
+            { label: 'Project Efficiency', percentage: 96, color: '#fed6e3', icon: <FaTasks /> },
+            { label: 'Collaboration', percentage: 89, color: '#d299c2', icon: <FaUsers /> },
+            { label: 'Automation', percentage: 94, color: '#a8edea', icon: <FaSyncAlt /> }
+          ],
+          projectStats: [
+            { value: '1000+', label: 'Projects', color: '#fed6e3' },
+            { value: '24/7', label: 'Monitoring', color: '#d299c2' },
+            { value: '99%', label: 'Success Rate', color: '#a8edea' }
+          ]
+        }
+      }
+    }
+  ];
+
+  const quickActions = [
+    {
+      title: 'Start Chat with Master Agent',
+      description: 'Begin a conversation with our AI assistant',
+      icon: <FaUserSecret />,
+      color: '#22c55e',
+      route: '/chatbot'
+    },
+    {
+      title: 'Explore Molecules',
+      description: 'Analyze molecular structures and properties',
+      icon: <FaMolecule />,
+      color: '#16a34a',
+      route: '/explorer'
+    },
+    {
+      title: 'Search Similar Compounds',
+      description: 'Find similar molecules in databases',
+      icon: <FaSearch />,
+      color: '#15803d',
+      route: '/identification'
+    },
+    {
+      title: 'Optimize Drug Properties',
+      description: 'Use AI to improve molecular properties',
+      icon: <FaLab />,
+      color: '#14532d',
+      route: '/optimization'
+    }
+  ];
 
   return (
     <div className="home-container">
-      {/* Navigation Bar */}
-      {/* Hero Section */}
-      <section className="hero-section">
-        <motion.div 
-          className="hero-content"
+      {/* Timeline Components */}
+      <div className="timeline-line"></div>
+      <div
+        className="timeline-progress"
+        style={{ height: `${scrollProgress}%` }}
+      ></div>
+
+      <div className="timeline-container" ref={timelineRef}>
+        {/* Hero Section */}
+        <motion.div
+          ref={heroRef}
           initial="hidden"
           animate="visible"
-          variants={fadeInLeftVariants}
+          variants={fadeInUpVariantStatic}
+          className="hero-section"
         >
-          <h1 className="hero-title">Accelerate Drug Discovery with Your Intelligent AI Assistant</h1>
-          <p className="hero-subtitle">
-            Seamlessly automate protein analysis, identify drug candidates, and optimize targets. 
-            Take control with intuitive chat-based tweaking and integrated manual tools.
-          </p>
-          <div className="hero-cta">
-            <Link to="/demo" className="primary-btn">Request a Demo</Link>
-            <Link to="/explore" className="secondary-btn">Explore the Assistant</Link>
+          <div className={`timeline-marker ${activeSection === 'hero' ? 'active' : ''}`}></div>
+          <div className="hero-content">
+            {/* <video autoPlay loop muted className="hero-video">
+              <source src="/videos/hero.mp4" type="video/mp4" />
+            </video> */}
+            <GlassyContainer className="hero-glassy-container">
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="hero-logo"
+            >
+              <img src="/images/logo_rendered_main.png" alt="Valency Logo" className="main-logo" />
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="hero-title"
+            >
+              Welcome to Valency
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              className="hero-subtitle"
+            >
+              Next-Generation AI-Powered Drug Discovery Platform
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="hero-description"
+            >
+              Harness the power of artificial intelligence to accelerate drug discovery,
+              analyze molecular structures, and optimize therapeutic compounds with unprecedented precision.
+            </motion.div>
+            </GlassyContainer>
           </div>
         </motion.div>
-        
-        <motion.div 
-          className="hero-dna-model"
+
+        {/* Quick Actions */}
+        <motion.div
+          ref={quickActionsRef}
           initial="hidden"
           animate="visible"
-          variants={fadeInRightVariants}
+          variants={fadeInUpVariantStatic}
+          className="quick-actions-section"
         >
-          {/* <DnaViewer /> */}
-          {/* <CanvasSample /> */}
-        </motion.div>
-      </section>
-
-      {/* Why Valency Section */}
-      <section className="why-section" id="why">
-        <motion.h2 
-          className="section-title"
-          initial="hieden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUpVariants}
-        >
-          Why Valency?
-        </motion.h2>
-        <div className="problem-cards">
-          <motion.div 
-            className="problem-card glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={0}
-          >
-            <h3>Time-Consuming Processes</h3>
-            <p>Traditional drug discovery involves labor-intensive manual processes that slow research progress.</p>
-          </motion.div>
-          
-          <motion.div 
-            className="problem-card glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={1}
-          >
-            <h3>Fragmented Tools</h3>
-            <p>Researchers waste valuable time switching between disconnected tools and reconciling inconsistent data.</p>
-          </motion.div>
-          
-          <motion.div 
-            className="problem-card glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={2}
-          >
-            <h3>Steep Learning Curves</h3>
-            <p>Complex software requires extensive training, creating barriers to effective utilization.</p>
-          </motion.div>
-        </div>
-        <motion.div 
-          className="solution-statement"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUpVariants}
-        >
-          <h2>We bridge the gap with an AI assistant that automates workflows while keeping you in control.</h2>
-        </motion.div>
-      </section>
-
-      {/* How It Works Section */}
-      <section className="how-works-section" id="how-it-works">
-        <motion.h2 
-          className="section-title"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUpVariants}
-        >
-          Meet Your AI Drug Discovery Co-Pilot
-        </motion.h2>
-        
-        <div className="workflow-steps">
-          <motion.div 
-            className="workflow-step"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={0}
-          >
-            <div className="step-number">1</div>
-            <div className="step-content">
-              <h3>Connect & Configure</h3>
-              <p>Seamlessly connect your data sources and configure your research parameters with natural language.</p>
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            className="workflow-step"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={1}
-          >
-            <div className="step-number">2</div>
-            <div className="step-content">
-              <h3>Automate & Analyze</h3>
-              <p>Let the AI execute complex workflows across protein analysis, drug candidate identification, and target optimization.</p>
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            className="workflow-step"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={2}
-          >
-            <div className="step-number">3</div>
-            <div className="step-content">
-              <h3>Interact & Tweak via Chat</h3>
-              <p>Guide the agent, adjust parameters, and request specific analyses through an intuitive chat interface.</p>
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            className="workflow-step"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={3}
-          >
-            <div className="step-number">4</div>
-            <div className="step-content">
-              <h3>Utilize Integrated Manual Tools</h3>
-              <p>Access specialized tools directly within the platform for hands-on control when needed.</p>
-            </div>
-          </motion.div>
-          
-          <motion.div 
-            className="workflow-step"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={4}
-          >
-            <div className="step-number">5</div>
-            <div className="step-content">
-              <h3>Iterate & Optimize</h3>
-              <p>Refine your results through rapid iterations, guided by AI suggestions and your expertise.</p>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Core Services Section */}
-      <section className="services-section">
-        <motion.h2 
-          className="section-title"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUpVariants}
-        >
-          Core Services
-        </motion.h2>
-        
-        <div className="services-grid">
-          {/* Protein Structure Analysis */}
-          <motion.div 
-            className="service-card glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={0}
-          >
-            <div className="service-icon">🧬</div>
-            <h3>Protein Structure Analysis</h3>
-            <p>Comprehensive tools for analyzing protein structures and predicting their functions.</p>
-            
-            <div className="capabilities">
-              <h4>Key Capabilities:</h4>
-              <ul>
-                <li>PDB fetching & parsing</li>
-                <li>3D visualization</li>
-                <li>Secondary structure prediction</li>
-                <li>Mutation impact analysis</li>
-              </ul>
-            </div>
-            
-            <div className="automation-example">
-              <h4>Agent-Powered Automation:</h4>
-              <div className="chat-example">
-                "Agent, analyze protein X for potential binding pockets."
-              </div>
-            </div>
-            
-            <Link to="/protein-analysis" className="service-cta">Explore Protein Analysis Tools</Link>
-          </motion.div>
-          
-          {/* Drug Candidate Identification */}
-          <motion.div 
-            className="service-card glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={1}
-          >
-            <div className="service-icon">💊</div>
-            <h3>Drug Candidate Identification</h3>
-            <p>AI-powered tools to identify and evaluate potential drug candidates efficiently.</p>
-            
-            <div className="capabilities">
-              <h4>Key Capabilities:</h4>
-              <ul>
-                <li>Virtual screening</li>
-                <li>QSAR modeling</li>
-                <li>ADMET prediction</li>
-                <li>Molecular docking</li>
-              </ul>
-            </div>
-            
-            <div className="automation-example">
-              <h4>Agent-Powered Automation:</h4>
-              <div className="chat-example">
-                "Agent, screen compound library against target protein and rank by binding affinity."
-              </div>
-            </div>
-            
-            <Link to="/drug-identification" className="service-cta">Explore Drug Identification Tools</Link>
-          </motion.div>
-          
-          {/* Target Optimization */}
-          <motion.div 
-            className="service-card glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={2}
-          >
-            <div className="service-icon">🎯</div>
-            <h3>Target Optimization</h3>
-            <p>Refine and optimize promising drug candidates for improved efficacy and safety.</p>
-            
-            <div className="capabilities">
-              <h4>Key Capabilities:</h4>
-              <ul>
-                <li>Lead optimization suggestions</li>
-                <li>Affinity maturation guidance</li>
-                <li>Selectivity profiling</li>
-                <li>Resistance mutation analysis</li>
-              </ul>
-            </div>
-            
-            <div className="automation-example">
-              <h4>Agent-Powered Automation:</h4>
-              <div className="chat-example">
-                "Agent, suggest R-group modifications to improve compound solubility."
-              </div>
-            </div>
-            
-            <Link to="/target-optimization" className="service-cta">Explore Target Optimization Tools</Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Chat Interface Section */}
-      <section className="chat-section">
-        <motion.div 
-          className="chat-content"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInLeftVariants}
-        >
-          <h2>Converse, Command, Create: Drug Discovery via Intuitive Chat</h2>
-          <p>
-            Our natural language chat interface serves as your command center, allowing you to:
-          </p>
-          <ul>
-            <li>Initiate complex workflows with simple commands</li>
-            <li>Adjust parameters in real-time</li>
-            <li>Query results and generate insights</li>
-            <li>Launch specialized tools when needed</li>
-          </ul>
-          <div className="chat-commands">
-            <div className="command-example">
-              "Compare binding affinities of compounds A and B with target protein."
-            </div>
-            <div className="command-example">
-              "Visualize molecular dynamics simulation and highlight residues 45-60."
-            </div>
-            <div className="command-example">
-              "Generate ADMET predictions for the top 5 candidates."
-            </div>
+          <div className={`timeline-marker ${activeSection === 'quick-actions' ? 'active' : ''}`}></div>
+          <h2 className="section-title">Quick Start</h2>
+          <div className="quick-actions-grid">
+            {quickActions.map((action, index) => (
+              <motion.div
+                key={index}
+                initial="hidden"
+                animate="visible"
+                variants={fadeInDownVariants}
+                custom={index}
+                className="quick-action-card"
+                onClick={() => navigate(action.route)}
+              >
+                <GlassyContainer className="action-card-content">
+                  <div
+                    className="action-icon"
+                    style={{ color: action.color }}
+                  >
+                    {action.icon}
+                  </div>
+                  <h3 className="action-title">{action.title}</h3>
+                  <p className="action-description">{action.description}</p>
+                  <div className="action-button">
+                    <FaPlay className="play-icon" />
+                    Get Started
+                  </div>
+                </GlassyContainer>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
-        <motion.div 
-          className="chat-image"
+
+        {/* Platform Sections */}
+        <div ref={platformRef} className="platform-sections">
+          <div className={`timeline-marker ${activeSection === 'platform' ? 'active' : ''}`}></div>
+          <h2 className="section-title">Platform Capabilities</h2>
+
+          {platformSections.map((section, index) => (
+            <motion.div
+              key={section.id}
+              initial="hidden"
+              animate="visible"
+              variants={fadeInLeftVariants}
+              custom={index}
+              className="platform-section"
+            >
+              <GlassyContainer className="section-container">
+                <div
+                  className="section-header"
+                  onClick={() => toggleSection(section.id)}
+                >
+                  <div className="section-header-left">
+                    <div
+                      className="section-icon"
+                      style={{ color: section.color }}
+                    >
+                      {section.icon}
+                    </div>
+                    <div className="section-header-text">
+                      <h3 className="section-header-title">{section.title}</h3>
+                      <p className="section-header-description">{section.description}</p>
+                    </div>
+                  </div>
+                  <div className="section-toggle">
+                    {expandedSections.has(section.id) ? <FaChevronUp /> : <FaChevronDown />}
+                  </div>
+                </div>
+
+                {expandedSections.has(section.id) && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="section-content"
+                  >
+                    <h4 className="content-subtitle">{section.content.subtitle}</h4>
+
+                    <div className="features-grid">
+                      <div className="features-list">
+                        <h5>Key Features</h5>
+                        <ul>
+                          {section.content.features.map((feature, idx) => (
+                            <li key={idx}>{feature}</li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {section.content.stats && (
+                        <div className="stats-grid">
+                          {section.content.stats.map((stat, idx) => (
+                            <div key={idx} className="stat-card">
+                              <div className="stat-icon">{stat.icon}</div>
+                              <div className="stat-value">{stat.value}</div>
+                              <div className="stat-label">{stat.label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {section.content.agents && (
+                        <div className="agents-grid">
+                          <h5>Specialized AI Agents</h5>
+                          {section.content.agents.map((agent, idx) => (
+                            <div key={idx} className="agent-card">
+                              <div className="agent-icon">{agent.icon}</div>
+                              <div className="agent-info">
+                                <div className="agent-name">{agent.name}</div>
+                                <div className="agent-specialty">{agent.specialty}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {section.content.tools && (
+                        <div className="tools-grid">
+                          <h5>Available Tools</h5>
+                          {section.content.tools.map((tool, idx) => (
+                            <div key={idx} className="tool-card">
+                              <div className="tool-icon">{tool.icon}</div>
+                              <div className="tool-info">
+                                <div className="tool-name">{tool.name}</div>
+                                <div className="tool-description">{tool.description}</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {section.content.databases && (
+                        <div className="databases-grid">
+                          <h5>Integrated Databases</h5>
+                          {section.content.databases.map((db, idx) => (
+                            <div key={idx} className="database-card">
+                              <div className="database-icon">{db.icon}</div>
+                              <div className="database-info">
+                                <div className="database-name">{db.name}</div>
+                                <div className="database-compounds">{db.compounds} compounds</div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {section.content.algorithms && (
+                        <div className="algorithms-grid">
+                          <h5>AI Algorithms</h5>
+                          {section.content.algorithms.map((algo, idx) => (
+                            <div key={idx} className="algorithm-card">
+                              <div className="algorithm-info">
+                                <div className="algorithm-name">{algo.name}</div>
+                                <div className="algorithm-description">{algo.description}</div>
+                              </div>
+                              <div className="algorithm-accuracy">
+                                <FaChartLine />
+                                {algo.accuracy}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {section.content.capabilities && (
+                        <div className="capabilities-list">
+                          <h5>Capabilities</h5>
+                          <ul>
+                            {section.content.capabilities.map((capability, idx) => (
+                              <li key={idx}>{capability}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Infographics Section */}
+                    <div className="infographics-section">
+                      {section.content.infographics && (
+                        <>
+                          {section.content.infographics.circularStats && (
+                            <div className="circular-stats-container">
+                              {section.content.infographics.circularStats.map((stat, idx) => (
+                                <StatsCircle
+                                  key={idx}
+                                  value={stat.value}
+                                  label={stat.label}
+                                  color={stat.color}
+                                  maxValue={100}
+                                />
+                              ))}
+                            </div>
+                          )}
+
+                          {section.content.infographics.processSteps && (
+                            <div className="process-steps-container">
+                              <h5>Process Overview</h5>
+                              <ProcessFlow steps={section.content.infographics.processSteps} />
+                            </div>
+                          )}
+
+                          {section.content.infographics.networkGraph && (
+                            <div className="network-graph-container">
+                              <h5>Agent Network</h5>
+                              <NetworkGraph />
+                            </div>
+                          )}
+
+                          {section.content.infographics.analysisMetrics && (
+                            <div className="analysis-metrics-container">
+                              <h5>Analysis Metrics</h5>
+                              <div className="metrics-grid">
+                                {section.content.infographics.analysisMetrics.map((metric, idx) => (
+                                  <div key={idx} className="metric-card">
+                                    <div className="metric-value" style={{ color: metric.color }}>
+                                      {metric.value}
+                                    </div>
+                                    <div className="metric-label">
+                                      {metric.label}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {section.content.infographics.capabilityFlow && (
+                            <div className="capability-flow-container">
+                              <h5>Capability Flow</h5>
+                              <ProcessFlow steps={section.content.infographics.capabilityFlow} />
+                            </div>
+                          )}
+
+                          {section.content.infographics.searchMetrics && (
+                            <div className="search-metrics-container">
+                              <h5>Search Performance</h5>
+                              <div className="metrics-grid">
+                                {section.content.infographics.searchMetrics.map((metric, idx) => (
+                                  <div key={idx} className="metric-card">
+                                    <div className="metric-icon" style={{ color: metric.color }}>
+                                      {metric.icon}
+                                    </div>
+                                    <div className="metric-info">
+                                      <div className="metric-label">{metric.label}</div>
+                                      <div className="metric-percentage">{metric.percentage}%</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {section.content.infographics.databaseStats && (
+                            <div className="database-stats-container">
+                              <h5>Database Statistics</h5>
+                              <div className="stats-grid">
+                                {section.content.infographics.databaseStats.map((stat, idx) => (
+                                  <div key={idx} className="stat-card">
+                                    <div className="stat-value" style={{ color: stat.color }}>
+                                      {stat.value}
+                                    </div>
+                                    <div className="stat-label">
+                                      {stat.label}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {section.content.infographics.optimizationMetrics && (
+                            <div className="optimization-metrics-container">
+                              <h5>Optimization Metrics</h5>
+                              <div className="metrics-grid">
+                                {section.content.infographics.optimizationMetrics.map((metric, idx) => (
+                                  <div key={idx} className="metric-card">
+                                    <div className="metric-icon" style={{ color: metric.color }}>
+                                      {metric.icon}
+                                    </div>
+                                    <div className="metric-info">
+                                      <div className="metric-label">{metric.label}</div>
+                                      <div className="metric-percentage">{metric.percentage}%</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {section.content.infographics.mlProgress && (
+                            <div className="ml-progress-container">
+                              <h5>Machine Learning Progress</h5>
+                              <ProcessFlow steps={section.content.infographics.mlProgress} />
+                            </div>
+                          )}
+
+                          {section.content.infographics.workflowMetrics && (
+                            <div className="workflow-metrics-container">
+                              <h5>Workflow Metrics</h5>
+                              <div className="metrics-grid">
+                                {section.content.infographics.workflowMetrics.map((metric, idx) => (
+                                  <div key={idx} className="metric-card">
+                                    <div className="metric-icon" style={{ color: metric.color }}>
+                                      {metric.icon}
+                                    </div>
+                                    <div className="metric-info">
+                                      <div className="metric-label">{metric.label}</div>
+                                      <div className="metric-percentage">{metric.percentage}%</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {section.content.infographics.projectStats && (
+                            <div className="project-stats-container">
+                              <h5>Project Statistics</h5>
+                              <div className="stats-grid">
+                                {section.content.infographics.projectStats.map((stat, idx) => (
+                                  <div key={idx} className="stat-card">
+                                    <div className="stat-value" style={{ color: stat.color }}>
+                                      {stat.value}
+                                    </div>
+                                    <div className="stat-label">
+                                      {stat.label}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+              </GlassyContainer>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Call to Action */}
+        <motion.div
+          ref={ctaRef}
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInRightVariants}
+          animate="visible"
+          variants={fadeInUpVariantStatic}
+          className="cta-section"
         >
-          <img src="/images/chatbot.png" alt="Chat Interface" className="chat-interface-img" />
+          <div className={`timeline-marker ${activeSection === 'cta' ? 'active' : ''}`}></div>
+          <GlassyContainer className="cta-content">
+            <h2 className="cta-title">Ready to Accelerate Your Research?</h2>
+            <p className="cta-description">
+              Join thousands of researchers using Valency to transform drug discovery
+            </p>
+            <button
+              className="cta-button"
+              onClick={() => navigate('/chatbot')}
+            >
+              <FaUserSecret />
+              Start with Master Agent
+            </button>
+          </GlassyContainer>
         </motion.div>
-      </section>
-
-      {/* Tools & Integrations Section */}
-      <section className="tools-section" id="tools">
-        <motion.h2 
-          className="section-title"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUpVariants}
-        >
-          Built on a Foundation of Open Science and Cutting-Edge APIs
-        </motion.h2>
-        
-        <div className="tools-grid">
-          <motion.div 
-            className="tool-item glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={0}
-          >
-            <h3>RDKit</h3>
-            <p>Powerful cheminformatics and machine learning toolkit</p>
-          </motion.div>
-          
-          <motion.div 
-            className="tool-item glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={1}
-          >
-            <h3>BioPython</h3>
-            <p>Tools for biological computation</p>
-          </motion.div>
-          
-          <motion.div 
-            className="tool-item glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={2}
-          >
-            <h3>PDB</h3>
-            <p>Protein Data Bank integration</p>
-          </motion.div>
-          
-          <motion.div 
-            className="tool-item glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={3}
-          >
-            <h3>AlphaFold DB</h3>
-            <p>Predicted protein structures database</p>
-          </motion.div>
-          
-          <motion.div 
-            className="tool-item glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={4}
-          >
-            <h3>ChEMBL</h3>
-            <p>Bioactive molecules database</p>
-          </motion.div>
-          
-          <motion.div 
-            className="tool-item glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={5}
-          >
-            <h3>PubChem</h3>
-            <p>Chemical information database</p>
-          </motion.div>
-          
-          <motion.div 
-            className="tool-item and-more glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={6}
-          >
-            <h3>And Many More...</h3>
-          </motion.div>
-        </div>
-        
-        <motion.div 
-          className="tools-cta"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUpVariants}
-        >
-          <Link to="/technology" className="secondary-btn">Learn More About Our Technology Stack</Link>
-        </motion.div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="benefits-section">
-        <motion.h2 
-          className="section-title"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={fadeInUpVariants}
-        >
-          Transform Your Drug Discovery Workflow
-        </motion.h2>
-        
-        <div className="benefits-grid">
-          <motion.div 
-            className="benefit-card glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={0}
-          >
-            <div className="benefit-icon">⚡</div>
-            <h3>Accelerate Research</h3>
-            <p>Automate repetitive tasks and streamline workflows to reduce research time by up to 70%.</p>
-          </motion.div>
-          
-          <motion.div 
-            className="benefit-card glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={1}
-          >
-            <div className="benefit-icon">🔍</div>
-            <h3>Enhance Precision & Control</h3>
-            <p>Maintain complete control through chat-based tweaking and direct access to specialized tools.</p>
-          </motion.div>
-          
-          <motion.div 
-            className="benefit-card glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={2}
-          >
-            <div className="benefit-icon">🧩</div>
-            <h3>Simplify Complexity</h3>
-            <p>Access sophisticated analysis tools through natural language, eliminating steep learning curves.</p>
-          </motion.div>
-          
-          <motion.div 
-            className="benefit-card glassy-feel"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUpVariants}
-            custom={3}
-          >
-            <div className="benefit-icon">🔄</div>
-            <h3>Foster Iteration & Innovation</h3>
-            <p>Rapidly test hypotheses and iterate on designs with immediate feedback and AI-powered suggestions.</p>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="main-footer">
-        <div className="footer-content">
-          <div className="footer-logo">
-            <img src="/images/valency_logo_light_600x600.png" alt="Valency Logo" className="footer-logo-img" />
-            <span className="footer-logo-text">Valency</span>
-          </div>
-          
-          <div className="footer-links">
-            <div className="footer-links-column">
-              <h3>Company</h3>
-              <Link to="/about">About Us</Link>
-              <Link to="/careers">Careers</Link>
-              <Link to="/contact">Contact</Link>
-            </div>
-            
-            <div className="footer-links-column">
-              <h3>Resources</h3>
-              <Link to="/documentation">Documentation</Link>
-              <Link to="/tutorials">Tutorials</Link>
-              <Link to="/blog">Blog</Link>
-            </div>
-            
-            <div className="footer-links-column">
-              <h3>Legal</h3>
-              <Link to="/privacy">Privacy Policy</Link>
-              <Link to="/terms">Terms of Service</Link>
-            </div>
-            
-            <div className="footer-links-column">
-              <h3>Connect</h3>
-              <div className="social-links">
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-link">LinkedIn</a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="social-link">Twitter</a>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="social-link">GitHub</a>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div className="copyright">
-          <p>© 2025 Valency. All Rights Reserved.</p>
-        </div>
-      </footer>
+      </div>
     </div>
   );
-}
+};
 
 export default Home;

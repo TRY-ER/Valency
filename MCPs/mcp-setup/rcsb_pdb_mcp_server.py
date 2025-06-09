@@ -332,47 +332,47 @@ def structure_similarity_by_file_url(file_url: str, file_format: str, operator: 
 # For simplicity, we'll skip direct file_upload from local machine path for now,
 # as it's not straightforward in a typical MCP server context without more infrastructure.
 
-@mcp.tool()
-def structure_motif_search_by_entry_id(entry_id: str, residues: list[dict], backbone_distance_tolerance: int = 1, side_chain_distance_tolerance: int = 1, angle_tolerance: int = 1, rmsd_cutoff: float = 2.0, return_type: str = "polymer_entity", max_results: int = 10) -> str:
-    """Search for 3D structural motifs using a PDB entry as the reference for the motif.
-    Args:
-        entry_id: The PDB ID defining the motif (e.g., "2MNR").
-        residues: A list of residue definitions. Each dict must have "chain_id", "struct_oper_id" (operator, usually "1"),
-                  and "label_seq_id" (residue number). Optional "exchanges" (list of AA codes).
-                  Example: [{"chain_id": "A", "struct_oper_id": "1", "label_seq_id": 192, "exchanges": ["LYS", "HIS"]}]
-        backbone_distance_tolerance: Allowed backbone distance tolerance in Angstrom (0-3). Default 1.
-        side_chain_distance_tolerance: Allowed side-chain distance tolerance in Angstrom (0-3). Default 1.
-        angle_tolerance: Allowed angle tolerance in multiples of 20 degrees (0-3). Default 1.
-        rmsd_cutoff: Threshold above which hits will be filtered by RMSD (>=0). Default 2.0.
-        return_type: The type of identifiers to return. Default "polymer_entity".
-        max_results: Maximum number of results to return. Default is 10.
-    Returns:
-        A JSON string with a list of polymer entity IDs.
-    """
-    try:
-        motif_residues = [
-            StructureMotifResidue(
-                chain_id=r.get("chain_id"),
-                struct_oper_id=r.get("struct_oper_id", "1"), # Default to "1" if not provided
-                label_seq_id=r.get("label_seq_id"),
-                exchanges=r.get("exchanges")
-            ) for r in residues
-        ]
-        query = StructMotifQuery(
-            entry_id=entry_id,
-            residue_ids=motif_residues,
-            backbone_distance_tolerance=backbone_distance_tolerance,
-            side_chain_distance_tolerance=side_chain_distance_tolerance,
-            angle_tolerance=angle_tolerance,
-            rmsd_cutoff=rmsd_cutoff
-        )
-        results = list(query(return_type=return_type))
-        if len(results) > max_results:
-            print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")
-            results = results[:max_results]
-        return json.dumps({"data": results})
-    except Exception as e:
-        return json.dumps({"error": f"Failed structure motif search for entry ID {entry_id}.", "details": str(e)})
+# @mcp.tool()
+# def structure_motif_search_by_entry_id(entry_id: str, residues: list[dict], backbone_distance_tolerance: int = 1, side_chain_distance_tolerance: int = 1, angle_tolerance: int = 1, rmsd_cutoff: float = 2.0, return_type: str = "polymer_entity", max_results: int = 10) -> str:
+#     """Search for 3D structural motifs using a PDB entry as the reference for the motif.
+#     Args:
+#         entry_id: The PDB ID defining the motif (e.g., "2MNR").
+#         residues: A list of residue definitions. Each dict must have "chain_id", "struct_oper_id" (operator, usually "1"),
+#                   and "label_seq_id" (residue number). Optional "exchanges" (list of AA codes).
+#                   Example: [{"chain_id": "A", "struct_oper_id": "1", "label_seq_id": 192, "exchanges": ["LYS", "HIS"]}]
+#         backbone_distance_tolerance: Allowed backbone distance tolerance in Angstrom (0-3). Default 1.
+#         side_chain_distance_tolerance: Allowed side-chain distance tolerance in Angstrom (0-3). Default 1.
+#         angle_tolerance: Allowed angle tolerance in multiples of 20 degrees (0-3). Default 1.
+#         rmsd_cutoff: Threshold above which hits will be filtered by RMSD (>=0). Default 2.0.
+#         return_type: The type of identifiers to return. Default "polymer_entity".
+#         max_results: Maximum number of results to return. Default is 10.
+#     Returns:
+#         A JSON string with a list of polymer entity IDs.
+#     """
+#     try:
+#         motif_residues = [
+#             StructureMotifResidue(
+#                 chain_id=r.get("chain_id"),
+#                 struct_oper_id=r.get("struct_oper_id", "1"), # Default to "1" if not provided
+#                 label_seq_id=r.get("label_seq_id"),
+#                 exchanges=r.get("exchanges")
+#             ) for r in residues
+#         ]
+#         query = StructMotifQuery(
+#             entry_id=entry_id,
+#             residue_ids=motif_residues,
+#             backbone_distance_tolerance=backbone_distance_tolerance,
+#             side_chain_distance_tolerance=side_chain_distance_tolerance,
+#             angle_tolerance=angle_tolerance,
+#             rmsd_cutoff=rmsd_cutoff
+#         )
+#         results = list(query(return_type=return_type))
+#         if len(results) > max_results:
+#             print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")
+#             results = results[:max_results]
+#         return json.dumps({"data": results})
+#     except Exception as e:
+#         return json.dumps({"error": f"Failed structure motif search for entry ID {entry_id}.", "details": str(e)})
 
 # --- PDB Protein Information Tool (using pypdb) ---
 

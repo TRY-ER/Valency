@@ -1,18 +1,25 @@
 import io
 import base64
 import random
-from typing import Dict, List, Generator
+import os
+import httpx
+from typing import Dict, List, Generator, AsyncGenerator, Union
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse, JSONResponse
 from engine.generators.BRICSGenerator import BRICSGenerator
-from engine.generators.LSTMGenerator import RNNPolymerGenerator 
 import uuid
-import torch
 
 router = APIRouter()
 
-# In-memory storage for uploaded files
-file_storage: Dict[str, List[str]] = {}
+# Configuration for external ADMET API
+ADMET_API_BASE_URL = os.getenv("ADMET_API_BASE_URL", "http://localhost:8053")
+ADMET_API_KEY = os.getenv("ADMET_API_KEY", "")
+
+if not ADMET_API_KEY:
+    print("WARNING: ADMET_API_KEY not found in environment variables. LSTM generation will not work.")
+
+# In-memory storage for uploaded files and generation parameters
+file_storage: Dict[str, Union[List[str], Dict]] = {}
 
 def event_stream(data_lines, gen: BRICSGenerator, is_polymer: bool) -> Generator[str, None, None]:
         for event in gen.stream_generate(data_lines, is_polymer):
@@ -37,16 +44,54 @@ def event_stream(data_lines, gen: BRICSGenerator, is_polymer: bool) -> Generator
                 # Send final file
                 yield f'data: {returnable}\n\n'
 
-def generator_stream(content: dict):
+async def generator_stream(content: dict) -> AsyncGenerator[str, None]:
+    """
+    Stream LSTM generation results from external ADMET API service.
+    """
     try:
-        if content["input_type"] == "psmiles":
-            generator = RNNPolymerGenerator(input_type="psmiles")
-            generator.load_model_from_ckpt("./resources/PSMILES_LSTM_1M_5_epochs.pth")
-        elif content["input_type"] == "wdg":
-            generator = RNNPolymerGenerator(input_type="wdg")
-            generator.load_model_from_ckpt("./resources/WDGraph_LSTM_42K_50_epochs.pth")
-        for entity in generator.stream_generate(int(content["num_gen"])):
-            yield f"data: {entity}\n\n"
+        # First, set the generation parameters on the external service
+        async with httpx.AsyncClient() as client:
+            headers = {"Authorization": f"Bearer {ADMET_API_KEY}"}
+            
+            # Set generation parameters
+            set_response = await client.post(
+                f"{ADMET_API_BASE_URL}/lstm/set",
+                json={
+                    "num_gen": content["num_gen"],
+                    "input_type": content["input_type"]
+                },
+                headers=headers
+            )
+            
+            if set_response.status_code != 200:
+                error_response = {
+                    "type": "error",
+                    "data": f"Failed to set generation parameters: {set_response.text}"
+                }
+                yield f"data: {error_response}\n\n"
+                return
+            
+            set_data = set_response.json()
+            gen_id = set_data["id"]
+            
+            # Stream generation results
+            async with client.stream(
+                "GET",
+                f"{ADMET_API_BASE_URL}/lstm/stream/{gen_id}",
+                headers=headers
+            ) as stream_response:
+                if stream_response.status_code != 200:
+                    error_response = {
+                        "type": "error", 
+                        "data": f"Failed to stream generation: {stream_response.status_code}"
+                    }
+                    yield f"data: {error_response}\n\n"
+                    return
+                
+                async for chunk in stream_response.aiter_text():
+                    if chunk.strip():
+                        yield chunk
+                        
     except Exception as e:
         error_response = {
             "type": "error",
@@ -127,33 +172,54 @@ async def stream_smiles(file_id: str):
         media_type="text/event-stream"
     )
 
-@router.get("/brics/psmiles/stream/{file_id}")
-async def stream_psmiles(file_id: str):
-    if file_id not in file_storage:
-        raise HTTPException(status_code=404, detail="File not found")
+# @router.get("/brics/psmiles/stream/{file_id}")
+# async def stream_psmiles(file_id: str):
+#     if file_id not in file_storage:
+#         raise HTTPException(status_code=404, detail="File not found")
     
-    content = file_storage[file_id]
-    del file_storage[file_id]
-    generator = BRICSGenerator()
-    return StreamingResponse(
-        event_stream(content, generator, is_polymer=True),
-        media_type="text/event-stream"
-    )
+#     content = file_storage[file_id]
+#     del file_storage[file_id]
+#     generator = BRICSGenerator()
+#     return StreamingResponse(
+#         event_stream(content, generator, is_polymer=True),
+#         media_type="text/event-stream"
+#     )
 
 @router.get("/lstm/stream/{gen_id}")
 async def stream_psmiles(gen_id: str):
     if gen_id not in file_storage:
-        raise HTTPException(status_code=404, detail="File not found")
+        raise HTTPException(status_code=404, detail="Generation ID not found")
     
     content = file_storage[gen_id]
     del file_storage[gen_id]
+    
+    # Ensure content is a dict (generation parameters)
+    if not isinstance(content, dict):
+        raise HTTPException(status_code=400, detail="Invalid generation parameters")
+    
     return StreamingResponse(
         generator_stream(content),
         media_type="text/event-stream"
     )
 
 if __name__ == "__main__":
-    generator = RNNPolymerGenerator(input_type="psmiles")
-    generator.load_model_from_ckpt("./resources/PSMILES_LSTM_1M_5_epochs.pth")
-    for gen in generator.stream_generate(10):
-        print('generations >>', gen)
+    # Test the external LSTM API connectivity
+    import asyncio
+    
+    async def test_api():
+        if not ADMET_API_KEY:
+            print("ERROR: ADMET_API_KEY not set in environment variables")
+            return
+            
+        try:
+            async with httpx.AsyncClient() as client:
+                headers = {"Authorization": f"Bearer {ADMET_API_KEY}"}
+                response = await client.get(f"{ADMET_API_BASE_URL}/health", headers=headers)
+                if response.status_code == 200:
+                    print(f"✓ External ADMET API is healthy: {response.json()}")
+                else:
+                    print(f"✗ External ADMET API health check failed: {response.status_code}")
+        except Exception as e:
+            print(f"✗ Failed to connect to external ADMET API: {e}")
+    
+    asyncio.run(test_api())

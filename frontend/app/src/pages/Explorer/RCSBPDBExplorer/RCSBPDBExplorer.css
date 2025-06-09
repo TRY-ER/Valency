@@ -1,0 +1,691 @@
+.rcsb-pdb-explorer-container .rcsb-search-type-selector-section {
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 100;
+    width: fit-content;
+}
+
+.rcsb-pdb-explorer-container .rcsb-search-type-selector-header {
+    font-size: 1.1em;
+    color: var(--color-text-secondary);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.rcsb-search-type-selector {
+    position: relative;
+    width: auto;
+    min-width: 200px;
+    max-width: 300px;
+    min-height: 44px;
+    z-index: 1000;
+}
+
+.rcsb-search-type-selector .selector-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    user-select: none;
+    min-height: 44px;
+    box-sizing: border-box;
+    font-weight: 500;
+}
+
+.rcsb-search-type-selector .selector-trigger:hover {
+    background-color: var(--glassy-color);
+    border-color: var(--color-accent);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.rcsb-search-type-selector .selector-trigger:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(4, 120, 4, 0.1); /* Assuming accent is green-ish, adjust if not */
+    background-color: var(--color-bg-primary);
+}
+
+.rcsb-search-type-selector .selector-trigger.open {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(4, 120, 4, 0.1);
+    background-color: var(--color-bg-primary);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.rcsb-search-type-selector.disabled .selector-trigger {
+    background-color: var(--c-deep-light);
+    color: var(--color-text-secondary);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.rcsb-search-type-selector .selected-text {
+    flex: 1;
+    text-align: left;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.rcsb-search-type-selector .dropdown-arrow {
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    transition: color 0.2s ease, transform 0.2s ease; /* Added transform */
+}
+
+.rcsb-search-type-selector .dropdown-arrow.open {
+    color: var(--color-accent);
+    transform: rotate(180deg);
+}
+
+/* Portal dropdown styles */
+.rcsb-selector-options-portal {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-accent);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 16px var(--shadow-color);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 10000;
+}
+
+/* Webkit scrollbar styling for RCSB portal dropdown */
+.rcsb-selector-options-portal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.rcsb-selector-options-portal::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+    border-radius: 3px;
+}
+
+.rcsb-selector-options-portal::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 3px;
+}
+
+.rcsb-selector-options-portal::-webkit-scrollbar-thumb:hover {
+    opacity: 1;
+}
+
+.rcsb-selector-options-portal .selector-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid var(--c-light-border);
+    font-weight: 500;
+}
+
+.rcsb-selector-options-portal .selector-option:last-child {
+    border-bottom: none;
+}
+
+.rcsb-selector-options-portal .selector-option:hover {
+    background-color: var(--glassy-color);
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.rcsb-selector-options-portal .selector-option.selected {
+    background-color: var(--color-accent) !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.rcsb-selector-options-portal .selector-option.selected:hover {
+    background-color: var(--color-accent) !important;
+    opacity: 0.9;
+}
+
+.rcsb-selector-options-portal .option-label {
+    flex: 1;
+    text-align: left;
+}
+
+.rcsb-selector-options-portal .check-icon {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+    color: currentColor; /* Will be white when selected */
+}
+
+/* Focus styles for accessibility */
+.rcsb-selector-options-portal .selector-option:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+}
+
+/* Responsive adjustments if needed */
+@media (max-width: 768px) {
+    .rcsb-search-type-selector .selector-trigger {
+        padding: 10px 12px;
+        min-height: 40px;
+        font-size: 0.9rem;
+    }
+    
+    .rcsb-selector-options-portal .selector-option {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .rcsb-search-type-selector {
+        max-width: 100%;
+    }
+}
+
+/* Generic Portal Dropdown Styles */
+/* These styles are very similar to rcsb-search-type-selector and chembl-search-selector */
+/* You might want to refactor these into a common stylesheet if they are identical */
+
+.generic-portal-dropdown {
+    position: relative;
+    width: 100%;
+    min-height: 44px;
+    max-width: 300px; /* Or make it full width: 100% */
+    z-index: 900; /* Lower than search type selector if they can overlap and this should be under */
+    margin-bottom: 10px; /* Add some spacing */
+}
+
+.generic-portal-dropdown .selector-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    user-select: none;
+    min-height: 44px;
+    box-sizing: border-box;
+    font-weight: 500;
+}
+
+.generic-portal-dropdown .selector-trigger:hover {
+    background-color: var(--glassy-color);
+    border-color: var(--color-accent);
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.generic-portal-dropdown .selector-trigger:focus {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(4, 120, 4, 0.1);
+    background-color: var(--color-bg-primary);
+}
+
+.generic-portal-dropdown .selector-trigger.open {
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(4, 120, 4, 0.1);
+    background-color: var(--color-bg-primary);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.generic-portal-dropdown.disabled .selector-trigger {
+    background-color: var(--c-deep-light);
+    color: var(--color-text-secondary);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.generic-portal-dropdown .selected-text {
+    flex: 1;
+    text-align: left;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.generic-portal-dropdown .dropdown-arrow {
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.generic-portal-dropdown .dropdown-arrow.open {
+    color: var(--color-accent);
+    transform: rotate(180deg);
+}
+
+/* Portal dropdown options for GenericPortalDropdown */
+.generic-portal-dropdown-options-portal {
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-accent);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    box-shadow: 0 4px 16px var(--shadow-color);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 10000;
+}
+
+/* Webkit scrollbar styling for Generic portal dropdown */
+.generic-portal-dropdown-options-portal::-webkit-scrollbar {
+    width: 6px;
+}
+
+.generic-portal-dropdown-options-portal::-webkit-scrollbar-track {
+    background: var(--color-bg-secondary);
+    border-radius: 3px;
+}
+
+.generic-portal-dropdown-options-portal::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 3px;
+}
+
+.generic-portal-dropdown-options-portal::-webkit-scrollbar-thumb:hover {
+    opacity: 1;
+}
+
+.generic-portal-dropdown-options-portal .selector-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.95rem;
+    color: var(--color-text-primary);
+    border-bottom: 1px solid var(--c-light-border);
+    font-weight: 500;
+}
+
+.generic-portal-dropdown-options-portal .selector-option:last-child {
+    border-bottom: none;
+}
+
+.generic-portal-dropdown-options-portal .selector-option:hover {
+    background-color: var(--glassy-color);
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.generic-portal-dropdown-options-portal .selector-option.selected {
+    background-color: var(--color-accent) !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+.generic-portal-dropdown-options-portal .selector-option.selected:hover {
+    background-color: var(--color-accent) !important;
+    opacity: 0.9;
+}
+
+.generic-portal-dropdown-options-portal .option-label {
+    flex: 1;
+    text-align: left;
+}
+
+.generic-portal-dropdown-options-portal .check-icon {
+    display: flex;
+    align-items: center;
+    margin-left: 8px;
+    color: currentColor;
+}
+
+.generic-portal-dropdown-options-portal .selector-option:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+}
+
+/* Dropdown field container styles */
+.dropdown-field-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    width: fit-content;
+}
+
+.dropdown-field-label {
+    font-size: 0.9em;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    min-width: 120px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* Input field container styles */
+.input-field-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.input-field-label {
+    font-size: 0.9em;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    min-width: 120px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* Search inputs container */
+.search-inputs-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 20px;
+    width: fit-content;
+    max-width: 100%;
+}
+
+/* Input field styling consistent with project patterns */
+.rcsb-input-field {
+    padding: 12px 16px;
+    background: var(--glassy-color);
+    border: 1px solid var(--c-light-border);
+    border-radius: 15px;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s ease;
+    flex: 1;
+}
+
+.rcsb-input-field:focus {
+    background-color: var(--color-bg-primary);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(4, 120, 4, 0.1);
+}
+
+.rcsb-input-field::placeholder {
+    color: var(--color-text-secondary);
+    font-weight: 400;
+}
+
+/* Textarea field styling */
+.rcsb-textarea-field {
+    padding: 12px 16px;
+    background: var(--glassy-color);
+    border: 1px solid var(--c-light-border);
+    border-radius: 15px;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-height: 80px;
+    resize: vertical;
+    font-family: inherit;
+}
+
+.rcsb-textarea-field:focus {
+    background-color: var(--color-bg-primary);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(4, 120, 4, 0.1);
+}
+
+.rcsb-textarea-field::placeholder {
+    color: var(--color-text-secondary);
+    font-weight: 400;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dropdown-field-container,
+    .input-field-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .dropdown-field-label,
+    .input-field-label {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+/* Activity Search Selector Styles */
+.activity-search-selector {
+    position: relative;
+    width: auto;
+    min-width: 200px;
+    max-width: 300px;
+    z-index: 1001;
+}
+
+.activity-search-selector.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.activity-search-selector .selector-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 40px;
+}
+
+.activity-search-selector .selector-trigger:hover:not(.disabled) {
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-secondary);
+}
+
+.activity-search-selector .selector-trigger.open {
+    border-color: var(--color-accent);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    background-color: var(--color-bg-primary);
+}
+
+.activity-search-selector .selected-text {
+    color: var(--color-text-primary);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.activity-search-selector .dropdown-arrow {
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.activity-search-selector .dropdown-arrow.open {
+    transform: rotate(180deg);
+}
+
+/* RCSB Submit Button Styles */
+.rcsb-submit-button {
+    padding: 12px 24px;
+    background: var(--color-success);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 160px;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rcsb-submit-button:hover:not(:disabled) {
+    background: var(--color-success-hover, #1e7e34);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.rcsb-submit-button:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rcsb-submit-button:disabled {
+    background: var(--color-disabled, #6c757d);
+    color: var(--color-text-disabled, #ccc);
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+/* Loading state styling for submit button */
+.rcsb-submit-button:disabled::after {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-left: 8px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .rcsb-submit-button {
+        padding: 10px 20px;
+        font-size: 13px;
+        min-width: 140px;
+    }
+}
+
+/* Add Attribute Filter Button Styles */
+.add-filter-btn {
+    padding: 10px 18px;
+    background: var(--color-accent);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 140px;
+    margin: 8px 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.add-filter-btn:hover:not(:disabled) {
+    background: var(--color-accent-hover, #0056b3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.add-filter-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.add-filter-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.add-filter-btn:disabled {
+    background: var(--color-disabled, #6c757d);
+    color: var(--color-text-disabled, #ccc);
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+/* Remove Filter Button Styles */
+.remove-filter-btn {
+    padding: 8px 16px;
+    background: var(--color-danger, #dc3545);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    margin: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.remove-filter-btn:hover:not(:disabled) {
+    background: var(--color-danger-hover, #c82333);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
+}
+
+.remove-filter-btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.remove-filter-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25);
+}
+
+.remove-filter-btn:disabled {
+    background: var(--color-disabled, #6c757d);
+    color: var(--color-text-disabled, #ccc);
+    cursor: not-allowed;
+    transform: none;
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+/* Responsive Design for Filter Buttons */
+@media (max-width: 768px) {
+    .add-filter-btn {
+        padding: 8px 14px;
+        font-size: 12px;
+        min-width: 120px;
+    }
+    
+    .remove-filter-btn {
+        padding: 6px 12px;
+        font-size: 11px;
+        min-width: 80px;
+    }
+}

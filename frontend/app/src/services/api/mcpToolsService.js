@@ -1298,3 +1298,369 @@ export const pingMcpToolsServer = async () => {
     throw error;
   }
 };
+
+// ==================== RCSB PDB TOOLS ====================
+
+/**
+ * @typedef {Object} RcsbPdbTextSearchArgs
+ * @property {string} query_string - The text to search for (e.g., "hemoglobin").
+ * @property {string} [return_type="entry"] - Type of identifiers to return (e.g., 'entry', 'polymer_entity'). Defaults to "entry".
+ * @property {string} [results_verbosity="compact"] - Verbosity of results ('compact', 'minimal', 'verbose'). Defaults to "compact".
+ */
+
+/**
+ * Perform a text search in RCSB PDB.
+ * @param {RcsbPdbTextSearchArgs} args - The arguments for the text search.
+ * @returns {Promise<object>} A promise that resolves to the search results.
+ */
+export const rcsbTextSearchPdb = async (args) => {
+  if (!args || !args.query_string) {
+    console.error('rcsbTextSearchPdb: query_string is required');
+    return Promise.reject(new Error('The text to search for (e.g., "hemoglobin") is required.'));
+  }
+  if (typeof args.query_string !== 'string' || args.query_string.trim() === '') {
+    console.error('rcsbTextSearchPdb: query_string must be a non-empty string');
+    return Promise.reject(new Error('The text to search for must be a non-empty string.'));
+  }
+
+  try {
+    const result = await callMcpTool('/mcp/rcsb/text_search_pdb', args);
+    console.log('RCSB PDB text search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform RCSB PDB text search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} RcsbPdbAttributeSearchArgs
+ * @property {string} attribute_path - Path of the attribute to query (e.g., 'exptl.method').
+ * @property {string} operator - Comparison operator (e.g., 'exact_match', 'greater').
+ * @property {any} value - Value to compare against. For 'in' operator, this should be a list.
+ * @property {string} [return_type="entry"] - Type of identifiers to return. Defaults to "entry".
+ * @property {string} [results_verbosity="compact"] - Verbosity of results. Defaults to "compact".
+ */
+
+/**
+ * Perform an attribute search in RCSB PDB.
+ * @param {RcsbPdbAttributeSearchArgs} args - The arguments for the attribute search.
+ * @returns {Promise<object>} A promise that resolves to the search results.
+ */
+export const rcsbAttributeSearchPdb = async (args) => {
+  if (!args || !args.attribute_path) {
+    console.error('rcsbAttributeSearchPdb: attribute_path is required');
+    return Promise.reject(new Error('Path of the attribute to query is required.'));
+  }
+  if (typeof args.attribute_path !== 'string' || args.attribute_path.trim() === '') {
+    console.error('rcsbAttributeSearchPdb: attribute_path must be a non-empty string');
+    return Promise.reject(new Error('Path of the attribute to query must be a non-empty string.'));
+  }
+  if (!args.operator) {
+    console.error('rcsbAttributeSearchPdb: operator is required');
+    return Promise.reject(new Error('Comparison operator is required.'));
+  }
+  if (typeof args.operator !== 'string' || args.operator.trim() === '') {
+    console.error('rcsbAttributeSearchPdb: operator must be a non-empty string');
+    return Promise.reject(new Error('Comparison operator must be a non-empty string.'));
+  }
+  if (args.value === undefined) {
+    console.error('rcsbAttributeSearchPdb: value is required');
+    return Promise.reject(new Error('Value to compare against is required.'));
+  }
+
+  try {
+    const result = await callMcpTool('/mcp/rcsb/attribute_search_pdb', args);
+    console.log('RCSB PDB attribute search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform RCSB PDB attribute search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} RcsbPdbCombinedSearchArgs
+ * @property {string} text_query_string - Main text query.
+ * @property {Array<Object>} attribute_filters - List of attribute filter dicts. Each dict: {"attribute_path": "...", "operator": "...", "value": ...}. Example: [{"attribute_path": "rcsb_struct_symmetry.symbol", "operator": "exact_match", "value": "C2"}].
+ * @property {string} [logical_operator="and"] - How to combine text and attribute filters ('and' or 'or'). Defaults to "and".
+ * @property {string} [return_type="entry"] - Type of identifiers to return. Defaults to "entry".
+ * @property {string} [results_verbosity="compact"] - Verbosity of results. Defaults to "compact".
+ */
+
+/**
+ * Combines a text query with multiple attribute queries in RCSB PDB.
+ * @param {RcsbPdbCombinedSearchArgs} args - The arguments for the combined search.
+ * @returns {Promise<object>} A promise that resolves to the search results.
+ */
+export const rcsbCombinedTextAndAttributeSearch = async (args) => {
+  if (!args || !args.text_query_string) {
+    console.error('rcsbCombinedTextAndAttributeSearch: text_query_string is required');
+    return Promise.reject(new Error('Main text query is required.'));
+  }
+  if (typeof args.text_query_string !== 'string' || args.text_query_string.trim() === '') {
+    console.error('rcsbCombinedTextAndAttributeSearch: text_query_string must be a non-empty string');
+    return Promise.reject(new Error('Main text query must be a non-empty string.'));
+  }
+  if (!args.attribute_filters) {
+    console.error('rcsbCombinedTextAndAttributeSearch: attribute_filters is required');
+    return Promise.reject(new Error('List of attribute filter dicts is required.'));
+  }
+  if (!Array.isArray(args.attribute_filters) || !args.attribute_filters.every(item => typeof item === 'object' && item !== null)) {
+    console.error('rcsbCombinedTextAndAttributeSearch: attribute_filters must be an array of objects');
+    return Promise.reject(new Error('Attribute filters must be an array of filter objects.'));
+  }
+
+  try {
+    const result = await callMcpTool('/mcp/rcsb/combined_text_and_attribute_search', args);
+    console.log('RCSB PDB combined search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform RCSB PDB combined search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} RcsbPdbSequenceIdentitySearchArgs
+ * @property {string} sequence - Protein, DNA, or RNA sequence string.
+ * @property {number} [identity_cutoff=0.9] - Minimum sequence identity (0.0 to 1.0). Defaults to 0.9.
+ * @property {number} [e_value_cutoff=1.0] - Maximum E-value for the match. Defaults to 1.0.
+ * @property {string} [sequence_type="protein"] - Type of sequence ('protein', 'dna', 'rna'). Defaults to "protein".
+ * @property {string} [return_type="polymer_entity"] - Type of identifiers to return. Defaults to "polymer_entity".
+ */
+
+/**
+ * Find PDB entities with sequence similarity.
+ * @param {RcsbPdbSequenceIdentitySearchArgs} args - The arguments for sequence identity search.
+ * @returns {Promise<object>} A promise that resolves to the search results.
+ */
+export const rcsbSequenceIdentitySearch = async (args) => {
+  if (!args || !args.sequence) {
+    console.error('rcsbSequenceIdentitySearch: sequence is required');
+    return Promise.reject(new Error('Protein, DNA, or RNA sequence string is required.'));
+  }
+  if (typeof args.sequence !== 'string' || args.sequence.trim() === '') {
+    console.error('rcsbSequenceIdentitySearch: sequence must be a non-empty string');
+    return Promise.reject(new Error('Sequence string must be a non-empty string.'));
+  }
+
+  try {
+    const result = await callMcpTool('/mcp/rcsb/sequence_identity_search', args);
+    console.log('RCSB PDB sequence identity search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform RCSB PDB sequence identity search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} RcsbPdbSequenceMotifSearchArgs
+ * @property {string} motif_pattern - Motif pattern (e.g., "C-x(2,4)-C-x(3)-[LIVMFYWC]-x(8)-H-x(3,5)-H." for PROSITE).
+ * @property {string} [pattern_type="prosite"] - Type of pattern ('prosite', 'regex', 'simple'). Defaults to "prosite".
+ * @property {string} [sequence_type="protein"] - Type of sequence. Defaults to "protein".
+ * @property {string} [return_type="polymer_entity"] - Type of identifiers to return. Defaults to "polymer_entity".
+ */
+
+/**
+ * Search for sequences containing a specific motif in RCSB PDB.
+ * @param {RcsbPdbSequenceMotifSearchArgs} args - The arguments for sequence motif search.
+ * @returns {Promise<object>} A promise that resolves to the search results.
+ */
+export const rcsbSequenceMotifSearch = async (args) => {
+  if (!args || !args.motif_pattern) {
+    console.error('rcsbSequenceMotifSearch: motif_pattern is required');
+    return Promise.reject(new Error('Motif pattern is required.'));
+  }
+  if (typeof args.motif_pattern !== 'string' || args.motif_pattern.trim() === '') {
+    console.error('rcsbSequenceMotifSearch: motif_pattern must be a non-empty string');
+    return Promise.reject(new Error('Motif pattern must be a non-empty string.'));
+  }
+
+  try {
+    const result = await callMcpTool('/mcp/rcsb/sequence_motif_search', args);
+    console.log('RCSB PDB sequence motif search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform RCSB PDB sequence motif search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} RcsbPdbStructSimilarityEntryIdArgs
+ * @property {string} entry_id - PDB ID of the query structure (e.g., '4HHB').
+ * @property {string} [assembly_id="1"] - Assembly ID of the query structure. Defaults to "1".
+ * @property {string} [operator="strict_shape_match"] - Similarity operator ('strict_shape_match' or 'relaxed_shape_match'). Defaults to "strict_shape_match".
+ * @property {string} [target_search_space="assembly"] - What to compare against ('assembly' or 'polymer_entity_instance'). Defaults to "assembly".
+ * @property {string} [return_type="assembly"] - Type of identifiers to return. Defaults to "assembly".
+ */
+
+/**
+ * Find structures similar to a given PDB entry ID in RCSB PDB.
+ * @param {RcsbPdbStructSimilarityEntryIdArgs} args - The arguments for structure similarity search by entry ID.
+ * @returns {Promise<object>} A promise that resolves to the search results.
+ */
+export const rcsbStructureSimilarityByEntryId = async (args) => {
+  if (!args || !args.entry_id) {
+    console.error('rcsbStructureSimilarityByEntryId: entry_id is required');
+    return Promise.reject(new Error('PDB ID of the query structure is required.'));
+  }
+  if (typeof args.entry_id !== 'string' || args.entry_id.trim() === '') {
+    console.error('rcsbStructureSimilarityByEntryId: entry_id must be a non-empty string');
+    return Promise.reject(new Error('PDB ID must be a non-empty string.'));
+  }
+
+  try {
+    const result = await callMcpTool('/mcp/rcsb/structure_similarity_by_entry_id', args);
+    console.log('RCSB PDB structure similarity by entry ID search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform RCSB PDB structure similarity by entry ID search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} RcsbPdbStructSimilarityFileUrlArgs
+ * @property {string} file_url - URL to the structure file (e.g., 'https://files.rcsb.org/view/4HHB.cif').
+ * @property {string} file_format - Format of the file ('cif', 'bcif', 'pdb', 'cif.gz', 'pdb.gz').
+ * @property {string} [operator="strict_shape_match"] - Similarity operator. Defaults to "strict_shape_match".
+ * @property {string} [target_search_space="assembly"] - What to compare against. Defaults to "assembly".
+ * @property {string} [return_type="assembly"] - Type of identifiers to return. Defaults to "assembly".
+ */
+
+/**
+ * Find structures similar to a structure provided via a file URL in RCSB PDB.
+ * @param {RcsbPdbStructSimilarityFileUrlArgs} args - The arguments for structure similarity search by file URL.
+ * @returns {Promise<object>} A promise that resolves to the search results.
+ */
+export const rcsbStructureSimilarityByFileUrl = async (args) => {
+  if (!args || !args.file_url) {
+    console.error('rcsbStructureSimilarityByFileUrl: file_url is required');
+    return Promise.reject(new Error('URL to the structure file is required.'));
+  }
+  if (typeof args.file_url !== 'string' || args.file_url.trim() === '') {
+    console.error('rcsbStructureSimilarityByFileUrl: file_url must be a non-empty string');
+    return Promise.reject(new Error('File URL must be a non-empty string.'));
+  }
+  if (!args.file_format) {
+    console.error('rcsbStructureSimilarityByFileUrl: file_format is required');
+    return Promise.reject(new Error('Format of the file is required.'));
+  }
+  if (typeof args.file_format !== 'string' || args.file_format.trim() === '') {
+    console.error('rcsbStructureSimilarityByFileUrl: file_format must be a non-empty string');
+    return Promise.reject(new Error('File format must be a non-empty string.'));
+  }
+
+  try {
+    const result = await callMcpTool('/mcp/rcsb/structure_similarity_by_file_url', args);
+    console.log('RCSB PDB structure similarity by file URL search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform RCSB PDB structure similarity by file URL search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} RcsbPdbGetProteinDetailsByIdArgs
+ * @property {string} pdb_id_string - The PDB ID of the protein (e.g., '6M0J', '1TIM').
+ */
+
+/**
+ * Retrieves detailed information about a specific protein from its PDB ID using pypdb.
+ * Complements the rcsbsearchapi tools by providing a different set of details.
+ * @param {RcsbPdbGetProteinDetailsByIdArgs} args - The arguments for protein details retrieval
+ * @returns {Promise<object>} A promise that resolves to the protein details data
+ */
+export const rcsbGetProteinDetailsByIdPypdb = async (args) => {
+  if (!args || !args.pdb_id_string) {
+    console.error('rcsbGetProteinDetailsByIdPypdb: pdb_id_string is required');
+    return Promise.reject(new Error('The PDB ID of the protein is required.'));
+  }
+  if (typeof args.pdb_id_string !== 'string' || args.pdb_id_string.trim() === '') {
+    console.error('rcsbGetProteinDetailsByIdPypdb: pdb_id_string must be a non-empty string');
+    return Promise.reject(new Error('The PDB ID must be a non-empty string.'));
+  }
+
+  try {
+    const result = await callMcpTool('/mcp/rcsb/get_protein_details_by_id_pypdb', args);
+    console.log('RCSB PDB protein details by ID (PyPDB) retrieval completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get RCSB PDB protein details by ID (PyPDB):', error.message);
+    throw error;
+  }
+};
+
+// ==================== UNIPROT TOOLS ====================
+
+/**
+ * @typedef {Object} UniprotSearchUniprotkbArgs
+ * @property {string} query_string - The UniProt query string.
+ * @property {string} [result_format="json"] - Desired format ('json', 'tsv', 'fasta', 'xml', 'txt', 'list', 'gff', 'obo', 'rdf', 'xlsx'). Defaults to "json".
+ * @property {string} [fields=""] - Comma-separated list of column names to retrieve (applies to tsv, xlsx, json). E.g., 'id,xref_pdb,gene_names'.
+ * @property {number} [size=30] - Number of results to retrieve per page (max 30 recommended). Defaults to 30.
+ * @property {string} [cursor=""] - Cursor for pagination to retrieve the next page of results.
+ * @property {boolean} [include_isoform=false] - Whether to include isoforms in the search results. Defaults to false.
+ */
+
+/**
+ * Search the UniProtKB database with various query options and filters.
+ * @param {UniprotSearchUniprotkbArgs} args - The arguments for UniProtKB search
+ * @returns {Promise<object>} A promise that resolves to the search results
+ */
+export const uniprotSearchUniprotkb = async (args) => {
+  if (!args || !args.query_string) {
+    console.error('uniprotSearchUniprotkb: query_string is required');
+    return Promise.reject(new Error('The UniProt query string is required'));
+  }
+  
+  if (typeof args.query_string !== 'string' || args.query_string.trim() === '') {
+    console.error('uniprotSearchUniprotkb: query_string must be a non-empty string');
+    return Promise.reject(new Error('UniProt query string must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/uniprot/search_uniprotkb', args);
+    console.log('UniProt UniProtKB search completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to perform UniProt UniProtKB search:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * @typedef {Object} UniprotGetUniprotkbEntryArgs
+ * @property {string} uniprot_id - The UniProtKB ID (e.g., 'P12345', 'SPIKE_SARS2').
+ * @property {string} [result_format="json"] - Desired format ('json', 'fasta', 'txt', 'xml', 'rdf', 'gff'). Defaults to "json".
+ */
+
+/**
+ * Retrieve a specific UniProtKB entry by its ID.
+ * @param {UniprotGetUniprotkbEntryArgs} args - The arguments for UniProtKB entry retrieval
+ * @returns {Promise<object>} A promise that resolves to the entry data
+ */
+export const uniprotGetUniprotkbEntry = async (args) => {
+  if (!args || !args.uniprot_id) {
+    console.error('uniprotGetUniprotkbEntry: uniprot_id is required');
+    return Promise.reject(new Error('The UniProtKB ID is required'));
+  }
+  
+  if (typeof args.uniprot_id !== 'string' || args.uniprot_id.trim() === '') {
+    console.error('uniprotGetUniprotkbEntry: uniprot_id must be a non-empty string');
+    return Promise.reject(new Error('UniProtKB ID must be a non-empty string'));
+  }
+  
+  try {
+    const result = await callMcpTool('/mcp/uniprot/get_uniprotkb_entry', args);
+    console.log('UniProt UniProtKB entry retrieval completed successfully');
+    return result;
+  } catch (error) {
+    console.error('Failed to get UniProt UniProtKB entry:', error.message);
+    throw error;
+  }
+};

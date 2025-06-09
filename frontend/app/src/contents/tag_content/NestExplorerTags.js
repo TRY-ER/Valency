@@ -4,6 +4,9 @@ import UniProtViewer from "../../pages/Explorer/ProtExplorer/UniProtViewer"; // 
 import DocRenderer from "../doc_content/DocRenderer";
 import UniProtSummaryViewer from "../../pages/Explorer/ProtExplorer/UniProtSummaryViewer";
 import AlphafoldAnnotationsViewer from "../../pages/Explorer/ProtExplorer/AlphafoldAnnotationsViewer";
+import RCSBPDBExplorer from "../../pages/Explorer/RCSBPDBExplorer/RCSBPDBExplorer";
+import RCSBStructureSimilaritySearch from "../../pages/Explorer/RCSBPDBExplorer/RCSBStructureSimilaritySearch";
+import UniProtExplorer from "../../pages/Explorer/UniProtExplorer/UniProtExplorer";
 
 const ProtExploreTabContents = [
     {
@@ -63,5 +66,35 @@ const UniProtExploreTabContents = [
     }
 ]
 
+const RCSBExplorerTabContent= [
+    {
+        id: 1, // New ID for the UniProt tab
+        title: 'Getter',
+        link: '', // New link for the UniProt tab
+        description: `RCSB PDB Explorer is a tool that allows users to search and retrieve protein structures from the RCSB Protein Data Bank (PDB) using various identifiers such as PDB ID, UniProt ID, or Gene Name. It provides a user-friendly interface for exploring protein structures and their associated data.`,
+        component: <RCSBPDBExplorer />,
+        docs: null 
+    },
+    {
+        id: 2, // New ID for the UniProt tab
+        title: 'Similarity Search',
+        link: 'ssearch', // New link for the UniProt tab
+        description: `Similarity search in RCSB PDB Explorer allows users to find protein structures that are similar to a given structure based on sequence or structural similarity. This feature helps in identifying homologous proteins and understanding structural relationships.`,
+        component: <RCSBStructureSimilaritySearch />,
+        docs: null 
+    },
+]
 
-export { ProtExploreTabContents, UniProtExploreTabContents };
+const UniprotTabContent= [
+    {
+        id: 1, // New ID for the UniProt tab
+        title: 'Search',
+        link: '', // New link for the UniProt tab
+        description: `Uniprot Explorer is a tool that allows users to search and retrieve protein information from the Uniprot database using various identifiers such as UniProt ID, Gene Name, or Protein Name. It provides a user-friendly interface for exploring protein sequences, functions, and annotations. with query and UniProt ID.`,
+        component: <UniProtExplorer />,
+        docs: <DocRenderer filePath="/markdown_repo/UniProtExplorer.md"/>
+    },
+]
+
+
+export { ProtExploreTabContents, UniProtExploreTabContents, RCSBExplorerTabContent, UniprotTabContent};

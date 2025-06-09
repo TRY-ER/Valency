@@ -9,8 +9,8 @@
   background-color: var(--color-bg-secondary); /* Uses themed variable */
   color: var(--color-text-primary); /* Uses themed variable */
   width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow: auto;
   display: flex;
   flex-direction: row;
 }
@@ -90,7 +90,7 @@
 .side-content {
   flex: 1;
   height: 100vh;
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 .tab-container {

@@ -2,7 +2,11 @@ import DocRenderer from "../doc_content/DocRenderer";
 import MolEComponent from "../../pages/Explorer/MolExplorer/MolExplorer";
 import ProtEComponent from "../../pages/Explorer/ProtExplorer/ProtExplorer";
 import PolyEComponent from "../../pages/Explorer/PolyExplorer/PolyExplorer";
-import { ProtExploreTabContents, UniProtExploreTabContents } from "./NestExplorerTags";
+import RCSBComponent from "../../pages/Explorer/ProtExplorer/RCSBExplorer";
+import UniProtExplorer from "../../pages/Explorer/UniProtExplorer/UniProtExplorer";
+import { ProtExploreTabContents, UniProtExploreTabContents, RCSBExplorerTabContent,
+    UniprotTabContent
+ } from "./NestExplorerTags";
 import { sub } from "framer-motion/client";
 
 const ExplorerTabContent = [
@@ -36,7 +40,7 @@ const ExplorerTabContent = [
         id: 3,
         title: 'Alphafold',
         link: 'alphafold', // This is correct for /explorer/proe
-        description: `The Uniprot explorer tool takes the Uniprot ID to show it's details`,
+        description: `The alfafold explorer tool takes the Uniprot ID to show it's details and 3D structure`,
         component: <ProtEComponent tabContent={UniProtExploreTabContents} basePath="explorer/alphafold"/>, // Corrected basePath
         // docs: <DocRenderer filePath="/markdown_repo/ProteinExplorer.md"/>,
         subElements: UniProtExploreTabContents,
@@ -44,6 +48,24 @@ const ExplorerTabContent = [
     },
     {
         id: 4,
+        title: 'RCSB',
+        link: 'rcsb', // This is correct for /explorer/proe
+        description: `The RCSB explorer tool enables various mode of search for the PDB ID, Uniprot ID, or Gene Name.`,
+        component: <RCSBComponent tabContent={RCSBExplorerTabContent} basePath="explorer/rcsb"/>, // Corrected basePath
+        // docs: <DocRenderer filePath="/markdown_repo/ProteinExplorer.md"/>,
+        subElements: RCSBExplorerTabContent,
+        includeDocs: true,
+    },
+    {
+        id: 5,
+        title: 'Uniprot',
+        link: 'uniprot', // This is correct for /explorer/uniprot
+        description: `The Uniprot explorer tool enables various mode of search for query and UniProt ID`,
+        component: <UniProtExplorer />, // Use UniProtExplorer directly
+        docs: <DocRenderer filePath="/markdown_repo/UniProtExplorer.md"/>,
+    },
+    {
+        id: 6,
         title: 'Polymer Explorer',
         link: 'polye', // This is correct for /explorer/polye
         description: `The polymer explorer tool takes PSMILES of the polymer and gives visual representation in a sidepanel,
