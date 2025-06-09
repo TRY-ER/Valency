@@ -180,6 +180,9 @@
     flex: 1;
     min-height: 44px;
     box-sizing: border-box;
+    min-width: 350px;
+    width: 100%;
+    max-width: 600px;
 }
 
 .uniprot-explorer-container .search-input:focus {
@@ -410,13 +413,13 @@
 }
 
 /* Loading States */
-.uniprot-explorer-container .search-button:disabled {
+.uniprot-explorer-container .search-button.loading {
     position: relative;
     overflow: hidden;
 }
 
 /* Loading state styling for submit button */
-.uniprot-explorer-container .search-button:disabled::after {
+.uniprot-explorer-container .search-button.loading::after {
     content: "";
     display: inline-block;
     width: 14px;

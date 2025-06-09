@@ -1,3 +1,15 @@
+/* Main Container */
+.rcsb-pdb-explorer-container {
+    background-color: var(--glassy-color);
+    border: 1px solid var(--c-light-border);
+    border-radius: 16px;
+    padding: 32px;
+    margin: 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px var(--shadow-color);
+    width: calc(100% - 40px);
+}
+
 .rcsb-pdb-explorer-container .rcsb-search-type-selector-section {
     margin-bottom: 20px;
     position: relative;
@@ -390,7 +402,7 @@
     flex-direction: column;
     gap: 16px;
     margin-bottom: 20px;
-    width: fit-content;
+    width: 100%;
     max-width: 100%;
 }
 
@@ -406,6 +418,9 @@
     outline: none;
     transition: all 0.2s ease;
     flex: 1;
+    min-width: 350px;
+    width: 100%;
+    max-width: 600px;
 }
 
 .rcsb-input-field:focus {
@@ -434,6 +449,9 @@
     min-height: 80px;
     resize: vertical;
     font-family: inherit;
+    min-width: 350px;
+    width: 100%;
+    max-width: 600px;
 }
 
 .rcsb-textarea-field:focus {

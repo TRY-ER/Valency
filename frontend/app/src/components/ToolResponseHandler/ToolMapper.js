@@ -32,7 +32,13 @@ import IdentitySearch from '../../pages/Explorer/PubChemExplorer/UtilityComponen
 import PubChemSimilarityGetter from '../../pages/Explorer/PubChemExplorer/PubChemSimilarityGetter';
 import SubstructureSearch from '../../pages/Explorer/PubChemExplorer/UtilityComponents/SubstructureSearch';
 
-// Import Generator Components
+// Import RCSB Components
+import RCSBPDBExplorer from '../../pages/Explorer/RCSBPDBExplorer/RCSBPDBExplorer';
+import RCSBStructureSimilaritySearch from '../../pages/Explorer/RCSBPDBExplorer/RCSBStructureSimilaritySearch'; // Import Generator Components
+
+// Import Uniprot Components
+import UniProtExplorer from '../../pages/Explorer/UniProtExplorer/UniProtExplorer';
+
 import BRICSComponent from '../../pages/Generator/BRICS/PSMILESContent';
 import LSTMComponent from '../../pages/Generator/LSTM/LSTMContent';
 import ADMETComponent from '../../pages/Generator/ADMET/ADMET';
@@ -77,6 +83,14 @@ const ToolMapper = {
     "fast_identity_search_by_cid": IdentitySearch,
     "fast_similarity_2d_search_by_cid": PubChemSimilarityGetter,
     "fast_substructure_search_by_smiles": SubstructureSearch, 
+
+
+    "text_search_pdb": RCSBPDBExplorer,
+    "get_protein_details_by_id_pypdb": RCSBPDBExplorer,
+    "structure_similarity_by_entry_id":  RCSBStructureSimilaritySearch,
+
+    "search_uniprotkb": UniProtExplorer,
+    "get_uniprotkb_entry": UniProtExplorer,
 
     // Utility Components
     'DataViewer': DataViewer,

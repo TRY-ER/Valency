@@ -484,6 +484,50 @@ const UniProtExplorer = ({ initialSearchType = "search_uniprotkb", toolData = nu
 
     // Fixed format to JSON for frontend parsing
 
+    // Effect to handle initial data passed as props
+    useEffect(() => {
+        if (toolData) {
+            console.log('Processing UniProt tool data:', toolData);
+            
+            try {
+                let processedData = null;
+                
+                // Handle different possible toolData structures
+                if (toolData.result && toolData.result["0"]) {
+                    // If toolData comes from API response format
+                    const parsedResult = JSON.parse(toolData.result["0"]);
+                    if (parsedResult.data) {
+                        processedData = parsedResult.data;
+                    } else if (parsedResult.results) {
+                        processedData = parsedResult.results;
+                    } else {
+                        processedData = parsedResult;
+                    }
+                } else if (toolData.data) {
+                    // Direct data structure
+                    processedData = toolData.data;
+                } else if (toolData.results) {
+                    // Results structure
+                    processedData = toolData.results;
+                } else if (Array.isArray(toolData) || (typeof toolData === 'object' && toolData !== null)) {
+                    // Direct array or object data
+                    processedData = toolData;
+                }
+                
+                if (processedData) {
+                    setResults(processedData);
+                    setError(null);
+                    console.log('Set initial UniProt results from toolData:', processedData);
+                } else {
+                    console.warn('Could not extract results from toolData:', toolData);
+                }
+            } catch (err) {
+                console.error('Error processing UniProt toolData:', err);
+                setError('Error processing initial data');
+            }
+        }
+    }, [toolData]);
+
     const debouncedSearch = useCallback(
         debounce(async () => {
             if (!queryString.trim() && searchType === "search_uniprotkb") return;
@@ -507,8 +551,24 @@ const UniProtExplorer = ({ initialSearchType = "search_uniprotkb", toolData = nu
                         result_format: resultFormat
                     });
                 }
-                
-                setResults(result);
+                if (result.status === "success") {
+                    if (result.result){
+                        var processible = result.result["0"];
+                        processible = JSON.parse(processible);
+                        if (processible.data){
+                            setResults(processible.data);
+                        }
+                        else if (processible.results){
+                            setResults(processible.results);
+                        }
+                        else {
+                            setResults(processible);
+                        }
+                    }
+                    else {
+                        setResults(result);
+                    }
+                }
             } catch (err) {
                 setError(err.message || 'An error occurred during the search');
                 setResults(null);
@@ -622,7 +682,7 @@ const UniProtExplorer = ({ initialSearchType = "search_uniprotkb", toolData = nu
                 
                 <div className="search-buttons">
                     <button 
-                        className="search-button primary"
+                        className={`search-button primary ${loading ? 'loading' : ''}`}
                         onClick={handleSearch}
                         disabled={loading || 
                             (searchType === "search_uniprotkb" && !queryString.trim()) ||

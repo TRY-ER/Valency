@@ -555,7 +555,19 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                 default:
                     throw new Error("Invalid search type");
             }
-            setApiData(result);
+            if (result.status === "success"){
+                if (result.result){
+                    var data = result.result["0"];
+                    var processible = JSON.parse(data);
+                    console.log('processible', processible);
+                    if (processible && processible.data) {
+                        result = processible.data;
+                    } else {
+                        result = processible; // Fallback to raw data if no 'data' field
+                    }
+                    setApiData(result);
+                }
+            }
         } catch (err) {
             setError(err.message || "An error occurred during the search.");
             console.error("RCSB PDB Search Error:", err);

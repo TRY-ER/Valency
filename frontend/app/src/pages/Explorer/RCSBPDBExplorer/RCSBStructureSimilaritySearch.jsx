@@ -563,7 +563,22 @@ const RCSBStructureSimilaritySearch = ({ initialSearchType = "entry_id_search", 
                 default:
                     throw new Error("Invalid search type");
             }
-            setApiData(result);
+            if (result.status === "success") {
+                if (result.result){
+                    var processible = result.result["0"];
+                    processible = JSON.parse(processible);
+                    if (processible?.data){
+                        setApiData(processible.data);
+                    }
+                    else{
+                        setApiData(processible);
+                    }
+                }
+                console.log()
+            }
+            else{
+                setApiData(null);
+            }
         } catch (err) {
             setError(err.message || "An error occurred during the structure similarity search.");
             console.error("RCSB PDB Structure Similarity Search Error:", err);

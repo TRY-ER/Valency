@@ -33,7 +33,12 @@ const toolTypeMapper = {
     "get_compound_synonyms_by_cid": null,
     "fast_identity_search_by_cid": "cid",
     "fast_similarity_2d_search_by_cid": "cid",
-    "fast_substructure_search_by_smiles": null
+    "fast_substructure_search_by_smiles": null,
+    "text_search_pdb": "text_search",
+    "get_protein_details_by_id_pypdb": "pdb_id_search",
+    "structure_similarity_by_entry_id": "entry_id_search",
+    "search_uniprotkb": "search_uniprotkb",
+    "get_uniprotkb_entry": "get_uniprotkb_entry",
     // Add more tool mappings here as needed
     // "another_tool": "another_type",
     // "simple_tool": null,
