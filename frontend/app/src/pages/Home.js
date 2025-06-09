@@ -41,7 +41,9 @@ import {
   FaCodeBranch,
   FaMagic,
   FaUpload,
-  FaArrowUp
+  FaArrowUp,
+  FaChevronLeft,
+  FaChevronRight
 } from 'react-icons/fa';
 import GlassyContainer from '../components/glassy_container/gc';
 import { fadeInUpVariantStatic, fadeInDownVariants, fadeInLeftVariants } from '../components/animations/framerAnim';
@@ -213,6 +215,7 @@ const Home = () => {
   const quickActionsRef = useRef(null);
   const platformRef = useRef(null);
   const ctaRef = useRef(null);
+  const quickActionsGridRef = useRef(null); // Added ref for the grid
 
   // Scroll handler for timeline progress and active section
   useEffect(() => {
@@ -259,6 +262,13 @@ const Home = () => {
     setExpandedSections(newExpanded);
   };
 
+  const scrollQuickActions = (direction) => {
+    if (quickActionsGridRef.current) {
+      const scrollAmount = direction === 'left' ? -300 : 300; // Adjust scroll amount as needed
+      quickActionsGridRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   // Enhanced platform sections with infographics
   const platformSections = [
     {
@@ -278,38 +288,10 @@ const Home = () => {
           'Interactive 3D molecular visualization'
         ],
         stats: [
-          { label: 'Molecular Databases', value: '3+', icon: <FaDatabase /> },
-          { label: 'Analysis Tools', value: '15+', icon: <FaCog /> },
-          { label: 'AI Agents', value: '4', icon: <FaRobot /> },
+          { label: 'AI Agents', value: '15+', icon: <FaRobot /> },
+          { label: 'Scientific Databases', value: '5+', icon: <FaDatabase /> },
           { label: 'Research Areas', value: '∞', icon: <FaGraduationCap /> }
         ],
-        infographics: {
-          circularStats: [
-            { value: '95%', label: 'Accuracy', color: '#22c55e', maxValue: 100 },
-            { value: '99.9%', label: 'Uptime', color: '#16a34a', maxValue: 100 },
-            { value: '24/7', label: 'Support', color: '#15803d', maxValue: 100 }
-          ],
-          processSteps: [
-            {
-              title: 'Data Input',
-              description: 'Submit molecular structures or targets',
-              icon: <FaUpload />,
-              color: '#22c55e'
-            },
-            {
-              title: 'AI Processing',
-              description: 'Advanced algorithms analyze your data',
-              icon: <FaBrain />,
-              color: '#16a34a'
-            },
-            {
-              title: 'Results',
-              description: 'Get comprehensive insights and predictions',
-              icon: <FaChartLine />,
-              color: '#15803d'
-            }
-          ]
-        }
       }
     },
     {
@@ -482,7 +464,7 @@ const Home = () => {
       id: 'activities',
       title: 'Workflow Management',
       icon: <FaTasks />,
-      color: '#fed6e3',
+      color: '#22c55e',
       description: 'Comprehensive project and workflow management',
       content: {
         subtitle: 'Streamlined Research Management',
@@ -520,29 +502,25 @@ const Home = () => {
     {
       title: 'Start Chat with Master Agent',
       description: 'Begin a conversation with our AI assistant',
-      icon: <FaUserSecret />,
-      color: '#22c55e',
+      icon: <FaUserSecret className='action-icon-object'/>,
       route: '/chatbot'
     },
     {
       title: 'Explore Molecules',
       description: 'Analyze molecular structures and properties',
-      icon: <FaMolecule />,
-      color: '#16a34a',
+      icon: <FaMolecule className='action-icon-object'/>,
       route: '/explorer'
     },
     {
       title: 'Search Similar Compounds',
       description: 'Find similar molecules in databases',
-      icon: <FaSearch />,
-      color: '#15803d',
+      icon: <FaSearch  className='action-icon-object'/>,
       route: '/identification'
     },
     {
       title: 'Optimize Drug Properties',
       description: 'Use AI to improve molecular properties',
-      icon: <FaLab />,
-      color: '#14532d',
+      icon: <FaLab className='action-icon-object'/>,
       route: '/optimization'
     }
   ];
@@ -621,33 +599,48 @@ const Home = () => {
         >
           <div className={`timeline-marker ${activeSection === 'quick-actions' ? 'active' : ''}`}></div>
           <h2 className="section-title">Quick Start</h2>
-          <div className="quick-actions-grid">
-            {quickActions.map((action, index) => (
-              <motion.div
-                key={index}
-                initial="hidden"
-                animate="visible"
-                variants={fadeInDownVariants}
-                custom={index}
-                className="quick-action-card"
-                onClick={() => navigate(action.route)}
-              >
-                <GlassyContainer className="action-card-content">
-                  <div
-                    className="action-icon"
-                    style={{ color: action.color }}
-                  >
-                    {action.icon}
-                  </div>
-                  <h3 className="action-title">{action.title}</h3>
-                  <p className="action-description">{action.description}</p>
-                  <div className="action-button">
-                    <FaPlay className="play-icon" />
-                    Get Started
-                  </div>
-                </GlassyContainer>
-              </motion.div>
-            ))}
+          <div className="quick-actions-grid-wrapper">
+            <button 
+              className="quick-actions-nav-arrow quick-actions-nav-left"
+              onClick={() => scrollQuickActions('left')}
+              aria-label="Scroll left"
+            >
+              <FaChevronLeft />
+            </button>
+            <div className="quick-actions-grid" ref={quickActionsGridRef}>
+              {quickActions.map((action, index) => (
+                <motion.div
+                  key={index}
+                  initial="hidden"
+                  animate="visible"
+                  variants={fadeInDownVariants}
+                  custom={index}
+                  className="quick-action-card"
+                  onClick={() => navigate(action.route)}
+                >
+                  <GlassyContainer className="action-card-content">
+                    <div
+                      className="action-icon"
+                    >
+                      {action.icon}
+                    </div>
+                    <h3 className="action-title">{action.title}</h3>
+                    <p className="action-description">{action.description}</p>
+                    <div className="action-button">
+                      <FaPlay className="play-icon" />
+                      Get Started
+                    </div>
+                  </GlassyContainer>
+                </motion.div>
+              ))}
+            </div>
+            <button 
+              className="quick-actions-nav-arrow quick-actions-nav-right"
+              onClick={() => scrollQuickActions('right')}
+              aria-label="Scroll right"
+            >
+              <FaChevronRight />
+            </button>
           </div>
         </motion.div>
 
