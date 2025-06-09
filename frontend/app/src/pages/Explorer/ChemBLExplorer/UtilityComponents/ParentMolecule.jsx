@@ -99,7 +99,12 @@ const ParentMolecule = ({ toolData = null, initialSmiles = "" }) => {
             className="utility-component-container"
         >
             <div className="utility-input-section">
-                <GlassyContainer>
+                <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                    <GlassyContainer>
                     <h3 style={{ marginBottom: '15px', fontWeight: '700' }}>Parent Molecule Extractor</h3>
                     <p style={{ marginBottom: '15px', color: 'var(--color-text-secondary)' }}>
                         Extract parent molecule structures from SMILES representations by removing salts, solvents, and counterions.
@@ -202,10 +207,18 @@ const ParentMolecule = ({ toolData = null, initialSmiles = "" }) => {
                         </button>
                     )}
                 </GlassyContainer>
+                </motion.div>
             </div>
 
             {error && (
-                <div className="utility-results-section" style={{ marginTop: '20px' }}>
+                <motion.div 
+                    className="utility-results-section" 
+                    style={{ marginTop: '20px' }}
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 50 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                >
                     <GlassyContainer>
                         <div style={{
                             padding: '16px',
@@ -221,18 +234,25 @@ const ParentMolecule = ({ toolData = null, initialSmiles = "" }) => {
                             </p>
                         </div>
                     </GlassyContainer>
-                </div>
+                </motion.div>
             )}
 
             {results && (
-                <div className="utility-results-section" style={{ marginTop: '20px' }}>
+                <motion.div 
+                    className="utility-results-section" 
+                    style={{ marginTop: '20px' }}
+                    initial={{ opacity: 0, y: 60 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 60 }}
+                    transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+                >
                     <GlassyContainer>
                         <DataViewer 
                             data={results} 
                             title={`Parent Molecule Extraction for SMILES: ${smiles || initialSmiles}`}
                         />
                     </GlassyContainer>
-                </div>
+                </motion.div>
             )}
         </motion.div>
     );

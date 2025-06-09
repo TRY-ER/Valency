@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { fadeInUpVariantStatic } from '../../../../components/animations/framerAnim';
-import { getCompoundProperties } from '../../../../services/api/mcpToolsService';
 import GlassyContainer from '../../../../components/glassy_container/gc';
+import { getCompoundProperties } from '../../../../services/api/mcpToolsService';
 import { FaCheckDouble, FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { IoWarningOutline } from "react-icons/io5";
 
@@ -315,23 +315,30 @@ const CompoundProperties = ({ toolData = null }) => {
                 {isDropdownOpen ? <FaChevronUp /> : <FaChevronDown />}
               </button>
               
-              {isDropdownOpen && (
-                <div style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: 0,
-                  right: 0,
-                  zIndex: 1000,
-                  backgroundColor: 'var(--color-bg-primary)',
-                  border: '1px solid var(--c-light-border)',
-                  borderRadius: '15px',
-                  marginTop: '5px',
-                  maxHeight: '300px',
-                  overflowY: 'auto',
-                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
-                }}>
+              <AnimatePresence>
+                {isDropdownOpen && (
+                <motion.div 
+                  style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    zIndex: 1000,
+                    backgroundColor: 'var(--color-bg-primary)',
+                    border: '1px solid var(--c-light-border)',
+                    borderRadius: '15px',
+                    marginTop: '5px',
+                    maxHeight: '300px',
+                    overflowY: 'auto',
+                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+                  }}
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2, ease: "easeOut" }}
+                >
                   {/* Select All Option */}
-                  <div
+                  <motion.div
                     onClick={handleSelectAll}
                     style={{
                       padding: '12px 16px',
@@ -344,6 +351,14 @@ const CompoundProperties = ({ toolData = null }) => {
                       display: 'flex',
                       alignItems: 'center'
                     }}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.2, delay: 0.05 }}
+                    whileHover={{ 
+                      backgroundColor: 'var(--color-bg-secondary)',
+                      scale: 1.02,
+                      transition: { duration: 0.15 }
+                    }}
                   >
                     <input
                       type="checkbox"
@@ -355,11 +370,11 @@ const CompoundProperties = ({ toolData = null }) => {
                       }}
                     />
                     {selectedProperties.length === AVAILABLE_PROPERTIES.length ? 'Deselect All' : 'Select All'}
-                  </div>
+                  </motion.div>
                   
                   {/* Individual Properties */}
-                  {AVAILABLE_PROPERTIES.map((property) => (
-                    <div
+                  {AVAILABLE_PROPERTIES.map((property, index) => (
+                    <motion.div
                       key={property.key}
                       onClick={() => handlePropertyToggle(property.key)}
                       style={{
@@ -370,6 +385,20 @@ const CompoundProperties = ({ toolData = null }) => {
                           ? 'rgba(40, 167, 69, 0.1)' 
                           : 'transparent',
                         textAlign: 'left'
+                      }}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ 
+                        duration: 0.2, 
+                        delay: 0.1 + (index * 0.02),
+                        ease: "easeOut"
+                      }}
+                      whileHover={{ 
+                        backgroundColor: selectedProperties.includes(property.key) 
+                          ? 'rgba(40, 167, 69, 0.15)' 
+                          : 'rgba(255, 255, 255, 0.05)',
+                        scale: 1.01,
+                        transition: { duration: 0.15 }
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
@@ -401,10 +430,11 @@ const CompoundProperties = ({ toolData = null }) => {
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
-              )}
+                </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
@@ -460,14 +490,26 @@ const CompoundProperties = ({ toolData = null }) => {
                 />
                 {/* Validation Icon */}
                 {isValidCid ? (
-                  <FaCheckDouble style={{ fontSize: '2rem', color: 'var(--color-success)' }} />
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                    <FaCheckDouble style={{ fontSize: '2rem', color: 'var(--color-success)' }} />
+                  </motion.div>
                 ) : (
-                  <IoWarningOutline style={{
-                    fontSize: '2rem',
-                    color: cid.length > 0 ? 'var(--color-alert)' : 'var(--glassy-color)'
-                  }} />
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                  >
+                    <IoWarningOutline style={{
+                      fontSize: '2rem',
+                      color: cid.length > 0 ? 'var(--color-alert)' : 'var(--glassy-color)'
+                    }} />
+                  </motion.div>
                 )}
-                <button
+                <motion.button
                   onClick={handleSearch}
                   disabled={!isValidCid || isLoading || selectedProperties.length === 0}
                   style={{
@@ -482,9 +524,22 @@ const CompoundProperties = ({ toolData = null }) => {
                     minHeight: '54px',
                     whiteSpace: 'nowrap'
                   }}
+                  whileHover={
+                    (!isValidCid || isLoading || selectedProperties.length === 0) ? {} : {
+                      scale: 1.05,
+                      backgroundColor: '#1e7e34',
+                      transition: { duration: 0.2 }
+                    }
+                  }
+                  whileTap={
+                    (!isValidCid || isLoading || selectedProperties.length === 0) ? {} : {
+                      scale: 0.98,
+                      transition: { duration: 0.1 }
+                    }
+                  }
                 >
                   {isLoading ? 'Fetching...' : 'Get Properties'}
-                </button>
+                </motion.button>
               </div>
             </div>
             {/* Validation message for CID */}
@@ -510,7 +565,7 @@ const CompoundProperties = ({ toolData = null }) => {
           </div>
           {(properties || error) && (
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-              <button
+              <motion.button
                 onClick={handleReset}
                 style={{
                   padding: '12px 24px',
@@ -522,33 +577,38 @@ const CompoundProperties = ({ toolData = null }) => {
                   transition: 'all 0.2s ease',
                   fontSize: '0.95em',
                   fontWeight: '600',
-                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
-                  '&:hover': {
-                    backgroundColor: 'var(--color-error-dark, #c82333)',
-                    transform: 'translateY(-1px)',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)'
-                  }
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)'
                 }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = 'var(--color-error-dark, #c82333)';
-                  e.target.style.transform = 'translateY(-1px)';
-                  e.target.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                whileHover={{
+                  backgroundColor: '#c82333',
+                  scale: 1.05,
+                  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)',
+                  transition: { duration: 0.2 }
                 }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = 'var(--color-error, #dc3545)';
-                  e.target.style.transform = 'translateY(0)';
-                  e.target.style.boxShadow = '0 2px 6px rgba(0, 0, 0, 0.1)';
+                whileTap={{
+                  scale: 0.98,
+                  transition: { duration: 0.1 }
                 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: 0.2 }}
               >
                 Reset All
-              </button>
+              </motion.button>
             </div>
           )}
         </GlassyContainer>
       </div>
 
       {error && (
-        <div className="utility-results-section" style={{ marginTop: '20px' }}>
+        <motion.div 
+          className="utility-results-section" 
+          style={{ marginTop: '20px' }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -30 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        >
           <GlassyContainer>
             <div style={{
               padding: '16px',
@@ -564,31 +624,58 @@ const CompoundProperties = ({ toolData = null }) => {
               </p>
             </div>
           </GlassyContainer>
-        </div>
+        </motion.div>
       )}
 
       {properties && (
-        <div className="utility-results-section" style={{ marginTop: '20px' }}>
+        <motion.div 
+          className="utility-results-section" 
+          style={{ marginTop: '20px' }}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -30 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+        >
           <GlassyContainer>
-            <h4 style={{ marginBottom: '20px', color: 'var(--color-text-primary)', fontWeight: '600' }}>
+            <motion.h4 
+              style={{ marginBottom: '20px', color: 'var(--color-text-primary)', fontWeight: '600' }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+            >
               Properties for CID {cid}
-            </h4>
+            </motion.h4>
             <div className="properties-list" style={{
               display: 'flex',
               flexDirection: 'column',
               gap: '0'
             }}>
               {Object.entries(properties).map(([key, value], index) => (
-                <div key={key} className="property-item" style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  padding: '16px 20px',
-                  borderBottom: index < Object.entries(properties).length - 1 ? '1px solid var(--c-light-border)' : 'none',
-                  backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)',
-                  transition: 'background-color 0.2s ease',
-                  borderRadius: index === 0 ? '8px 8px 0 0' : index === Object.entries(properties).length - 1 ? '0 0 8px 8px' : '0'
-                }}>
+                <motion.div 
+                  key={key} 
+                  className="property-item" 
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    padding: '16px 20px',
+                    borderBottom: index < Object.entries(properties).length - 1 ? '1px solid var(--c-light-border)' : 'none',
+                    backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.02)',
+                    transition: 'background-color 0.2s ease',
+                    borderRadius: index === 0 ? '8px 8px 0 0' : index === Object.entries(properties).length - 1 ? '0 0 8px 8px' : '0'
+                  }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ 
+                    duration: 0.4, 
+                    delay: 0.3 + (index * 0.05),
+                    ease: "easeOut"
+                  }}
+                  whileHover={{ 
+                    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                    transition: { duration: 0.2 }
+                  }}
+                >
                   <div className="property-label" style={{
                     fontWeight: '600',
                     color: 'var(--color-text-primary)',
@@ -611,29 +698,41 @@ const CompoundProperties = ({ toolData = null }) => {
                   }}>
                     {formatPropertyValue(value)}
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </GlassyContainer>
-        </div>
+        </motion.div>
       )}
 
       {!isLoading && !properties && cid && !error && (
-        <div className="utility-results-section" style={{ marginTop: '20px' }}>
+        <motion.div 
+          className="utility-results-section" 
+          style={{ marginTop: '20px' }}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -30 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+        >
           <GlassyContainer>
-            <div style={{
-              textAlign: 'center',
-              color: 'var(--color-text-secondary)',
-              fontStyle: 'italic',
-              padding: '40px 20px',
-              background: 'var(--color-bg-secondary)',
-              border: '2px dashed var(--c-light-border)',
-              borderRadius: '12px'
-            }}>
+            <motion.div 
+              style={{
+                textAlign: 'center',
+                color: 'var(--color-text-secondary)',
+                fontStyle: 'italic',
+                padding: '40px 20px',
+                background: 'var(--color-bg-secondary)',
+                border: '2px dashed var(--c-light-border)',
+                borderRadius: '12px'
+              }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
               No properties found for the specified compound.
-            </div>
+            </motion.div>
           </GlassyContainer>
-        </div>
+        </motion.div>
       )}
     </motion.div>
   );

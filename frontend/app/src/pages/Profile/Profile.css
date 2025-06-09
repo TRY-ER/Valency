@@ -1,0 +1,314 @@
+/* Profile Page Styles - Using CSS Variables for Theming */
+
+/* Container Styles */
+.profile-container {
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+  padding: 2rem 0;
+  transition: background-color 0.3s ease;
+}
+
+.profile-content {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 640px) {
+  .profile-content {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .profile-content {
+    padding: 0 2rem;
+  }
+}
+
+/* Main Card */
+.profile-card {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--c-light-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px var(--shadow-color);
+  transition: all 0.3s ease;
+}
+
+/* Header Styles */
+.profile-header {
+  padding: 2rem 1.5rem;
+  border-bottom: 1px solid var(--c-light-border);
+}
+
+.profile-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0 0 0.5rem 0;
+  transition: color 0.3s ease;
+}
+
+.profile-subtitle {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+/* User Information Section */
+.profile-info-section {
+  padding: 1.5rem;
+}
+
+.profile-info-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 1.5rem 0;
+  transition: color 0.3s ease;
+}
+
+.profile-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.profile-info-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--c-light-border);
+  transition: border-color 0.3s ease;
+}
+
+.profile-info-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  transition: color 0.3s ease;
+}
+
+.profile-info-value {
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+/* No Data State */
+.profile-no-data {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.profile-no-data-text {
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  margin: 0;
+  transition: color 0.3s ease;
+}
+
+/* Logout Section */
+.profile-logout-section {
+  padding: 1.5rem;
+  border-top: 1px solid var(--c-light-border);
+}
+
+.profile-logout-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.profile-logout-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-alert);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.profile-logout-btn:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.profile-logout-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.5);
+}
+
+.profile-logout-btn:active {
+  transform: translateY(0);
+}
+
+.profile-logout-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  stroke: currentColor;
+  fill: none;
+}
+
+/* Loading State */
+.profile-loading-container {
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.profile-loading-content {
+  text-align: center;
+}
+
+.profile-loading-spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 3px solid var(--c-light-border);
+  border-top: 3px solid var(--color-success);
+  border-radius: 50%;
+  margin: 0 auto;
+  animation: profile-spin 1s linear infinite;
+}
+
+.profile-loading-text {
+  margin-top: 1rem;
+  color: var(--color-text-secondary);
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+/* Error State */
+.profile-error-container {
+  min-height: 100vh;
+  background-color: var(--color-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease;
+}
+
+.profile-error-content {
+  text-align: center;
+}
+
+.profile-error-card {
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-alert);
+  border-radius: 8px;
+  padding: 1.5rem;
+  max-width: 28rem;
+  margin: 0 auto;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.profile-error-title {
+  color: var(--color-alert);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.profile-error-message {
+  color: var(--color-text-secondary);
+  margin: 0 0 1rem 0;
+  line-height: 1.5;
+}
+
+.profile-error-retry-btn {
+  background-color: var(--color-alert);
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-error-retry-btn:hover {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+}
+
+/* Animations */
+@keyframes profile-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .profile-container {
+    padding: 1rem 0;
+  }
+  
+  .profile-header {
+    padding: 1.5rem 1rem;
+  }
+  
+  .profile-title {
+    font-size: 1.875rem;
+  }
+  
+  .profile-info-section,
+  .profile-logout-section {
+    padding: 1rem;
+  }
+  
+  .profile-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .profile-logout-container {
+    justify-content: center;
+  }
+  
+  .profile-logout-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Hover Effects for Better UX */
+.profile-info-item:hover {
+  background-color: var(--glassy-color);
+  border-radius: 6px;
+  margin: 0 -0.5rem;
+  padding: 1rem 0.5rem;
+}
+
+.profile-card:hover {
+  box-shadow: 0 8px 25px var(--shadow-color);
+  transform: translateY(-2px);
+}
+
+/* Focus States for Accessibility */
+.profile-logout-btn:focus-visible {
+  outline: 2px solid var(--color-success);
+  outline-offset: 2px;
+}
+
+.profile-error-retry-btn:focus-visible {
+  outline: 2px solid var(--color-success);
+  outline-offset: 2px;
+}

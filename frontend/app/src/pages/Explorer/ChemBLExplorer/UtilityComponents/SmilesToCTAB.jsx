@@ -67,7 +67,11 @@ const CTABViewer = ({ data, title }) => {
 
             <div style={{ padding: '20px', minHeight: '200px' }}>
                 {activeTab === 'raw' && (
-                    <div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                    >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid var(--c-light-border, #e1e5e9)' }}>
                             <h5 style={{ margin: '0', color: 'var(--color-text-primary, #333333)', fontWeight: '600' }}>
                                 Raw CTAB Content
@@ -103,11 +107,15 @@ const CTABViewer = ({ data, title }) => {
                         }}>
                             {ctabData}
                         </pre>
-                    </div>
+                    </motion.div>
                 )}
 
                 {activeTab === 'info' && data.molecular_formula && (
-                    <div>
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                    >
                         <div style={{ background: 'var(--color-bg-secondary, #f8f9fa)', borderRadius: '8px', padding: '16px', border: '1px solid var(--c-light-border, #e1e5e9)' }}>
                             <h5 style={{ margin: '0 0 12px 0', color: 'var(--color-text-primary, #333333)', fontWeight: '600', fontSize: '1rem' }}>
                                 Molecule Information
@@ -151,7 +159,7 @@ const CTABViewer = ({ data, title }) => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 )}
             </div>
         </div>
@@ -245,7 +253,12 @@ const SmilesToCTAB = ({ toolData = null, initialSmiles = "" }) => {
             animate="animate"
             className="utility-component-container"
         >
-            <div className="utility-input-section">
+            <motion.div 
+                className="utility-input-section"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+            >
                 <GlassyContainer>
                     <h3 style={{ marginBottom: '15px', fontWeight: '700' }}>SMILES to CTAB Converter</h3>
                     <p style={{ marginBottom: '15px', color: 'var(--color-text-secondary)' }}>
@@ -359,10 +372,16 @@ const SmilesToCTAB = ({ toolData = null, initialSmiles = "" }) => {
                         </button>
                     )}
                 </GlassyContainer>
-            </div>
+            </motion.div>
 
             {error && (
-                <div className="utility-results-section" style={{ marginTop: '20px' }}>
+                <motion.div 
+                    className="utility-results-section" 
+                    style={{ marginTop: '20px' }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                >
                     <GlassyContainer>
                         <div style={{
                             padding: '16px',
@@ -378,18 +397,24 @@ const SmilesToCTAB = ({ toolData = null, initialSmiles = "" }) => {
                             </p>
                         </div>
                     </GlassyContainer>
-                </div>
+                </motion.div>
             )}
 
             {results && (
-                <div className="utility-results-section" style={{ marginTop: '20px' }}>
+                <motion.div 
+                    className="utility-results-section" 
+                    style={{ marginTop: '20px' }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                >
                     <GlassyContainer>
                         <CTABViewer 
                             data={results} 
                             title={`CTAB Output for SMILES: ${smiles || initialSmiles}`}
                         />
                     </GlassyContainer>
-                </div>
+                </motion.div>
             )}
         </motion.div>
     );

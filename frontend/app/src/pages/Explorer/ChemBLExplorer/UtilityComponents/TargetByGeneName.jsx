@@ -97,7 +97,14 @@ const TargetByGeneName = ({ toolData = null, initialGeneName = "" }) => {
             </div>
 
             {error && (
-                <div className="utility-results-section" style={{ marginTop: '20px' }}>
+                <motion.div 
+                    className="utility-results-section" 
+                    style={{ marginTop: '20px' }}
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 50 }}
+                    transition={{ duration: 0.5, ease: "easeOut" }}
+                >
                     <GlassyContainer>
                         <h4 style={{ marginBottom: '15px', color: 'var(--color-error, #ff6b6b)' }}>
                             Error
@@ -106,11 +113,18 @@ const TargetByGeneName = ({ toolData = null, initialGeneName = "" }) => {
                             {error}
                         </p>
                     </GlassyContainer>
-                </div>
+                </motion.div>
             )}
 
             {results && (
-                <div className="utility-results-section" style={{ marginTop: '20px' }}>
+                <motion.div 
+                    className="utility-results-section" 
+                    style={{ marginTop: '20px' }}
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 50 }}
+                    transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
+                >
                     <GlassyContainer>
                         <DataViewer 
                             data={results} 
@@ -119,7 +133,7 @@ const TargetByGeneName = ({ toolData = null, initialGeneName = "" }) => {
                             maxDepth={8}
                         />
                     </GlassyContainer>
-                </div>
+                </motion.div>
             )}
         </motion.div>
     );

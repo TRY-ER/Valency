@@ -7,6 +7,7 @@ import {
 } from '../../../services/api/mcpToolsService'; // Adjust path as needed
 import DataViewer from '../../../components/UI/DataViewer/DataViewer'; // Adjusted path
 import './RCSBPDBExplorer.css'; // Import the same CSS file for consistent styling
+import { motion } from 'framer-motion';
 
 // Debounce function
 const debounce = (func, delay) => {
@@ -19,6 +20,7 @@ const debounce = (func, delay) => {
 };
 
 // Moved PortalDropdown to be a standalone component
+
 const StandalonePortalDropdownMenu = ({
     isOpen,
     options,
@@ -632,8 +634,18 @@ const RCSBStructureSimilaritySearch = ({ initialSearchType = "entry_id_search", 
         switch (searchType) {
             case "entry_id_search":
                 return (
-                    <div className="search-inputs-container">
-                        <div className="input-field-container">
+                    <motion.div 
+                        className="search-inputs-container"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.4, delay: 0.1 }}
+                    >
+                        <motion.div 
+                            className="input-field-container"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.2 }}
+                        >
                             <label className="input-field-label">PDB Entry ID:</label>
                             <input
                                 type="text"
@@ -642,8 +654,13 @@ const RCSBStructureSimilaritySearch = ({ initialSearchType = "entry_id_search", 
                                 placeholder="Enter PDB ID (e.g., 4HHB)"
                                 className="rcsb-input-field"
                             />
-                        </div>
-                        <div className="input-field-container">
+                        </motion.div>
+                        <motion.div 
+                            className="input-field-container"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.25 }}
+                        >
                             <label className="input-field-label">Assembly ID:</label>
                             <input
                                 type="text"
@@ -652,31 +669,59 @@ const RCSBStructureSimilaritySearch = ({ initialSearchType = "entry_id_search", 
                                 placeholder="Assembly ID (default: 1)"
                                 className="rcsb-input-field"
                             />
-                        </div>
-                        <GenericDropdownSelector
-                            value={operator}
-                            onChange={setOperator}
-                            options={operatorOptions}
-                            placeholder="Select Similarity Operator"
-                        />
-                        <GenericDropdownSelector
-                            value={targetSearchSpace}
-                            onChange={setTargetSearchSpace}
-                            options={targetSearchSpaceOptions}
-                            placeholder="Select Target Search Space"
-                        />
-                        <GenericDropdownSelector
-                            value={returnType}
-                            onChange={setReturnType}
-                            options={returnTypeOptions}
-                            placeholder="Select Return Type"
-                        />
-                    </div>
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.3 }}
+                        >
+                            <GenericDropdownSelector
+                                value={operator}
+                                onChange={setOperator}
+                                options={operatorOptions}
+                                placeholder="Select Similarity Operator"
+                            />
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.35 }}
+                        >
+                            <GenericDropdownSelector
+                                value={targetSearchSpace}
+                                onChange={setTargetSearchSpace}
+                                options={targetSearchSpaceOptions}
+                                placeholder="Select Target Search Space"
+                            />
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.4 }}
+                        >
+                            <GenericDropdownSelector
+                                value={returnType}
+                                onChange={setReturnType}
+                                options={returnTypeOptions}
+                                placeholder="Select Return Type"
+                            />
+                        </motion.div>
+                    </motion.div>
                 );
             case "file_url_search":
                 return (
-                    <div className="search-inputs-container">
-                        <div className="input-field-container">
+                    <motion.div 
+                        className="search-inputs-container"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.4, delay: 0.1 }}
+                    >
+                        <motion.div 
+                            className="input-field-container"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.2 }}
+                        >
                             <label className="input-field-label">File URL:</label>
                             <input
                                 type="text"
@@ -685,32 +730,56 @@ const RCSBStructureSimilaritySearch = ({ initialSearchType = "entry_id_search", 
                                 placeholder="URL to structure file (e.g., https://files.rcsb.org/view/4HHB.cif)"
                                 className="rcsb-input-field"
                             />
-                        </div>
-                        <GenericDropdownSelector
-                            value={fileFormat}
-                            onChange={setFileFormat}
-                            options={fileFormatOptions}
-                            placeholder="Select File Format"
-                        />
-                        <GenericDropdownSelector
-                            value={operator}
-                            onChange={setOperator}
-                            options={operatorOptions}
-                            placeholder="Select Similarity Operator"
-                        />
-                        <GenericDropdownSelector
-                            value={targetSearchSpace}
-                            onChange={setTargetSearchSpace}
-                            options={targetSearchSpaceOptions}
-                            placeholder="Select Target Search Space"
-                        />
-                        <GenericDropdownSelector
-                            value={returnType}
-                            onChange={setReturnType}
-                            options={returnTypeOptions}
-                            placeholder="Select Return Type"
-                        />
-                    </div>
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.25 }}
+                        >
+                            <GenericDropdownSelector
+                                value={fileFormat}
+                                onChange={setFileFormat}
+                                options={fileFormatOptions}
+                                placeholder="Select File Format"
+                            />
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.3 }}
+                        >
+                            <GenericDropdownSelector
+                                value={operator}
+                                onChange={setOperator}
+                                options={operatorOptions}
+                                placeholder="Select Similarity Operator"
+                            />
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.35 }}
+                        >
+                            <GenericDropdownSelector
+                                value={targetSearchSpace}
+                                onChange={setTargetSearchSpace}
+                                options={targetSearchSpaceOptions}
+                                placeholder="Select Target Search Space"
+                            />
+                        </motion.div>
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.3, delay: 0.4 }}
+                        >
+                            <GenericDropdownSelector
+                                value={returnType}
+                                onChange={setReturnType}
+                                options={returnTypeOptions}
+                                placeholder="Select Return Type"
+                            />
+                        </motion.div>
+                    </motion.div>
                 );
             default:
                 return <p>Select a search type.</p>;
@@ -718,27 +787,67 @@ const RCSBStructureSimilaritySearch = ({ initialSearchType = "entry_id_search", 
     };
 
     return (
-        <div className="rcsb-pdb-explorer-container">
-            <div className="rcsb-search-type-selector-section">
+        <motion.div 
+            className="rcsb-pdb-explorer-container"
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+        >
+            <motion.div 
+                className="rcsb-search-type-selector-section"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
+            >
                 <ActivitySearchTypeSelector
                     value={searchType}
                     onChange={setSearchType}
                     options={searchTypeOptions}
                     placeholder="Select Search Type"
                 />
-            </div>
+            </motion.div>
 
-            <form onSubmit={handleSubmit} className="rcsb-search-form">
+            <motion.form 
+                onSubmit={handleSubmit} 
+                className="rcsb-search-form"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+            >
                 {renderSearchInputs()}
-                <button type="submit" disabled={isLoading} className="rcsb-submit-button">
+                <motion.button 
+                    type="submit" 
+                    disabled={isLoading} 
+                    className="rcsb-submit-button"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.4, ease: "easeOut" }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                >
                     {isLoading ? 'Searching...' : 'Find Similar Structures'}
-                </button>
-            </form>
+                </motion.button>
+            </motion.form>
 
-            {error && <p style={{ color: 'red', marginTop: '10px' }}>Error: {error}</p>}
+            {error && (
+                <motion.p 
+                    style={{ color: 'red', marginTop: '10px' }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    Error: {error}
+                </motion.p>
+            )}
 
-            <DataViewer data={apiData} />
-        </div>
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+            >
+                <DataViewer data={apiData} />
+            </motion.div>
+        </motion.div>
     );
 };
 

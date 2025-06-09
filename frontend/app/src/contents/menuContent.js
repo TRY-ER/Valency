@@ -15,8 +15,7 @@ import {
     FaTools,
     FaHome,
     FaTasks,
-    FaRobot,
-    FaUserSecret // Added FaUserSecret
+    FaRobot
 } from 'react-icons/fa';
 import Home from "../pages/Home";
 
@@ -33,7 +32,7 @@ const menuContent = [
     {
         id: 6, // ID shifted from 4
         title: 'Master Agent',
-        icon: <FaUserSecret />, // Changed from FaComments to FaUserSecret
+        icon: <FaRobot />, // Changed from FaUserSecret to FaRobot
         link: 'chatbot',
         description: 'Chatbot is used to craftfully navigate in the system.',
         component: <ChatInterface />

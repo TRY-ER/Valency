@@ -30,6 +30,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [isVerified, setIsVerified] = useState<boolean>(localStorage.getItem('isUserVerified') === 'true');
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  // Listen for storage changes to handle logout from other tabs or services
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'access_token' && e.newValue === null) {
+        // Token was removed, likely due to logout
+        console.log('Auth token removed, updating auth state...');
+        setAccessToken(null);
+        setUser(null);
+        setIsAuthenticated(false);
+        setIsVerified(false);
+      }
+    };
+
+    const handleLogoutEvent = (e: CustomEvent) => {
+      console.log('Logout event received:', e.detail);
+      // Force logout when triggered by external services
+      logout();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener('auth:logout', handleLogoutEvent as EventListener);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('auth:logout', handleLogoutEvent as EventListener);
+    };
+  }, []);
+
   useEffect(() => {
     const initializeAuth = async () => {
       setIsLoading(true);
@@ -37,7 +65,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (currentAccessToken) {
         // Attempt to validate the current access token
-        AuthService.client.setAuthHeader(`Bearer ${currentAccessToken}`); // Ensure ApiClient has the token
         let validationResponse = await AuthService.getCurrentUser();
 
         if (!validationResponse.success) {
@@ -50,7 +77,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Token refreshed, get the new access token and retry getCurrentUser
             currentAccessToken = AuthService.getAccessToken();
             if (currentAccessToken) {
-              AuthService.client.setAuthHeader(`Bearer ${currentAccessToken}`); // Update ApiClient with new token
+              // AuthService.storeAuthToken() already updated the auth header
               validationResponse = await AuthService.getCurrentUser();
             } else {
               // Should not happen if refreshToken() was successful and stored the token
@@ -60,8 +87,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               return;
             }
           } else {
-            // Refresh token failed (e.g., expired or invalid)
-            console.log("Token refresh failed. Logging out.");
+            // Refresh token failed (e.g., expired or invalid) - logout immediately
+            console.log("Refresh token is invalid or expired. Logging out immediately.");
             logout();
             setIsLoading(false);
             return;
@@ -114,7 +141,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const logout = () => {
-    // AuthService.logout(); // Optional: Call backend logout endpoint
+    // Clear all authentication data immediately
     AuthService.clearAuthData(); // Clears localStorage and ApiClient auth header
     setAccessToken(null);
     setUser(null);

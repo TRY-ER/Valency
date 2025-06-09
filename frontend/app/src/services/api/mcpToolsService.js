@@ -1,13 +1,13 @@
 import axios from 'axios';
+import AuthService from './AuthService.ts';
 
 const MCP_TOOLS_BASE_URL = 'http://localhost:8000'; // Base URL for MCP tools
 
 /**
- * Retrieves the auth token from localStorage.
- * In a real app, this might come from a more robust auth service or context.
+ * Retrieves the auth token from localStorage via AuthService.
  */
 const getAuthToken = () => {
-  return localStorage.getItem('access_token');
+  return AuthService.getAccessToken();
 };
 
 /**
@@ -29,6 +29,53 @@ mcpToolsApiClient.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+/**
+ * Response interceptor to handle token refresh on 401 errors.
+ */
+mcpToolsApiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        console.log('MCP Tools: Access token expired, attempting refresh...');
+        const refreshSuccess = await AuthService.refreshToken();
+        
+        if (refreshSuccess) {
+          console.log('MCP Tools: Token refresh successful, retrying original request...');
+          const newToken = AuthService.getAccessToken();
+          
+          if (newToken) {
+            // Update the Authorization header for the retry
+            originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+            return mcpToolsApiClient.request(originalRequest);
+          }
+        }
+      } catch (refreshError) {
+        console.error('MCP Tools: Token refresh failed:', refreshError);
+      }
+
+      // If refresh failed or no new token, clear auth data
+      console.log('MCP Tools: Token refresh failed, clearing auth data...');
+      AuthService.clearAuthData();
+      
+      // Dispatch a custom event to notify the app about the logout
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('auth:logout', { 
+          detail: { reason: 'token_refresh_failed', source: 'mcp_service' }
+        }));
+      }
+    }
+
     return Promise.reject(error);
   }
 );
@@ -60,14 +107,11 @@ const callMcpTool = async (toolPath, toolArgs = {}, method = 'POST') => {
   } catch (error) {
     console.error(`Error calling MCP tool ${toolPath}:`, error.response ? error.response.data : error.message);
     
-    // Handle specific error cases
+    // Handle specific error cases (401 is handled by response interceptor)
     if (error.response) {
       const { status, data } = error.response;
       
-      if (status === 401) {
-        console.error('Authentication failed for MCP tool call');
-        // You might want to trigger a re-login here
-      } else if (status === 404) {
+      if (status === 404) {
         console.error(`MCP tool endpoint not found: ${toolPath}`);
       } else if (status === 422) {
         console.error('Invalid arguments provided to MCP tool:', data);

@@ -65,7 +65,8 @@ class ApiClient {
     endpoint: string, 
     method: string = 'GET', 
     body?: any,
-    customHeaders?: HeadersInit // Add customHeaders parameter
+    customHeaders?: HeadersInit, // Add customHeaders parameter
+    isRetry: boolean = false // Add retry flag to prevent infinite loops
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     
@@ -77,6 +78,36 @@ class ApiClient {
         mode: 'cors', // Explicitly set CORS mode
         credentials: 'include', // Include cookies and authentication headers
       });
+
+      // Handle 401 Unauthorized for token refresh (but avoid refresh for auth endpoints)
+      if (response.status === 401 && !isRetry && !endpoint.includes('/auth/')) {
+        console.log('ApiClient: Access token expired, attempting refresh...');
+        
+        // Import AuthService dynamically to avoid circular dependencies
+        const { default: AuthService } = await import('./AuthService.ts');
+        const refreshSuccess = await AuthService.refreshToken();
+        
+        if (refreshSuccess) {
+          console.log('ApiClient: Token refresh successful, retrying original request...');
+          const newToken = AuthService.getAccessToken();
+          
+          if (newToken) {
+            // Update the auth header and retry the request
+            this.setAuthHeader(`Bearer ${newToken}`);
+            return this.request<T>(endpoint, method, body, customHeaders, true);
+          }
+        }
+        
+        // If refresh failed, clear auth data and dispatch logout event
+        console.log('ApiClient: Token refresh failed, clearing auth data...');
+        AuthService.clearAuthData();
+        
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:logout', { 
+            detail: { reason: 'token_refresh_failed', source: 'api_client' }
+          }));
+        }
+      }
 
       const data = await response.json();
       

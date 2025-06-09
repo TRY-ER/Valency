@@ -165,6 +165,14 @@ class AuthService {
         this.storeAuthToken(responseData); // This already calls setAuthHeader
         this.isRefreshingToken = false;
         this.notifyTokenRefreshSubscribers(true);
+        
+        // Dispatch token refresh success event
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('auth:token_refreshed', { 
+            detail: { timestamp: new Date().toISOString() }
+          }));
+        }
+        
         return true;
       } else {
         console.error("Refresh token response was OK but not in expected AuthResponse format:", responseData);
@@ -233,7 +241,7 @@ class AuthService {
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
     localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('isVerified');
+    localStorage.removeItem('isUserVerified'); // Fixed to match the actual key being used
     localStorage.removeItem('mfa_required');
     // Clear auth header in ApiClient
     this.client.clearAuthHeader();

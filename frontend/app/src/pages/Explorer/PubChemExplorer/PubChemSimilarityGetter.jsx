@@ -5,8 +5,14 @@ import SimpleInputBox from "../../../components/UI/SimpleInputBox/SimpleInputBox
 import DataViewer from "../../../components/UI/DataViewer/DataViewer";
 
 import TwoDViewer from "../../../components/UI/TwoDViewer/TwoDViewer";
-import { motion } from "framer-motion";
-import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+    fadeInUpVariantStatic, 
+    fadeInUpVariants, 
+    containerVariants, 
+    itemVariants,
+    scaleInVariants 
+} from "../../../components/animations/framerAnim";
 import GlassyContainer from "../../../components/glassy_container/gc";
 import { fastSimilarity2dSearchByCid, getCompoundByCid } from "../../../services/api/mcpToolsService";
 import { FaCheckDouble } from "react-icons/fa6";
@@ -111,9 +117,13 @@ const PubChemSimilaritySearchTypeSelector = ({ value, onChange, options, disable
         if (!isOpen) return null;
 
         return createPortal(
-            <div
+            <motion.div
                 ref={dropdownRef}
                 className="pubchem-similarity-selector-options-portal"
+                initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
                 style={{
                     position: 'fixed',
                     top: `${dropdownPosition.top}px`,
@@ -129,25 +139,42 @@ const PubChemSimilaritySearchTypeSelector = ({ value, onChange, options, disable
                     overflowY: 'auto'
                 }}
             >
-                {options.map((option) => (
-                    <div
+                {options.map((option, index) => (
+                    <motion.div
                         key={option.value}
                         className={`pubchem-similarity-selector-option ${option.value === value ? 'selected' : ''}`}
                         onClick={() => handleOptionClick(option.value)}
                         role="option"
                         aria-selected={option.value === value}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ 
+                            delay: index * 0.05, 
+                            duration: 0.2,
+                            ease: "easeOut" 
+                        }}
+                        whileHover={{ 
+                            backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                            x: 5,
+                            transition: { duration: 0.15 }
+                        }}
                     >
                         <span className="option-label">{option.label}</span>
                         {option.value === value && (
-                            <span className="check-icon">
+                            <motion.span 
+                                className="check-icon"
+                                initial={{ scale: 0, rotate: -90 }}
+                                animate={{ scale: 1, rotate: 0 }}
+                                transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                            >
                                 <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor">
                                     <path d="M13 1L5 9L1 5" />
                                 </svg>
-                            </span>
+                            </motion.span>
                         )}
-                    </div>
+                    </motion.div>
                 ))}
-            </div>,
+            </motion.div>,
             document.body
         );
     };
@@ -158,7 +185,7 @@ const PubChemSimilaritySearchTypeSelector = ({ value, onChange, options, disable
                 className={`pubchem-similarity-search-selector ${disabled ? 'disabled' : ''}`}
                 ref={triggerRef}
             >
-                <div
+                <motion.div
                     className={`selector-trigger ${isOpen ? 'open' : ''}`}
                     onClick={() => !disabled && setIsOpen(!isOpen)}
                     role="button"
@@ -169,27 +196,32 @@ const PubChemSimilaritySearchTypeSelector = ({ value, onChange, options, disable
                             !disabled && setIsOpen(!isOpen);
                         }
                     }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{ duration: 0.15 }}
                 >
                     <span className="selected-text">
                         {selectedOption ? selectedOption.label : 'Select search type'}
                     </span>
-                    <span className={`dropdown-arrow ${isOpen ? 'open' : ''}`}>
+                    <motion.span 
+                        className={`dropdown-arrow ${isOpen ? 'open' : ''}`}
+                        animate={{ rotate: isOpen ? 180 : 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                    >
                         <svg
                             width="12"
                             height="8"
                             viewBox="0 0 12 8"
                             fill="currentColor"
-                            style={{
-                                transition: 'transform 0.2s ease',
-                                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
-                            }}
                         >
                             <path d="M6 8L0 0h12z" />
                         </svg>
-                    </span>
-                </div>
+                    </motion.span>
+                </motion.div>
             </div>
-            <PortalDropdown />
+            <AnimatePresence>
+                <PortalDropdown />
+            </AnimatePresence>
         </>
     );
 };
@@ -568,66 +600,371 @@ const PubChemSimilarityGetter = ({
 
     return (
         <GlassyContainer>
-            <div className="pubchem-similarity-getter">
-                {!hideInputBox && (
-                    <motion.div variants={fadeInUpVariantStatic} className="input-section">
-                        <div className="header-title">{getHeaderText()}</div>
-                        {/* PubChemSimilaritySearchTypeSelector was removed in a previous step implicitly by only supporting CID */}
-                        <SimpleInputBox
-                            value={inputValue || ''}
-                            onChange={handleInputChange}
-                            onSubmit={() => handleSubmit(inputValue)}
-                            placeholder={getPlaceholderText()}
-                            buttonText="Search Similar"
-                            isLoading={isLoading}
-                            error={validationError}
-                            disabled={isLoading}
-                        />
-                        {/* Threshold slider can be added here if needed */}
-                    </motion.div>
-                )}
+            <motion.div 
+                className="pubchem-similarity-getter"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+            >
+                <AnimatePresence mode="wait">
+                    {!hideInputBox && (
+                        <motion.div 
+                            variants={itemVariants} 
+                            className="input-section"
+                            key="input-section"
+                        >
+                            <motion.div 
+                                className="header-title"
+                                variants={fadeInUpVariants}
+                                custom={0}
+                            >
+                                {getHeaderText()}
+                            </motion.div>
+                            <motion.div
+                                variants={fadeInUpVariants}
+                                custom={1}
+                            >
+                                <SimpleInputBox
+                                    value={inputValue || ''}
+                                    onChange={handleInputChange}
+                                    onSubmit={() => handleSubmit(inputValue)}
+                                    placeholder={getPlaceholderText()}
+                                    buttonText="Search Similar"
+                                    isLoading={isLoading}
+                                    error={validationError}
+                                    disabled={isLoading}
+                                />
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                {isLoading && <p>Loading...</p>}
+                <AnimatePresence mode="wait">
+                    {isLoading && (
+                        <motion.div
+                            key="loading"
+                            variants={scaleInVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            style={{
+                                padding: '20px',
+                                textAlign: 'center',
+                                color: 'var(--color-text-primary)'
+                            }}
+                        >
+                            <motion.p
+                                animate={{ 
+                                    scale: [1, 1.05, 1],
+                                    opacity: [0.7, 1, 0.7]
+                                }}
+                                transition={{ 
+                                    duration: 1.5, 
+                                    repeat: Infinity,
+                                    ease: "easeInOut"
+                                }}
+                            >
+                                🔍 Searching for similar molecules...
+                            </motion.p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
 
-                {/* MODIFIED RESULTS DISPLAY SECTION */}
-                {(selectedMolecule || apiData) && !isLoading && !error && !validationError ? (
-                    <motion.div variants={fadeInUpVariantStatic} className="results-display-unified">
-                        <DataViewer 
-                            data={selectedMolecule || apiData} 
-                            // Pass a title or let DataViewer decide.
-                            // Example: title={selectedMolecule ? `Details for CID: ${selectedMolecule.cid}` : "Compound Information"}
-                        />
-                    </motion.div>
-                ) : (
-                    !isLoading && !error && !validationError && similarMolecules.length === 0 && ( // Show only if no results and not loading/error
-                        <div style={{
-                            padding: '16px 20px',
-                            backgroundColor: 'rgba(66, 153, 225, 0.1)',
-                            borderRadius: '8px',
-                            border: '1px solid rgba(66, 153, 225, 0.3)',
-                            textAlign: 'center',
-                            color: 'var(--color-text-primary)',
-                            margin: '20px 0'
-                        }}>
-                            <h4 style={{ 
-                                marginBottom: '8px', 
-                                color: 'var(--color-text-primary)', 
-                                margin: '0 0 8px 0',
-                                fontWeight: '600'
-                            }}>
-                                ℹ️ No Data Available
-                            </h4>
-                            <p style={{ 
-                                color: 'var(--color-text-secondary)', 
-                                margin: 0,
-                                fontSize: '0.9rem'
-                            }}>
-                                No data to display. Perform a search or check your input.
-                            </p>
-                        </div>
-                    )
-                )}
-            </div>
+                <AnimatePresence mode="wait">
+                    {error && (
+                        <motion.div
+                            key="error"
+                            variants={fadeInUpVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            style={{
+                                padding: '16px 20px',
+                                backgroundColor: 'rgba(220, 38, 38, 0.1)',
+                                borderRadius: '8px',
+                                border: '1px solid rgba(220, 38, 38, 0.3)',
+                                textAlign: 'center',
+                                color: 'var(--color-text-primary)',
+                                margin: '20px 0'
+                            }}
+                        >
+                            <motion.h4 
+                                style={{ 
+                                    marginBottom: '8px', 
+                                    color: '#dc2626', 
+                                    margin: '0 0 8px 0',
+                                    fontWeight: '600'
+                                }}
+                                variants={fadeInUpVariants}
+                                custom={0}
+                            >
+                                ⚠️ Error
+                            </motion.h4>
+                            <motion.p 
+                                style={{ 
+                                    color: 'var(--color-text-secondary)', 
+                                    margin: 0,
+                                    fontSize: '0.9rem'
+                                }}
+                                variants={fadeInUpVariants}
+                                custom={1}
+                            >
+                                {error}
+                            </motion.p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                <AnimatePresence mode="wait">
+                    {(selectedMolecule || apiData) && !isLoading && !error && !validationError ? (
+                        <motion.div 
+                            key="results"
+                            variants={itemVariants} 
+                            className="results-display-unified"
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                        >
+                            <motion.div
+                                variants={fadeInUpVariants}
+                                custom={0}
+                            >
+                                <DataViewer 
+                                    data={selectedMolecule || apiData} 
+                                />
+                            </motion.div>
+                        </motion.div>
+                    ) : (
+                        !isLoading && !error && !validationError && similarMolecules.length === 0 && (
+                            <motion.div
+                                key="no-data"
+                                variants={fadeInUpVariants}
+                                initial="hidden"
+                                animate="visible"
+                                exit="exit"
+                                style={{
+                                    padding: '16px 20px',
+                                    backgroundColor: 'rgba(66, 153, 225, 0.1)',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(66, 153, 225, 0.3)',
+                                    textAlign: 'center',
+                                    color: 'var(--color-text-primary)',
+                                    margin: '20px 0'
+                                }}
+                            >
+                                <motion.h4 
+                                    style={{ 
+                                        marginBottom: '8px', 
+                                        color: 'var(--color-text-primary)', 
+                                        margin: '0 0 8px 0',
+                                        fontWeight: '600'
+                                    }}
+                                    variants={fadeInUpVariants}
+                                    custom={0}
+                                >
+                                    ℹ️ No Data Available
+                                </motion.h4>
+                                <motion.p 
+                                    style={{ 
+                                        color: 'var(--color-text-secondary)', 
+                                        margin: 0,
+                                        fontSize: '0.9rem'
+                                    }}
+                                    variants={fadeInUpVariants}
+                                    custom={1}
+                                >
+                                    No data to display. Perform a search or check your input.
+                                </motion.p>
+                            </motion.div>
+                        )
+                    )}
+                </AnimatePresence>
+
+                {/* Similar Molecules Results Section */}
+                <AnimatePresence mode="wait">
+                    {similarMolecules && similarMolecules.length > 1 && !isLoading && !error && (
+                        <motion.div 
+                            key="similar-molecules"
+                            variants={itemVariants}
+                            initial="hidden"
+                            animate="visible"
+                            exit="exit"
+                            style={{ marginTop: '20px' }}
+                        >
+                            <motion.div
+                                variants={containerVariants}
+                                style={{
+                                    backgroundColor: 'var(--color-bg-secondary)',
+                                    borderRadius: '12px',
+                                    border: '1px solid var(--c-light-border)',
+                                    padding: '20px'
+                                }}
+                            >
+                                <motion.h3 
+                                    variants={fadeInUpVariants}
+                                    custom={0}
+                                    style={{ 
+                                        marginBottom: '16px', 
+                                        fontWeight: '700',
+                                        color: 'var(--color-text-primary)'
+                                    }}
+                                >
+                                    🧪 Similar Molecules Results ({similarMolecules.length} found)
+                                </motion.h3>
+                                
+                                <motion.p 
+                                    variants={fadeInUpVariants}
+                                    custom={1}
+                                    style={{
+                                        color: 'var(--color-text-secondary)',
+                                        fontSize: '0.9rem',
+                                        marginBottom: '16px',
+                                        fontStyle: 'italic'
+                                    }}
+                                >
+                                    💡 Click on any molecule to view detailed information
+                                </motion.p>
+
+                                <div
+                                    style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                                        gap: '16px',
+                                        marginTop: '16px'
+                                    }}
+                                >
+                                    {similarMolecules.map((molecule, index) => (
+                                        <motion.div
+                                            key={`similar-${molecule.cid || molecule.similar_cid || index}`}
+                                            variants={fadeInUpVariants}
+                                            custom={index}
+                                            whileHover={{ 
+                                                scale: 1.02, 
+                                                y: -5,
+                                                transition: { duration: 0.2 }
+                                            }}
+                                            whileTap={{ scale: 0.98 }}
+                                            onClick={() => setSelectedMolecule(molecule)}
+                                            style={{
+                                                background: selectedMolecule === molecule 
+                                                    ? 'var(--color-accent)' 
+                                                    : 'var(--color-bg-primary)',
+                                                border: selectedMolecule === molecule 
+                                                    ? '2px solid var(--color-accent-light)' 
+                                                    : '1px solid var(--c-light-border)',
+                                                borderRadius: '12px',
+                                                padding: '16px',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease',
+                                                position: 'relative',
+                                                overflow: 'hidden'
+                                            }}
+                                        >
+                                            {/* Selection indicator */}
+                                            {selectedMolecule === molecule && (
+                                                <motion.div
+                                                    initial={{ scale: 0, rotate: -90 }}
+                                                    animate={{ scale: 1, rotate: 0 }}
+                                                    transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '12px',
+                                                        right: '12px',
+                                                        color: 'white',
+                                                        fontSize: '16px',
+                                                        fontWeight: 'bold'
+                                                    }}
+                                                >
+                                                    ✓
+                                                </motion.div>
+                                            )}
+
+                                            <div style={{ marginBottom: '12px' }}>
+                                                <motion.div 
+                                                    style={{
+                                                        color: selectedMolecule === molecule 
+                                                            ? 'white' 
+                                                            : 'var(--color-accent)',
+                                                        fontSize: '14px',
+                                                        fontWeight: 'bold',
+                                                        marginBottom: '4px'
+                                                    }}
+                                                    variants={fadeInUpVariants}
+                                                    custom={0}
+                                                >
+                                                    CID: {molecule.cid || molecule.similar_cid || 'Unknown'}
+                                                </motion.div>
+                                                
+                                                {molecule.similarity_score && (
+                                                    <motion.div 
+                                                        style={{
+                                                            color: selectedMolecule === molecule 
+                                                                ? 'rgba(255, 255, 255, 0.9)' 
+                                                                : 'var(--color-success)',
+                                                            fontSize: '12px',
+                                                            fontWeight: '600'
+                                                        }}
+                                                        variants={fadeInUpVariants}
+                                                        custom={1}
+                                                    >
+                                                        {(molecule.similarity_score * 100).toFixed(1)}% similar
+                                                    </motion.div>
+                                                )}
+                                            </div>
+
+                                            {molecule.compound_name && (
+                                                <motion.div 
+                                                    style={{
+                                                        color: selectedMolecule === molecule 
+                                                            ? 'rgba(255, 255, 255, 0.9)' 
+                                                            : 'var(--color-text-primary)',
+                                                        fontSize: '13px',
+                                                        marginBottom: '12px',
+                                                        fontWeight: '500',
+                                                        lineHeight: '1.3'
+                                                    }}
+                                                    variants={fadeInUpVariants}
+                                                    custom={2}
+                                                >
+                                                    {molecule.compound_name.slice(0, 80)}
+                                                    {molecule.compound_name.length > 80 && '...'}
+                                                </motion.div>
+                                            )}
+
+                                            {(molecule.cid || molecule.similar_cid) && (
+                                                <motion.div 
+                                                    style={{ marginTop: '12px' }}
+                                                    variants={scaleInVariants}
+                                                    custom={index}
+                                                >
+                                                    <img 
+                                                        src={`https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${molecule.cid || molecule.similar_cid}/PNG?record_type=2d&image_size=small`}
+                                                        alt={`Compound ${molecule.cid || molecule.similar_cid}`}
+                                                        style={{
+                                                            width: '100%',
+                                                            height: 'auto',
+                                                            borderRadius: '8px',
+                                                            backgroundColor: 'white',
+                                                            padding: '8px',
+                                                            border: selectedMolecule === molecule 
+                                                                ? '2px solid rgba(255, 255, 255, 0.5)' 
+                                                                : '1px solid var(--c-light-border)'
+                                                        }}
+                                                        onError={(e) => {
+                                                            e.target.style.display = 'none';
+                                                        }}
+                                                    />
+                                                </motion.div>
+                                            )}
+                                        </motion.div>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </motion.div>
         </GlassyContainer>
     );
 };

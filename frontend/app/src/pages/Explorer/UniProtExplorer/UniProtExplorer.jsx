@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 import {
     uniprotSearchUniprotkb,
@@ -16,6 +17,55 @@ const debounce = (func, delay) => {
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(context, args), delay);
     };
+};
+
+// Animation variants for Framer Motion
+const containerVariants = {
+    hidden: { 
+        opacity: 0, 
+        y: 50 
+    },
+    visible: { 
+        opacity: 1, 
+        y: 0,
+        transition: {
+            duration: 0.6,
+            ease: "easeOut",
+            staggerChildren: 0.1
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { 
+        opacity: 0, 
+        y: 30 
+    },
+    visible: { 
+        opacity: 1, 
+        y: 0,
+        transition: {
+            duration: 0.4,
+            ease: "easeOut"
+        }
+    }
+};
+
+const resultVariants = {
+    hidden: { 
+        opacity: 0, 
+        y: 50,
+        scale: 0.95
+    },
+    visible: { 
+        opacity: 1, 
+        y: 0,
+        scale: 1,
+        transition: {
+            duration: 0.5,
+            ease: "easeOut"
+        }
+    }
 };
 
 // Moved PortalDropdown to be a standalone component
@@ -667,17 +717,28 @@ const UniProtExplorer = ({ initialSearchType = "search_uniprotkb", toolData = nu
     };
 
     return (
-        <div className="uniprot-explorer-container">
-            <div className="uniprot-search-type-selector-section">
+        <motion.div 
+            className="uniprot-explorer-container"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
+            <motion.div 
+                className="uniprot-search-type-selector-section"
+                variants={itemVariants}
+            >
                 <ActivitySearchTypeSelector
                     value={searchType}
                     onChange={setSearchType}
                     options={searchTypeOptions}
                     placeholder="Search Type"
                 />
-            </div>
+            </motion.div>
 
-            <div className="search-section">
+            <motion.div 
+                className="search-section"
+                variants={itemVariants}
+            >
                 {renderSearchFields()}
                 
                 <div className="search-buttons">
@@ -699,25 +760,35 @@ const UniProtExplorer = ({ initialSearchType = "search_uniprotkb", toolData = nu
                         Clear
                     </button>
                 </div>
-            </div>
+            </motion.div>
 
             {error && (
-                <div className="error-section">
+                <motion.div 
+                    className="error-section"
+                    variants={resultVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
                     <div className="error-message">
                         <strong>Error:</strong> {error}
                     </div>
-                </div>
+                </motion.div>
             )}
 
             {results && (
-                <div className="results-section">
+                <motion.div 
+                    className="results-section"
+                    variants={resultVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
                     <DataViewer 
                         data={results} 
                         title={`UniProt ${searchType === "search_uniprotkb" ? "Search" : "Entry"} Results`}
                     />
-                </div>
+                </motion.div>
             )}
-        </div>
+        </motion.div>
     );
 };
 

@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { color, motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   FaCompass,
+  FaDesktop,
+  FaRoute,
   FaBalanceScale,
+  FaThumbsUp,
   FaFlask,
-  FaUserSecret,
   FaTasks,
   FaChevronDown,
   FaChevronUp,
@@ -43,10 +45,27 @@ import {
   FaUpload,
   FaArrowUp,
   FaChevronLeft,
-  FaChevronRight
+  FaChevronRight,
+  FaClock
 } from 'react-icons/fa';
 import GlassyContainer from '../components/glassy_container/gc';
-import { fadeInUpVariantStatic, fadeInDownVariants, fadeInLeftVariants } from '../components/animations/framerAnim';
+import {
+  fadeInUpVariantStatic,
+  fadeInDownVariants,
+  fadeInLeftVariants,
+  fadeInRightVariants,
+  scaleInVariants,
+  slideInVariants,
+  bounceInVariants,
+  rotateInVariants,
+  containerVariants,
+  itemVariants,
+  hoverVariants,
+  cardVariants,
+  listItemVariants,
+  expandableVariants,
+  fadeInUpVariants
+} from '../components/animations/framerAnim';
 import './Home.css';
 
 // New Infographic Components
@@ -148,19 +167,25 @@ const ProcessFlow = ({ steps }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: index * 0.2 }}
         >
-          <div className="process-step-number">{index + 1}</div>
-          <div className="process-step-icon" style={{ color: step.color }}>
-            {step.icon}
-          </div>
-          <div className="process-step-content">
-            <h6 className="process-step-title">{step.title}</h6>
-            <p className="process-step-description">{step.description}</p>
-          </div>
-          {index < steps.length - 1 && (
-            <div className="process-connector">
-              <FaChevronDown />
+          <div className="process-step-left">
+            <div className="process-step-number-container">
+              <div className="process-step-number">{index + 1}</div>
+              {index < steps.length - 1 && (
+                <div className="process-step-line"></div>
+              )}
             </div>
-          )}
+          </div>
+          <div className="process-step-right">
+            <div className="process-step-header">
+              <div className="process-step-icon" style={{ color: step.color }}>
+                {step.icon}
+              </div>
+              <h6 className="process-step-title">{step.title}</h6>
+            </div>
+            <div className="process-step-content">
+              <p className="process-step-description">{step.description}</p>
+            </div>
+          </div>
         </motion.div>
       ))}
     </div>
@@ -276,10 +301,11 @@ const Home = () => {
       title: 'Platform Overview',
       icon: <FaLightbulb />,
       color: '#22c55e',
-      description: 'Comprehensive drug discovery and molecular analysis platform',
+      description: 'Agentic drug discovery and molecular analysis platform',
       content: {
         subtitle: 'Advanced AI-Powered Drug Discovery Toolkit',
         features: [
+          'Scientific Tool Based AI Agent Collaborative System',
           'Integrated molecular analysis and visualization',
           'AI-driven optimization and generation algorithms',
           'Comprehensive database integration (ChEMBL, PubChem, UniProt)',
@@ -288,18 +314,90 @@ const Home = () => {
           'Interactive 3D molecular visualization'
         ],
         stats: [
-          { label: 'AI Agents', value: '15+', icon: <FaRobot /> },
-          { label: 'Scientific Databases', value: '5+', icon: <FaDatabase /> },
-          { label: 'Research Areas', value: '∞', icon: <FaGraduationCap /> }
+          { label: 'AI Agents', value: '10+', icon: <FaRobot />, color: '#0edf5b' },
+          { label: 'Scientific Databases', value: '5+', icon: <FaDatabase />, color: '#0fa346' },
+          { label: 'Research Ideas', value: '∞', icon: <FaGraduationCap />, color: '#04722d' },
         ],
+        infographics: {
+          platformMetrics: [
+            { label: 'System Reliability', percentage: 99, color: 'var(--color-success)', icon: <FaShieldAlt /> },
+            { label: 'AI Accuracy', percentage: 94, color: 'var(--color-accent)', icon: <FaBrain /> },
+            { label: 'User Satisfaction', percentage: 97, color: 'var(--color-success)', icon: <FaThumbsUp /> }
+          ],
+          automationWorkflow: [
+            {
+              title: 'Natural Language Query',
+              description: 'Describe your research goal in plain English',
+              icon: <FaRobot />,
+              color: 'var(--color-accent)'
+            },
+            {
+              title: 'AI Agent Orchestration',
+              description: 'Master agent delegates tasks to specialized agents',
+              icon: <FaBrain />,
+              color: 'var(--color-accent)'
+            },
+            {
+              title: 'Automated Processing',
+              description: 'AI agents execute complex workflows autonomously',
+              icon: <FaMagic />,
+              color: 'var(--color-accent)'
+            },
+            {
+              title: 'Tool Monitoring',
+              description: 'Real-time tracking of analysis and results from various scientific algorithms',
+              icon: <FaDesktop />,
+              color: 'var(--color-success)'
+            },
+            {
+              title: 'Intelligent Results',
+              description: 'Comprehensive insights delivered automatically',
+              icon: <FaChartLine />,
+              color: 'var(--color-success)'
+            }
+
+          ],
+          manualWorkflow: [
+            {
+              title: 'Data Input',
+              description: 'Input correspoding scientific data of protines, DNAs, Drugs, etc.',
+              icon: <FaUpload />,
+              color: 'var(--color-success)'
+            },
+            {
+              title: 'Tool Selection',
+              description: 'Choose specific analysis tools and parameters',
+              icon: <FaCog />,
+              color: 'var(--color-success)'
+            },
+            {
+              title: 'Manual Analysis',
+              description: 'Execute step-by-step analysis with full control',
+              icon: <FaPlay />,
+              color: 'var(--color-success)'
+            },
+            {
+              title: 'Relevant Redirections',
+              description: 'Redirect to relevant tools and resources with ease following website structure.',
+              icon: <FaRoute />,
+              color: 'var(--color-success)'
+            },
+            {
+              title: 'Custom Results',
+              description: 'Tailored visualizations and detailed reports of candidates',
+              icon: <FaChartPie />,
+              color: 'var(--color-success)'
+            }
+          ]
+        }
       }
     },
     {
       id: 'master-agent',
       title: 'Master Agent System',
-      icon: <FaUserSecret />,
+      icon: <FaRobot />,
       color: '#22c55e',
-      description: 'Intelligent AI orchestrator for complex drug discovery workflows',
+      description: 'Intelligent agentic orchestrator for complex drug discovery workflows',
       content: {
         subtitle: 'Your AI Research Assistant',
         features: [
@@ -307,22 +405,15 @@ const Home = () => {
           'Multi-agent coordination and delegation',
           'Context-aware task routing',
           'Specialized sub-agents for different domains',
+          'Completely functional tool interaction within chat interface',
           'Real-time workflow management',
           'Interactive conversational interface'
         ],
         agents: [
-          { name: 'DrugAgent', specialty: 'Database searches & exploration', icon: <FaSearch /> },
-          { name: 'DrugOptimizationAgent', specialty: 'ADMET & molecular generation', icon: <FaFlask /> },
-          { name: 'ProteinAgent', specialty: 'Protein analysis & structure', icon: <FaDna /> }
-        ],
-        infographics: {
-          networkGraph: true,
-          agentMetrics: [
-            { label: 'Response Time', percentage: 98, color: '#22c55e', icon: <FaStopwatch /> },
-            { label: 'Query Accuracy', percentage: 94, color: '#16a34a', icon: <FaBullseye /> },
-            { label: 'Task Success', percentage: 96, color: '#15803d', icon: <FaCheckCircle /> }
-          ]
-        }
+          { name: 'Protein Agent', specialty: 'Protein analysis & structure', icon: <FaDna /> },
+          { name: 'Drug Agent', specialty: 'Database searches & exploration', icon: <FaSearch /> },
+          { name: 'Drug Optimization Agent', specialty: 'ADMET prediction & molecular generation', icon: <FaFlask /> }
+        ]
       }
     },
     {
@@ -342,34 +433,52 @@ const Home = () => {
           'Structure-activity relationship analysis'
         ],
         tools: [
-          { name: 'Molecule Explorer', description: 'SMILES-based molecular analysis', icon: <FaMolecule /> },
-          { name: 'Protein Explorer', description: 'UniProt & PDB structure analysis', icon: <FaDna /> },
-          { name: 'Polymer Explorer', description: 'Polymer structure characterization', icon: <FaAtom /> }
+          {
+            name: 'Molecule Explorer',
+            description: 'SMILES-based molecular analysis',
+            icon: <FaMolecule />,
+            route: '/explorer',
+            buttonText: 'Explore Molecules'
+          },
+          {
+            name: 'Protein Explorer',
+            description: 'UniProt & PDB structure analysis',
+            icon: <FaDna />,
+            route: '/explorer/proe',
+            buttonText: 'Analyze Proteins'
+          },
+          {
+            name: 'Polymer Explorer',
+            description: 'Polymer structure Analysis',
+            icon: <FaAtom />,
+            route: 'explorer/polye',
+            buttonText: 'Study Polymers'
+          }
         ],
         infographics: {
           analysisMetrics: [
-            { value: '2M+', label: 'Structures', color: '#22c55e' },
-            { value: '50ms', label: 'Avg Time', color: '#16a34a' },
-            { value: '15+', label: 'Properties', color: '#15803d' }
+            { value: '100M+', label: 'Structures', color: '#24e76b', icon: <FaDatabase /> },
+            { value: '50ms', label: 'Avg Time', color: '#05ad42', icon: <FaClock /> },
+            { value: '50+', label: 'Properties', color: '#016b28', icon: <FaAtom /> }
           ],
           capabilityFlow: [
             {
               title: 'Input Structure',
-              description: 'SMILES, PDB, or draw molecular structures',
+              description: 'PDB, UniProt, SMILES, or PSMILES input',
               icon: <FaMolecule />,
-              color: '#22c55e'
+              color: '#24e76b'
             },
             {
               title: 'Analyze Properties',
-              description: 'Calculate physicochemical properties',
+              description: 'Calculate physicochemical and ADMET properties',
               icon: <FaAtom />,
-              color: '#16a34a'
+              color: '#05ad42'
             },
             {
               title: 'Visualize Results',
-              description: '3D visualization and interactive exploration',
+              description: '2D Chemical and 3D Atomic interactive exploration',
               icon: <FaEye />,
-              color: '#15803d'
+              color: '#016b28'
             }
           ]
         }
@@ -388,24 +497,19 @@ const Home = () => {
           'Substructure matching',
           'Chemical fingerprint comparison',
           'Cross-database identification',
-          'Tanimoto coefficient calculations',
-          'Multi-parameter similarity analysis'
+          'Multi-parameter similarity analysis',
+          'Target and activity analysis',
         ],
         databases: [
-          { name: 'ChEMBL', compounds: '2M+', icon: <FaDatabase /> },
-          { name: 'PubChem', compounds: '100M+', icon: <FaDatabase /> },
-          { name: 'Custom Sets', compounds: 'Unlimited', icon: <FaUsers /> }
+          { name: 'ChEMBL', compounds: '1.6M+ Compounds', icon: <FaDatabase />, route: '/identification/chembl', buttonText: 'Search ChEMBL' },
+          { name: 'PubChem', compounds: '100M+ Compounds', icon: <FaDatabase />, route: '/identification/pubchem', buttonText: 'Search PubChem' },
+          { name: 'UniProt', compounds: '150M+ Candidates', icon: <FaDatabase />, route: '/explorer/uniprot', buttonText: 'Explore UniProt' },
         ],
         infographics: {
-          searchMetrics: [
-            { label: 'Search Speed', percentage: 95, color: '#ff9a56', icon: <FaRocket /> },
-            { label: 'Match Accuracy', percentage: 92, color: '#ffad7a', icon: <FaFingerprint /> },
-            { label: 'Database Coverage', percentage: 89, color: '#ffc09f', icon: <FaGlobeAmericas /> }
-          ],
           databaseStats: [
-            { value: '100M+', label: 'Compounds', color: '#ff9a56' },
-            { value: '3', label: 'Databases', color: '#ffad7a' },
-            { value: '<1s', label: 'Search Time', color: '#ffc09f' }
+            { value: '200M+', label: 'Compounds and Candidates', color: "#03d450", icon: <FaDatabase /> },
+            { value: '3+', label: 'Databases', color: '#009938', icon: <FaDatabase /> },
+            { value: '<1s', label: 'Search Time', color: '#01501e', icon: <FaClock /> }
           ]
         }
       }
@@ -415,46 +519,40 @@ const Home = () => {
       title: 'Drug Optimization',
       icon: <FaFlask />,
       color: '#22c55e',
-      description: 'AI-powered molecular optimization and generation',
+      description: 'AI-powered molecular generation and optimization',
       content: {
         subtitle: 'Next-Generation Drug Design',
         features: [
           'ADMET property prediction',
           'BRICS-based molecular generation',
-          'LSTM neural network optimization',
+          'LSTM molecular candidates generation',
           'Structure-based drug design',
           'Lead compound optimization',
-          'Synthetic accessibility prediction'
         ],
         algorithms: [
-          { name: 'BRICS', description: 'Fragment-based generation', accuracy: '85%' },
-          { name: 'LSTM', description: 'Neural network optimization', accuracy: '92%' },
-          { name: 'ADMET-AI', description: 'Property prediction', accuracy: '88%' }
+          { name: 'BRICS', description: 'Fragment-based generation', icon: <FaMolecule />, route: 'optimization', buttonText: 'Use BRICS' },
+          { name: 'LSTM', description: 'Neural network optimization', icon: <FaBrain />, route: 'optimization/lstm', buttonText: 'Use LSTM' },
+          { name: 'ADMET-AI', description: 'Property prediction', icon: <FaShieldAlt />, route: 'optimization/admet', buttonText: 'Use ADMET-AI' }
         ],
         infographics: {
-          optimizationMetrics: [
-            { label: 'ADMET Accuracy', percentage: 88, color: '#a8edea', icon: <FaShieldAlt /> },
-            { label: 'Generation Speed', percentage: 92, color: '#d299c2', icon: <FaMagic /> },
-            { label: 'Drug-likeness', percentage: 85, color: '#fed6e3', icon: <FaBullseye /> }
-          ],
           mlProgress: [
             {
               title: 'Input Molecule',
               description: 'Provide target molecule or constraints',
               icon: <FaMolecule />,
-              color: '#a8edea'
+              color: '#22c55e'
             },
             {
               title: 'AI Processing',
-              description: 'LSTM and BRICS algorithms optimize',
+              description: 'LSTM and BRICS algorithms for generation tasks',
               icon: <FaBrain />,
-              color: '#d299c2'
+              color: '#16a34a'
             },
             {
               title: 'Optimized Output',
-              description: 'Enhanced molecules with better properties',
+              description: 'Filter candidates based on ADMET properties',
               icon: <FaArrowUp />,
-              color: '#fed6e3'
+              color: '#15803d'
             }
           ]
         }
@@ -462,38 +560,22 @@ const Home = () => {
     },
     {
       id: 'activities',
-      title: 'Workflow Management',
+      title: 'Activity Management',
       icon: <FaTasks />,
       color: '#22c55e',
-      description: 'Comprehensive project and workflow management',
+      description: 'Comprehensive activity and output management',
       content: {
-        subtitle: 'Streamlined Research Management',
+        subtitle: 'Streamlined Research with Agent Interaction Management',
         features: [
-          'Project workflow tracking',
-          'Task dependency management',
-          'Progress visualization',
-          'Result organization',
-          'Collaborative workspaces',
-          'Automated reporting'
+          'Activity Tracking',
+          'Agent and Tool Call Statistics',
+          'User Specific Activity Logs',
         ],
         capabilities: [
-          'Multi-step workflow design',
-          'Real-time progress tracking',
-          'Automated quality checks',
-          'Export and sharing tools'
-        ],
-        infographics: {
-          workflowMetrics: [
-            { label: 'Project Efficiency', percentage: 96, color: '#fed6e3', icon: <FaTasks /> },
-            { label: 'Collaboration', percentage: 89, color: '#d299c2', icon: <FaUsers /> },
-            { label: 'Automation', percentage: 94, color: '#a8edea', icon: <FaSyncAlt /> }
-          ],
-          projectStats: [
-            { value: '1000+', label: 'Projects', color: '#fed6e3' },
-            { value: '24/7', label: 'Monitoring', color: '#d299c2' },
-            { value: '99%', label: 'Success Rate', color: '#a8edea' }
-          ]
-        }
+          { name: 'Multi-step workflow design', description: 'Create complex research workflows maintained within activity.', icon: <FaCodeBranch /> },
+          { name: 'Fail-safe Activity Log', description: 'Even after closing the browser the activity is stored with it\'s progress.', icon: <FaCheckCircle /> },
+          { name: 'Export and using tools', description: 'Activity shows the tool usage as counts to ensure conditionally show tools and preserver resources.', icon: <FaUpload /> }
+        ]
       }
     }
   ];
@@ -501,26 +583,26 @@ const Home = () => {
   const quickActions = [
     {
       title: 'Start Chat with Master Agent',
-      description: 'Begin a conversation with our AI assistant',
-      icon: <FaUserSecret className='action-icon-object'/>,
+      description: 'Begin a conversation with our Automation Agent',
+      icon: <FaRobot className='action-icon-object' />,
       route: '/chatbot'
     },
     {
       title: 'Explore Molecules',
       description: 'Analyze molecular structures and properties',
-      icon: <FaMolecule className='action-icon-object'/>,
+      icon: <FaMolecule className='action-icon-object' />,
       route: '/explorer'
     },
     {
       title: 'Search Similar Compounds',
       description: 'Find similar molecules in databases',
-      icon: <FaSearch  className='action-icon-object'/>,
+      icon: <FaSearch className='action-icon-object' />,
       route: '/identification'
     },
     {
       title: 'Optimize Drug Properties',
-      description: 'Use AI to improve molecular properties',
-      icon: <FaLab className='action-icon-object'/>,
+      description: 'Use AI to generate and optimize compounds',
+      icon: <FaLab className='action-icon-object' />,
       route: '/optimization'
     }
   ];
@@ -543,48 +625,48 @@ const Home = () => {
           variants={fadeInUpVariantStatic}
           className="hero-section"
         >
-          <div className={`timeline-marker ${activeSection === 'hero' ? 'active' : ''}`}></div>
+          <div className={`timeline-marker active`}></div>
           <div className="hero-content">
             {/* <video autoPlay loop muted className="hero-video">
               <source src="/videos/hero.mp4" type="video/mp4" />
             </video> */}
             <GlassyContainer className="hero-glassy-container">
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="hero-logo"
-            >
-              <img src="/images/logo_rendered_main.png" alt="Valency Logo" className="main-logo" />
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="hero-logo"
+              >
+                <img src="/images/logo_rendered_main.png" alt="Valency Logo" className="main-logo" />
+              </motion.div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="hero-title"
-            >
-              Welcome to Valency
-            </motion.h1>
+              <motion.h1
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="hero-title"
+              >
+                Welcome to Valency
+              </motion.h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-              className="hero-subtitle"
-            >
-              Next-Generation AI-Powered Drug Discovery Platform
-            </motion.p>
+              <motion.p
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+                className="hero-subtitle"
+              >
+                The Agentic Drug Discovery Platform
+              </motion.p>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-              className="hero-description"
-            >
-              Harness the power of artificial intelligence to accelerate drug discovery,
-              analyze molecular structures, and optimize therapeutic compounds with unprecedented precision.
-            </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+                className="hero-description"
+              >
+                Harness the power of artificial intelligence to accelerate drug discovery,
+                analyze molecular structures, and optimize therapeutic compounds with unprecedented precision just with your prompt.
+              </motion.div>
             </GlassyContainer>
           </div>
         </motion.div>
@@ -594,164 +676,462 @@ const Home = () => {
           ref={quickActionsRef}
           initial="hidden"
           animate="visible"
-          variants={fadeInUpVariantStatic}
+          variants={containerVariants}
           className="quick-actions-section"
         >
-          <div className={`timeline-marker ${activeSection === 'quick-actions' ? 'active' : ''}`}></div>
-          <h2 className="section-title">Quick Start</h2>
+          <div className={`timeline-marker active`}></div>
+          <motion.h2
+            className="section-title"
+            variants={scaleInVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            Quick Start
+          </motion.h2>
           <div className="quick-actions-grid-wrapper">
-            <button 
+            <motion.button
               className="quick-actions-nav-arrow quick-actions-nav-left"
               onClick={() => scrollQuickActions('left')}
               aria-label="Scroll left"
+              whileHover={{ scale: 1.1, x: -5 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.2 }}
             >
               <FaChevronLeft />
-            </button>
-            <div className="quick-actions-grid" ref={quickActionsGridRef}>
+            </motion.button>
+            <motion.div
+              className="quick-actions-grid"
+              ref={quickActionsGridRef}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
               {quickActions.map((action, index) => (
                 <motion.div
                   key={index}
-                  initial="hidden"
-                  animate="visible"
-                  variants={fadeInDownVariants}
+                  variants={cardVariants}
                   custom={index}
                   className="quick-action-card"
                   onClick={() => navigate(action.route)}
+                  whileHover="hover"
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <GlassyContainer className="action-card-content">
-                    <div
+                    <motion.div
                       className="action-icon"
+                      variants={rotateInVariants}
+                      custom={index}
                     >
                       {action.icon}
-                    </div>
-                    <h3 className="action-title">{action.title}</h3>
-                    <p className="action-description">{action.description}</p>
-                    <div className="action-button">
+                    </motion.div>
+                    <motion.h3
+                      className="action-title"
+                      variants={itemVariants}
+                    >
+                      {action.title}
+                    </motion.h3>
+                    <motion.p
+                      className="action-description"
+                      variants={itemVariants}
+                    >
+                      {action.description}
+                    </motion.p>
+                    <motion.div
+                      className="action-button"
+                      variants={bounceInVariants}
+                      custom={index}
+                    >
                       <FaPlay className="play-icon" />
                       Get Started
-                    </div>
+                    </motion.div>
                   </GlassyContainer>
                 </motion.div>
               ))}
-            </div>
-            <button 
+            </motion.div>
+            <motion.button
               className="quick-actions-nav-arrow quick-actions-nav-right"
               onClick={() => scrollQuickActions('right')}
               aria-label="Scroll right"
+              whileHover={{ scale: 1.1, x: 5 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ duration: 0.2 }}
             >
               <FaChevronRight />
-            </button>
+            </motion.button>
           </div>
         </motion.div>
 
         {/* Platform Sections */}
-        <div ref={platformRef} className="platform-sections">
-          <div className={`timeline-marker ${activeSection === 'platform' ? 'active' : ''}`}></div>
-          <h2 className="section-title">Platform Capabilities</h2>
+        <motion.div
+          ref={platformRef}
+          className="platform-sections"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <div className={`timeline-marker active`}></div>
+          <motion.h2
+            className="section-title"
+            variants={scaleInVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            Platform Capabilities
+          </motion.h2>
 
           {platformSections.map((section, index) => (
             <motion.div
               key={section.id}
-              initial="hidden"
-              animate="visible"
-              variants={fadeInLeftVariants}
+              variants={slideInVariants}
               custom={index}
               className="platform-section"
             >
               <GlassyContainer className="section-container">
-                <div
+                <motion.div
                   className="section-header"
                   onClick={() => toggleSection(section.id)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.2 }}
                 >
                   <div className="section-header-left">
-                    <div
+                    <motion.div
                       className="section-icon"
                       style={{ color: section.color }}
+                      variants={rotateInVariants}
+                      initial="hidden"
+                      animate="visible"
+                      custom={index}
                     >
                       {section.icon}
-                    </div>
+                    </motion.div>
                     <div className="section-header-text">
-                      <h3 className="section-header-title">{section.title}</h3>
-                      <p className="section-header-description">{section.description}</p>
+                      <motion.h3
+                        className="section-header-title"
+                        variants={fadeInRightVariants}
+                        initial="hidden"
+                        animate="visible"
+                        custom={index}
+                      >
+                        {section.title}
+                      </motion.h3>
+                      <motion.p
+                        className="section-header-description"
+                        variants={fadeInRightVariants}
+                        initial="hidden"
+                        animate="visible"
+                        custom={index + 0.5}
+                      >
+                        {section.description}
+                      </motion.p>
                     </div>
                   </div>
-                  <div className="section-toggle">
-                    {expandedSections.has(section.id) ? <FaChevronUp /> : <FaChevronDown />}
-                  </div>
-                </div>
+                  <motion.div
+                    className="section-toggle"
+                    animate={{
+                      rotate: expandedSections.has(section.id) ? 180 : 0
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <FaChevronDown />
+                  </motion.div>
+                </motion.div>
 
                 {expandedSections.has(section.id) && (
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
+                    variants={expandableVariants}
+                    initial="collapsed"
+                    animate="expanded"
+                    exit="exit"
                     className="section-content"
                   >
-                    <h4 className="content-subtitle">{section.content.subtitle}</h4>
+                    <motion.h4
+                      className="content-subtitle"
+                      variants={scaleInVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      {section.content.subtitle}
+                    </motion.h4>
 
-                    <div className="features-grid">
-                      <div className="features-list">
+                    <motion.div
+                      className="features-grid"
+                      variants={containerVariants}
+                      initial="hidden"
+                      animate="visible"
+                    >
+                      <motion.div
+                        className="features-list"
+                        variants={itemVariants}
+                      >
                         <h5>Key Features</h5>
                         <ul>
                           {section.content.features.map((feature, idx) => (
-                            <li key={idx}>{feature}</li>
+                            <motion.li
+                              key={idx}
+                              variants={listItemVariants}
+                              custom={idx}
+                              initial="hidden"
+                              animate="visible"
+                            >
+                              {feature}
+                            </motion.li>
                           ))}
                         </ul>
-                      </div>
+                      </motion.div>
 
                       {section.content.stats && (
-                        <div className="stats-grid">
+                        <motion.div
+                          className="stats-grid"
+                          variants={containerVariants}
+                          initial="hidden"
+                          animate="visible"
+                        >
                           {section.content.stats.map((stat, idx) => (
-                            <div key={idx} className="stat-card">
-                              <div className="stat-icon">{stat.icon}</div>
-                              <div className="stat-value">{stat.value}</div>
-                              <div className="stat-label">{stat.label}</div>
-                            </div>
+                            <motion.div
+                              key={idx}
+                              className="stat-card"
+                              variants={cardVariants}
+                              custom={idx}
+                              whileHover="hover"
+                            >
+                              <motion.div
+                                className="stat-icon"
+                                style={{ color: `${stat.color}` }}
+                                variants={bounceInVariants}
+                                custom={idx}
+                              >
+                                {stat.icon}
+                              </motion.div>
+                              <motion.div
+                                className="stat-value"
+                                variants={scaleInVariants}
+                                custom={idx}
+                              >
+                                {stat.value}
+                              </motion.div>
+                              <motion.div
+                                className="stat-label"
+                                variants={fadeInUpVariants}
+                                custom={idx}
+                              >
+                                {stat.label}
+                              </motion.div>
+                            </motion.div>
                           ))}
-                        </div>
+                        </motion.div>
                       )}
 
                       {section.content.agents && (
-                        <div className="agents-grid">
+                        <motion.div
+                          className="agents-grid"
+                          variants={containerVariants}
+                          initial="hidden"
+                          animate="visible"
+                        >
                           <h5>Specialized AI Agents</h5>
                           {section.content.agents.map((agent, idx) => (
-                            <div key={idx} className="agent-card">
-                              <div className="agent-icon">{agent.icon}</div>
+                            <motion.div
+                              key={idx}
+                              className="agent-card"
+                              variants={cardVariants}
+                              custom={idx}
+                              whileHover="hover"
+                            >
+                              <motion.div
+                                className="agent-icon"
+                                variants={rotateInVariants}
+                                custom={idx}
+                              >
+                                {agent.icon}
+                              </motion.div>
                               <div className="agent-info">
-                                <div className="agent-name">{agent.name}</div>
-                                <div className="agent-specialty">{agent.specialty}</div>
+                                <motion.div
+                                  className="agent-name"
+                                  variants={fadeInUpVariants}
+                                  custom={idx}
+                                >
+                                  {agent.name}
+                                </motion.div>
+                                <motion.div
+                                  className="agent-specialty"
+                                  variants={fadeInUpVariants}
+                                  custom={idx + 0.2}
+                                >
+                                  {agent.specialty}
+                                </motion.div>
                               </div>
-                            </div>
+                            </motion.div>
                           ))}
-                        </div>
+                          
+                          {/* Add chatbot button for master-agent section only */}
+                          {section.id === 'master-agent' && (
+                            <motion.div
+                              className="master-agent-button-container"
+                              variants={containerVariants}
+                              initial="hidden"
+                              animate="visible"
+                              style={{ marginTop: '25px', textAlign: 'center' }}
+                            >
+                              <motion.button
+                                className="master-agent-redirect-button"
+                                onClick={() => navigate('/chatbot')}
+                                variants={scaleInVariants}
+                                whileHover={{
+                                  backgroundColor: '#16a34a',
+                                  y: -2,
+                                  boxShadow: '0 6px 12px rgba(0,0,0,0.15)',
+                                  scale: 1.05
+                                }}
+                                whileTap={{ scale: 0.95 }}
+                                style={{
+                                  padding: '12px 24px',
+                                  backgroundColor: '#22c55e',
+                                  color: 'white',
+                                  border: 'none',
+                                  borderRadius: '8px',
+                                  cursor: 'pointer',
+                                  fontSize: '16px',
+                                  fontWeight: '600',
+                                  transition: 'all 0.2s ease',
+                                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '8px'
+                                }}
+                              >
+                                <FaRobot />
+                                Start Chatting with Master Agent
+                              </motion.button>
+                            </motion.div>
+                          )}
+                        </motion.div>
                       )}
 
                       {section.content.tools && (
-                        <div className="tools-grid">
+                        <motion.div
+                          className="tools-grid"
+                          variants={containerVariants}
+                          initial="hidden"
+                          animate="visible"
+                        >
                           <h5>Available Tools</h5>
                           {section.content.tools.map((tool, idx) => (
-                            <div key={idx} className="tool-card">
-                              <div className="tool-icon">{tool.icon}</div>
-                              <div className="tool-info">
-                                <div className="tool-name">{tool.name}</div>
-                                <div className="tool-description">{tool.description}</div>
+                            <motion.div
+                              key={idx}
+                              className="tool-card"
+                              style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                              variants={cardVariants}
+                              custom={idx}
+                              whileHover="hover"
+                            >
+                              <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                                <motion.div
+                                  className="tool-icon"
+                                  style={{ marginRight: '16px' }}
+                                  variants={bounceInVariants}
+                                  custom={idx}
+                                >
+                                  {tool.icon}
+                                </motion.div>
+                                <div className="tool-info">
+                                  <motion.div
+                                    className="tool-name"
+                                    variants={fadeInRightVariants}
+                                    custom={idx}
+                                  >
+                                    {tool.name}
+                                  </motion.div>
+                                  <motion.div
+                                    className="tool-description"
+                                    variants={fadeInRightVariants}
+                                    custom={idx + 0.2}
+                                  >
+                                    {tool.description}
+                                  </motion.div>
+                                </div>
                               </div>
-                            </div>
+                              {tool.route && tool.buttonText && (
+                                <motion.button
+                                  className="tool-redirect-button"
+                                  onClick={() => navigate(tool.route)}
+                                  style={{
+                                    marginLeft: '20px',
+                                    padding: '8px 16px',
+                                    backgroundColor: '#22c55e',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    transition: 'all 0.2s ease',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                    flexShrink: 0
+                                  }}
+                                  whileHover={{
+                                    backgroundColor: '#16a34a',
+                                    y: -1,
+                                    boxShadow: '0 4px 8px rgba(0,0,0,0.15)',
+                                    scale: 1.05
+                                  }}
+                                  whileTap={{ scale: 0.95 }}
+                                  variants={scaleInVariants}
+                                  custom={idx}
+                                >
+                                  {tool.buttonText}
+                                </motion.button>
+                              )}
+                            </motion.div>
                           ))}
-                        </div>
+                        </motion.div>
                       )}
 
                       {section.content.databases && (
                         <div className="databases-grid">
                           <h5>Integrated Databases</h5>
                           {section.content.databases.map((db, idx) => (
-                            <div key={idx} className="database-card">
-                              <div className="database-icon">{db.icon}</div>
-                              <div className="database-info">
-                                <div className="database-name">{db.name}</div>
-                                <div className="database-compounds">{db.compounds} compounds</div>
+                            <div key={idx} className="database-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                                <div className="database-icon" style={{ marginRight: '16px' }}>{db.icon}</div>
+                                <div className="database-info">
+                                  <div className="database-name">{db.name}</div>
+                                  <div className="database-compounds">{db.compounds}</div>
+                                </div>
                               </div>
+                              {db.route && db.buttonText && (
+                                <button
+                                  className="database-redirect-button"
+                                  onClick={() => navigate(db.route)}
+                                  style={{
+                                    marginLeft: '20px',
+                                    padding: '8px 16px',
+                                    backgroundColor: '#22c55e',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    transition: 'all 0.2s ease',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                    flexShrink: 0
+                                  }}
+                                  onMouseOver={(e) => {
+                                    e.target.style.backgroundColor = '#16a34a';
+                                    e.target.style.transform = 'translateY(-1px)';
+                                    e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                                  }}
+                                  onMouseOut={(e) => {
+                                    e.target.style.backgroundColor = '#22c55e';
+                                    e.target.style.transform = 'translateY(0)';
+                                    e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                                  }}
+                                >
+                                  {db.buttonText}
+                                </button>
+                              )}
                             </div>
                           ))}
                         </div>
@@ -761,36 +1141,259 @@ const Home = () => {
                         <div className="algorithms-grid">
                           <h5>AI Algorithms</h5>
                           {section.content.algorithms.map((algo, idx) => (
-                            <div key={idx} className="algorithm-card">
-                              <div className="algorithm-info">
-                                <div className="algorithm-name">{algo.name}</div>
-                                <div className="algorithm-description">{algo.description}</div>
+                            <div key={idx} className="algorithm-card" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+                                <div className="algorithm-icon" style={{ marginRight: '16px' }}>{algo.icon}</div>
+                                <div className="algorithm-info">
+                                  <div className="algorithm-name">{algo.name}</div>
+                                  <div className="algorithm-description">{algo.description}</div>
+                                </div>
                               </div>
-                              <div className="algorithm-accuracy">
-                                <FaChartLine />
-                                {algo.accuracy}
-                              </div>
+                              {algo.route && algo.buttonText && (
+                                <button
+                                  className="algorithm-redirect-button"
+                                  onClick={() => navigate(algo.route)}
+                                  style={{
+                                    marginLeft: '20px',
+                                    padding: '8px 16px',
+                                    backgroundColor: '#22c55e',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    fontSize: '14px',
+                                    fontWeight: '600',
+                                    transition: 'all 0.2s ease',
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                                    flexShrink: 0
+                                  }}
+                                  onMouseOver={(e) => {
+                                    e.target.style.backgroundColor = '#16a34a';
+                                    e.target.style.transform = 'translateY(-1px)';
+                                    e.target.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)';
+                                  }}
+                                  onMouseOut={(e) => {
+                                    e.target.style.backgroundColor = '#22c55e';
+                                    e.target.style.transform = 'translateY(0)';
+                                    e.target.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                                  }}
+                                >
+                                  {algo.buttonText}
+                                </button>
+                              )}
                             </div>
                           ))}
                         </div>
                       )}
 
                       {section.content.capabilities && (
-                        <div className="capabilities-list">
-                          <h5>Capabilities</h5>
-                          <ul>
-                            {section.content.capabilities.map((capability, idx) => (
-                              <li key={idx}>{capability}</li>
-                            ))}
-                          </ul>
+                        <div className="capabilities-grid">
+                          <h5>Advanced Capabilities</h5>
+                          {section.content.capabilities.map((capability, idx) => (
+                            <div key={idx} className="capability-card">
+                              <div className="capability-icon">{capability.icon}</div>
+                              <div className="capability-info">
+                                <div className="capability-name">{capability.name}</div>
+                                <div className="capability-description">{capability.description}</div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       )}
-                    </div>
+
+                      {/* Add activities button for activities section only */}
+                      {section.id === 'activities' && (
+                        <motion.div
+                          className="activities-button-container"
+                          variants={containerVariants}
+                          initial="hidden"
+                          animate="visible"
+                          style={{ marginTop: '25px', textAlign: 'center' }}
+                        >
+                          <motion.button
+                            className="activities-redirect-button"
+                            onClick={() => navigate('/activities')}
+                            variants={scaleInVariants}
+                            whileHover={{
+                              backgroundColor: '#16a34a',
+                              y: -2,
+                              boxShadow: '0 6px 12px rgba(0,0,0,0.15)',
+                              scale: 1.05
+                            }}
+                            whileTap={{ scale: 0.95 }}
+                            style={{
+                              padding: '12px 24px',
+                              backgroundColor: '#22c55e',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '8px',
+                              cursor: 'pointer',
+                              fontSize: '16px',
+                              fontWeight: '600',
+                              transition: 'all 0.2s ease',
+                              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '8px'
+                            }}
+                          >
+                            <FaTasks />
+                            Go to Activities Page
+                          </motion.button>
+                        </motion.div>
+                      )}
+                    </motion.div>
 
                     {/* Infographics Section */}
                     <div className="infographics-section">
                       {section.content.infographics && (
                         <>
+                          {/* Automation and Manual Workflows */}
+                          {(section.content.infographics.automationWorkflow || section.content.infographics.manualWorkflow) && (
+                            <div className="dual-workflow-container">
+                              <h5>Research Workflows</h5>
+                              <div className="workflows-side-by-side">
+                                {section.content.infographics.automationWorkflow && (
+                                  <div className="workflow-column">
+                                    <div className="workflow-header">
+                                      <div className="workflow-header-icon">
+                                        <FaRobot style={{ color: 'var(--color-accent)' }} />
+                                      </div>
+                                      <h6>Automation Workflow</h6>
+                                      <p>AI-driven research with natural language queries</p>
+                                    </div>
+                                    <ProcessFlow steps={section.content.infographics.automationWorkflow} />
+                                  </div>
+                                )}
+                                {section.content.infographics.manualWorkflow && (
+                                  <div className="workflow-column">
+                                    <div className="workflow-header">
+                                      <div className="workflow-header-icon">
+                                        <FaCog style={{ color: 'var(--color-success)' }} />
+                                      </div>
+                                      <h6>Manual Workflow</h6>
+                                      <p>Precision control with step-by-step analysis</p>
+                                    </div>
+                                    <ProcessFlow steps={section.content.infographics.manualWorkflow} />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Legacy Workflow Steps Support */}
+                          {section.content.infographics.workflowSteps && !section.content.infographics.automationWorkflow && !section.content.infographics.manualWorkflow && (
+                            <div className="workflow-steps-container">
+                              <h5>Platform Workflow</h5>
+                              <ProcessFlow steps={section.content.infographics.workflowSteps} />
+                            </div>
+                          )}
+
+                          {/* Analysis Metrics */}
+                          {section.content.infographics.analysisMetrics && (
+                            <div className="analysis-metrics-container">
+                              <h5>Analysis Statistics</h5>
+                              <div className="stats-grid">
+                                {section.content.infographics.analysisMetrics.map((stat, idx) => (
+                                  <div key={idx} className="stat-card">
+                                    {stat.icon && (
+                                      <div className="stat-icon" style={{ color: stat.color }}>
+                                        {stat.icon}
+                                      </div>
+                                    )}
+                                    <div className="stat-value" style={{ color: stat.color }}>
+                                      {stat.value}
+                                    </div>
+                                    <div className="stat-label">
+                                      {stat.label}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Search Metrics */}
+                          {section.content.infographics.searchMetrics && (
+                            <div className="search-metrics-container">
+                              <h5>Search Performance</h5>
+                              <div className="metrics-grid">
+                                {section.content.infographics.searchMetrics.map((metric, idx) => (
+                                  <div key={idx} className="metric-card">
+                                    <div className="metric-icon" style={{ color: metric.color }}>
+                                      {metric.icon}
+                                    </div>
+                                    <div className="metric-info">
+                                      <div className="metric-label">{metric.label}</div>
+                                      <div className="metric-percentage">{metric.percentage}%</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Database Stats */}
+                          {section.content.infographics.databaseStats && (
+                            <div className="database-stats-container">
+                              <h5>Database Statistics</h5>
+                              <div className="stats-grid">
+                                {section.content.infographics.databaseStats.map((stat, idx) => (
+                                  <div key={idx} className="stat-card">
+                                    {stat.icon && (
+                                      <div className="stat-icon" style={{ color: stat.color }}>
+                                        {stat.icon}
+                                      </div>
+                                    )}
+                                    <div className="stat-value" style={{ color: stat.color }}>
+                                      {stat.value}
+                                    </div>
+                                    <div className="stat-label">
+                                      {stat.label}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Optimization Metrics */}
+                          {section.content.infographics.optimizationMetrics && (
+                            <div className="optimization-metrics-container">
+                              <h5>Optimization Performance</h5>
+                              <div className="metrics-grid">
+                                {section.content.infographics.optimizationMetrics.map((metric, idx) => (
+                                  <div key={idx} className="metric-card">
+                                    <div className="metric-icon" style={{ color: metric.color }}>
+                                      {metric.icon}
+                                    </div>
+                                    <div className="metric-info">
+                                      <div className="metric-label">{metric.label}</div>
+                                      <div className="metric-percentage">{metric.percentage}%</div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Capability Flow */}
+                          {section.content.infographics.capabilityFlow && (
+                            <div className="capability-flow-container">
+                              <h5>Capability Flow</h5>
+                              <ProcessFlow steps={section.content.infographics.capabilityFlow} />
+                            </div>
+                          )}
+
+                          {/* ML Progress */}
+                          {section.content.infographics.mlProgress && (
+                            <div className="ml-progress-container">
+                              <h5>Machine Learning Progress</h5>
+                              <ProcessFlow steps={section.content.infographics.mlProgress} />
+                            </div>
+                          )}
+
+                          {/* Legacy handlers for backward compatibility */}
                           {section.content.infographics.circularStats && (
                             <div className="circular-stats-container">
                               {section.content.infographics.circularStats.map((stat, idx) => (
@@ -816,94 +1419,6 @@ const Home = () => {
                             <div className="network-graph-container">
                               <h5>Agent Network</h5>
                               <NetworkGraph />
-                            </div>
-                          )}
-
-                          {section.content.infographics.analysisMetrics && (
-                            <div className="analysis-metrics-container">
-                              <h5>Analysis Metrics</h5>
-                              <div className="metrics-grid">
-                                {section.content.infographics.analysisMetrics.map((metric, idx) => (
-                                  <div key={idx} className="metric-card">
-                                    <div className="metric-value" style={{ color: metric.color }}>
-                                      {metric.value}
-                                    </div>
-                                    <div className="metric-label">
-                                      {metric.label}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {section.content.infographics.capabilityFlow && (
-                            <div className="capability-flow-container">
-                              <h5>Capability Flow</h5>
-                              <ProcessFlow steps={section.content.infographics.capabilityFlow} />
-                            </div>
-                          )}
-
-                          {section.content.infographics.searchMetrics && (
-                            <div className="search-metrics-container">
-                              <h5>Search Performance</h5>
-                              <div className="metrics-grid">
-                                {section.content.infographics.searchMetrics.map((metric, idx) => (
-                                  <div key={idx} className="metric-card">
-                                    <div className="metric-icon" style={{ color: metric.color }}>
-                                      {metric.icon}
-                                    </div>
-                                    <div className="metric-info">
-                                      <div className="metric-label">{metric.label}</div>
-                                      <div className="metric-percentage">{metric.percentage}%</div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {section.content.infographics.databaseStats && (
-                            <div className="database-stats-container">
-                              <h5>Database Statistics</h5>
-                              <div className="stats-grid">
-                                {section.content.infographics.databaseStats.map((stat, idx) => (
-                                  <div key={idx} className="stat-card">
-                                    <div className="stat-value" style={{ color: stat.color }}>
-                                      {stat.value}
-                                    </div>
-                                    <div className="stat-label">
-                                      {stat.label}
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {section.content.infographics.optimizationMetrics && (
-                            <div className="optimization-metrics-container">
-                              <h5>Optimization Metrics</h5>
-                              <div className="metrics-grid">
-                                {section.content.infographics.optimizationMetrics.map((metric, idx) => (
-                                  <div key={idx} className="metric-card">
-                                    <div className="metric-icon" style={{ color: metric.color }}>
-                                      {metric.icon}
-                                    </div>
-                                    <div className="metric-info">
-                                      <div className="metric-label">{metric.label}</div>
-                                      <div className="metric-percentage">{metric.percentage}%</div>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {section.content.infographics.mlProgress && (
-                            <div className="ml-progress-container">
-                              <h5>Machine Learning Progress</h5>
-                              <ProcessFlow steps={section.content.infographics.mlProgress} />
                             </div>
                           )}
 
@@ -951,34 +1466,30 @@ const Home = () => {
               </GlassyContainer>
             </motion.div>
           ))}
-        </div>
+      </motion.div>
 
-        {/* Call to Action */}
-        <motion.div
-          ref={ctaRef}
-          initial="hidden"
-          animate="visible"
-          variants={fadeInUpVariantStatic}
-          className="cta-section"
-        >
-          <div className={`timeline-marker ${activeSection === 'cta' ? 'active' : ''}`}></div>
-          <GlassyContainer className="cta-content">
-            <h2 className="cta-title">Ready to Accelerate Your Research?</h2>
-            <p className="cta-description">
-              Join thousands of researchers using Valency to transform drug discovery
-            </p>
-            <button
-              className="cta-button"
-              onClick={() => navigate('/chatbot')}
-            >
-              <FaUserSecret />
-              Start with Master Agent
-            </button>
-          </GlassyContainer>
-        </motion.div>
-      </div>
+      {/* Call to Action */}
+      <motion.div
+        ref={ctaRef}
+        initial="hidden"
+        animate="visible"
+        variants={fadeInUpVariantStatic}
+        className="cta-section"
+      >
+        <div className={`timeline-marker active`}></div>
+        <GlassyContainer className="cta-content">
+          <h2 className="cta-title">Ready to Accelerate Your Research?</h2>
+          <button
+            className="cta-button"
+            onClick={() => navigate('/chatbot')}
+          >
+            <FaRobot />
+            Start with Master Agent
+          </button>
+        </GlassyContainer>
+      </motion.div>
     </div>
-  );
+  </div>);
 };
 
 export default Home;

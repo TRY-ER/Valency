@@ -6,7 +6,7 @@ import DataViewer from "../../../components/UI/DataViewer/DataViewer";
 import InfoBox from "../../../components/UI/InfoBox/InfoBox";
 import TwoDViewer from "../../../components/UI/TwoDViewer/TwoDViewer";
 import { motion } from "framer-motion";
-import { fadeInUpVariantStatic } from "../../../components/animations/framerAnim";
+import { fadeInUpVariantStatic, fadeInUpVariants, containerVariants, itemVariants } from "../../../components/animations/framerAnim";
 import GlassyContainer from "../../../components/glassy_container/gc";
 import { getApprovedDrugs } from "../../../services/api/mcpToolsService";
 
@@ -315,13 +315,17 @@ const ApprovedDrugsViewer = ({
         <>
             <motion.div
                 className="approved-drugs-container"
-                variants={fadeInUpVariantStatic}
-                initial="initial"
-                animate="animate"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
             >
                 {/* Header and Controls */}
                 {!hideControls && (
-                    <div className="approved-drugs-row-1">
+                    <motion.div 
+                        className="approved-drugs-row-1"
+                        variants={fadeInUpVariants}
+                        custom={0}
+                    >
                         <GlassyContainer>
                             <div className="approved-drugs-search-controls">
                                 <h2 className="approved-drugs-header">{getHeaderText()}</h2>
@@ -364,27 +368,45 @@ const ApprovedDrugsViewer = ({
                                 </div>
                             </div>
                         </GlassyContainer>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* Loading State */}
                 {isLoading && (
-                    <div className="approved-drugs-loading">
+                    <motion.div 
+                        className="approved-drugs-loading"
+                        variants={fadeInUpVariants}
+                        custom={1}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
                         <div className="loading-spinner"></div>
                         <p>Fetching approved drugs data...</p>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* Error State */}
                 {error && (
-                    <div className="approved-drugs-error">
+                    <motion.div 
+                        className="approved-drugs-error"
+                        variants={fadeInUpVariants}
+                        custom={1}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                    >
                         <p>⚠️ {error}</p>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* Drugs List Display */}
                 {filteredDrugs.length > 0 && (
-                    <div className="approved-drugs-row-2">
+                    <motion.div 
+                        className="approved-drugs-row-2"
+                        variants={fadeInUpVariants}
+                        custom={2}
+                    >
                         <GlassyContainer>
                             <div className="approved-drugs-selection-container">
                                 {/* Left Panel - Drug List */}
@@ -488,7 +510,7 @@ const ApprovedDrugsViewer = ({
                                 </div>
                             </div>
                         </GlassyContainer>
-                    </div>
+                    </motion.div>
                 )}
 
                 {/* DataViewer - show selected drug data */}

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import MolInputBox from "../../../components/UI/InputBox/InputBox";
 import InfoBox from "../../../components/UI/InfoBox/InfoBox";
 import TwoDViewer from "../../../components/UI/TwoDViewer/TwoDViewer";
@@ -45,6 +46,55 @@ const PSMILESListComponent = ({ toolData = null }) => {
     const [isSelectedCandidateValid, setIsSelectedCandidateValid] = useState(false);
     const [selectedIndex, setSelectedIndex] = useState(0);
     // const [showRawResults, setShowRawResults] = useState(false);
+
+    // Animation variants
+    const containerVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut",
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const sectionVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: {
+                duration: 0.5,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const candidateItemVariants = {
+        hidden: { opacity: 0, scale: 0.8, y: 10 },
+        visible: {
+            opacity: 1,
+            scale: 1,
+            y: 0,
+            transition: {
+                duration: 0.3,
+                ease: "easeOut"
+            }
+        }
+    };
+
+    const listContainerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.05
+            }
+        }
+    };
 
     // Initialize component with toolData if provided
     useEffect(() => {
@@ -171,20 +221,28 @@ const PSMILESListComponent = ({ toolData = null }) => {
     }, [showVals])
 
     return (
-        <div style={{ 
-            padding: '20px', 
-            backgroundColor: 'var(--color-bg-primary)',
-            color: 'var(--color-text-primary)',
-            width: '100%',
-            border: '1px solid var(--c-light-border)',
-            borderRadius: '12px'
-        }}>
-            <h2 style={{ 
-                marginBottom: '16px', 
+        <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            style={{ 
+                padding: '20px', 
+                backgroundColor: 'var(--color-bg-primary)',
                 color: 'var(--color-text-primary)',
-                fontSize: '1.5rem',
-                fontWeight: '600'
-            }}>
+                width: '100%',
+                border: '1px solid var(--c-light-border)',
+                borderRadius: '12px'
+            }}
+        >
+            <motion.h2 
+                variants={sectionVariants}
+                style={{ 
+                    marginBottom: '16px', 
+                    color: 'var(--color-text-primary)',
+                    fontSize: '1.5rem',
+                    fontWeight: '600'
+                }}
+            >
                 BRICS Candidate Generation from Candidates List
                 {toolData && (
                     <span style={{
@@ -200,16 +258,19 @@ const PSMILESListComponent = ({ toolData = null }) => {
                         Pre-loaded Results
                     </span>
                 )}
-            </h2>
+            </motion.h2>
 
             {/* Input Section */}
-            <div style={{ 
-                marginBottom: '16px', 
-                display: 'flex', 
-                gap: '12px', 
-                alignItems: 'flex-end',
-                flexWrap: 'wrap'
-            }}>
+            <motion.div 
+                variants={sectionVariants}
+                style={{ 
+                    marginBottom: '16px', 
+                    display: 'flex', 
+                    gap: '12px', 
+                    alignItems: 'flex-end',
+                    flexWrap: 'wrap'
+                }}
+            >
                 {/* Dropdown for candidate type - moved to the left */}
                 <div className="brics-input-container">
                     <label className="brics-type-label">
@@ -261,10 +322,13 @@ const PSMILESListComponent = ({ toolData = null }) => {
                 >
                     + Add to List
                 </button>
-            </div>
+            </motion.div>
 
             {/* List Section */}
-            <div style={{ marginBottom: '16px' }}>
+            <motion.div 
+                variants={sectionVariants}
+                style={{ marginBottom: '16px' }}
+            >
                 <h3 style={{ 
                     color: 'var(--color-text-primary)',
                     fontSize: '1.1rem',
@@ -363,15 +427,18 @@ const PSMILESListComponent = ({ toolData = null }) => {
                         ))}
                     </div>
                 )}
-            </div>
+            </motion.div>
 
             {/* Action Section */}
-            <div style={{ 
-                display: 'flex', 
-                gap: '12px', 
-                marginBottom: '16px',
-                flexWrap: 'wrap'
-            }}>
+            <motion.div 
+                variants={sectionVariants}
+                style={{ 
+                    display: 'flex', 
+                    gap: '12px', 
+                    marginBottom: '16px',
+                    flexWrap: 'wrap'
+                }}
+            >
                 <button 
                     onClick={handleProcessList} 
                     disabled={candidatesList.length === 0 || status === "loading"}
@@ -414,33 +481,43 @@ const PSMILESListComponent = ({ toolData = null }) => {
                 >
                     Reset
                 </button>
-            </div>
+            </motion.div>
 
             {/* Error Message */}
             {status === "error" && error && (
-                <div style={{ 
-                    color: 'var(--color-alert)',
-                    backgroundColor: 'var(--color-bg-secondary)',
-                    padding: '12px',
-                    border: '1px solid var(--color-alert)',
-                    borderRadius: '8px',
-                    marginBottom: '16px'
-                }}>
+                <motion.div 
+                    variants={sectionVariants}
+                    initial="hidden"
+                    animate="visible"
+                    style={{ 
+                        color: 'var(--color-alert)',
+                        backgroundColor: 'var(--color-bg-secondary)',
+                        padding: '12px',
+                        border: '1px solid var(--color-alert)',
+                        borderRadius: '8px',
+                        marginBottom: '16px'
+                    }}
+                >
                     <p style={{ margin: '0', fontWeight: '500' }}>
                         <strong>Error:</strong> {error}
                     </p>
-                </div>
+                </motion.div>
             )}
 
             {/* Results Section */}
             {status === "success" && results && (
-                <div style={{ 
-                    backgroundColor: 'var(--color-bg-secondary)',
-                    borderRadius: '8px',
-                    border: '1px solid var(--c-light-border)',
-                    padding: '16px',
-                    marginBottom: '20px'
-                }}>
+                <motion.div 
+                    variants={sectionVariants}
+                    initial="hidden"
+                    animate="visible"
+                    style={{ 
+                        backgroundColor: 'var(--color-bg-secondary)',
+                        borderRadius: '8px',
+                        border: '1px solid var(--c-light-border)',
+                        padding: '16px',
+                        marginBottom: '20px'
+                    }}
+                >
                     <h3 style={{ 
                         color: 'var(--color-text-primary)',
                         fontSize: '1.1rem',
@@ -568,7 +645,7 @@ const PSMILESListComponent = ({ toolData = null }) => {
                     </div>
                         </>
                     )}
-                </div>
+                </motion.div>
             )}
 
             {/* Raw JSON Results (Collapsible) */}
@@ -630,7 +707,7 @@ const PSMILESListComponent = ({ toolData = null }) => {
                     )}
                 </div>
             )} */}
-        </div>
+        </motion.div>
     );
 };
 

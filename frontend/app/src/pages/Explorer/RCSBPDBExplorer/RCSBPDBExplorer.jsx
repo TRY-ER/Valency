@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
+import { motion } from 'framer-motion';
 import {
     rcsbTextSearchPdb,
     rcsbAttributeSearchPdb,
@@ -468,6 +469,32 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    // Animation variants for Framer Motion
+    const containerVariants = {
+        hidden: { opacity: 0, y: 50 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.6,
+                ease: "easeOut",
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 30 },
+        visible: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.5,
+                ease: "easeOut"
+            }
+        }
+    };
+
     // Input states for each search type
     const [textQuery, setTextQuery] = useState("");
     const [pdbId, setPdbId] = useState(""); // New state for PDB ID search
@@ -668,11 +695,42 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
 
 
     const renderSearchInputs = () => {
+        const inputContainerVariants = {
+            hidden: { opacity: 0, y: 20 },
+            visible: { 
+                opacity: 1, 
+                y: 0,
+                transition: {
+                    duration: 0.4,
+                    ease: "easeOut",
+                    staggerChildren: 0.05
+                }
+            }
+        };
+
+        const inputItemVariants = {
+            hidden: { opacity: 0, y: 15 },
+            visible: { 
+                opacity: 1, 
+                y: 0,
+                transition: {
+                    duration: 0.3,
+                    ease: "easeOut"
+                }
+            }
+        };
+
         switch (searchType) {
             case "text_search":
                 return (
-                    <div className="search-inputs-container">
-                        <div className="input-field-container">
+                    <motion.div 
+                        className="search-inputs-container"
+                        variants={inputContainerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        key="text_search"
+                    >
+                        <motion.div className="input-field-container" variants={inputItemVariants}>
                             <label className="input-field-label">Text Query:</label>
                             <input
                                 type="text"
@@ -681,13 +739,19 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                                 placeholder="Enter text query (e.g., hemoglobin)"
                                 className="rcsb-input-field"
                             />
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 );
             case "pdb_id_search":
                 return (
-                    <div className="search-inputs-container">
-                        <div className="input-field-container">
+                    <motion.div 
+                        className="search-inputs-container"
+                        variants={inputContainerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        key="pdb_id_search"
+                    >
+                        <motion.div className="input-field-container" variants={inputItemVariants}>
                             <label className="input-field-label">PDB ID:</label>
                             <input
                                 type="text"
@@ -696,13 +760,19 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                                 placeholder="Enter PDB ID (e.g., 6M0J, 1TIM)"
                                 className="rcsb-input-field"
                             />
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 );
             case "attribute_search":
                 return (
-                    <div className="search-inputs-container">
-                        <div className="input-field-container">
+                    <motion.div 
+                        className="search-inputs-container"
+                        variants={inputContainerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        key="attribute_search"
+                    >
+                        <motion.div className="input-field-container" variants={inputItemVariants}>
                             <label className="input-field-label">Attribute Path:</label>
                             <input
                                 type="text"
@@ -711,14 +781,16 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                                 placeholder="Attribute Path (e.g., exptl.method)"
                                 className="rcsb-input-field"
                             />
-                        </div>
-                        <GenericDropdownSelector
-                            value={operator}
-                            onChange={setOperator}
-                            options={operatorOptions}
-                            placeholder="Select Operator"
-                        />
-                        <div className="input-field-container">
+                        </motion.div>
+                        <motion.div variants={inputItemVariants}>
+                            <GenericDropdownSelector
+                                value={operator}
+                                onChange={setOperator}
+                                options={operatorOptions}
+                                placeholder="Select Operator"
+                            />
+                        </motion.div>
+                        <motion.div className="input-field-container" variants={inputItemVariants}>
                             <label className="input-field-label">Value:</label>
                             <input
                                 type="text"
@@ -727,13 +799,19 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                                 placeholder="Value (e.g., X-RAY DIFFRACTION or list for 'in')"
                                 className="rcsb-input-field"
                             />
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 );
             case "combined_search":
                 return (
-                    <div className="search-inputs-container">
-                        <div className="input-field-container">
+                    <motion.div 
+                        className="search-inputs-container"
+                        variants={inputContainerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        key="combined_search"
+                    >
+                        <motion.div className="input-field-container" variants={inputItemVariants}>
                             <label className="input-field-label">Main Text Query:</label>
                             <input
                                 type="text"
@@ -742,9 +820,13 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                                 placeholder="Main text query"
                                 className="rcsb-input-field"
                             />
-                        </div>
+                        </motion.div>
                         {attributeFilters.map((filter, index) => (
-                            <div key={index} className="attribute-filter-group">
+                            <motion.div 
+                                key={index} 
+                                className="attribute-filter-group"
+                                variants={inputItemVariants}
+                            >
                                 <h4>Attribute Filter {index + 1}</h4>
                                 <div className="input-field-container">
                                     <label className="input-field-label">Attribute Path:</label>
@@ -775,15 +857,28 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                                 {attributeFilters.length > 1 && (
                                     <button type="button" onClick={() => handleRemoveAttributeFilter(index)} className="remove-filter-btn">Remove Filter</button>
                                 )}
-                            </div>
+                            </motion.div>
                         ))}
-                        <button type="button" onClick={handleAddAttributeFilter} className="add-filter-btn">Add Attribute Filter</button>
-                    </div>
+                        <motion.button 
+                            type="button" 
+                            onClick={handleAddAttributeFilter} 
+                            className="add-filter-btn"
+                            variants={inputItemVariants}
+                        >
+                            Add Attribute Filter
+                        </motion.button>
+                    </motion.div>
                 );
             case "sequence_identity_search":
                 return (
-                    <div className="search-inputs-container">
-                        <div className="input-field-container">
+                    <motion.div 
+                        className="search-inputs-container"
+                        variants={inputContainerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        key="sequence_identity_search"
+                    >
+                        <motion.div className="input-field-container" variants={inputItemVariants}>
                             <label className="input-field-label">Sequence:</label>
                             <textarea
                                 value={sequence}
@@ -792,14 +887,16 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                                 rows={4}
                                 className="rcsb-textarea-field"
                             />
-                        </div>
-                        <GenericDropdownSelector
-                            value={sequenceType}
-                            onChange={setSequenceType}
-                            options={sequenceTypeOptions}
-                            placeholder="Select Sequence Type"
-                        />
-                        <div className="input-field-container">
+                        </motion.div>
+                        <motion.div variants={inputItemVariants}>
+                            <GenericDropdownSelector
+                                value={sequenceType}
+                                onChange={setSequenceType}
+                                options={sequenceTypeOptions}
+                                placeholder="Select Sequence Type"
+                            />
+                        </motion.div>
+                        <motion.div className="input-field-container" variants={inputItemVariants}>
                             <label className="input-field-label">Identity Cutoff:</label>
                             <input
                                 type="number"
@@ -811,8 +908,8 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                                 max="1"
                                 className="rcsb-input-field"
                             />
-                        </div>
-                        <div className="input-field-container">
+                        </motion.div>
+                        <motion.div className="input-field-container" variants={inputItemVariants}>
                             <label className="input-field-label">E-value Cutoff:</label>
                             <input
                                 type="number"
@@ -822,13 +919,19 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                                 step="0.1"
                                 className="rcsb-input-field"
                             />
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 );
             case "sequence_motif_search":
                 return (
-                    <div className="search-inputs-container">
-                        <div className="input-field-container">
+                    <motion.div 
+                        className="search-inputs-container"
+                        variants={inputContainerVariants}
+                        initial="hidden"
+                        animate="visible"
+                        key="sequence_motif_search"
+                    >
+                        <motion.div className="input-field-container" variants={inputItemVariants}>
                             <label className="input-field-label">Motif Pattern:</label>
                             <input
                                 type="text"
@@ -837,51 +940,86 @@ const RCSBPDBExplorer = ({ initialSearchType = "text_search", toolData = null })
                                 placeholder="Motif pattern (e.g., PROSITE format)"
                                 className="rcsb-input-field"
                             />
-                        </div>
-                        <GenericDropdownSelector
-                            value={patternType}
-                            onChange={setPatternType}
-                            options={patternTypeOptions}
-                            placeholder="Select Pattern Type"
-                        />
-                         <GenericDropdownSelector
-                            value={sequenceType} // Reusing sequenceType state and options
-                            onChange={setSequenceType}
-                            options={sequenceTypeOptions}
-                            placeholder="Select Sequence Type"
-                        />
-                    </div>
+                        </motion.div>
+                        <motion.div variants={inputItemVariants}>
+                            <GenericDropdownSelector
+                                value={patternType}
+                                onChange={setPatternType}
+                                options={patternTypeOptions}
+                                placeholder="Select Pattern Type"
+                            />
+                        </motion.div>
+                        <motion.div variants={inputItemVariants}>
+                             <GenericDropdownSelector
+                                value={sequenceType} // Reusing sequenceType state and options
+                                onChange={setSequenceType}
+                                options={sequenceTypeOptions}
+                                placeholder="Select Sequence Type"
+                            />
+                        </motion.div>
+                    </motion.div>
                 );
             default:
-                return <p>Select a search type.</p>;
+                return (
+                    <motion.p
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                    >
+                        Select a search type.
+                    </motion.p>
+                );
         }
     };
 
     return (
-        <div className="rcsb-pdb-explorer-container">
+        <motion.div 
+            className="rcsb-pdb-explorer-container"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+        >
             {/* Header or Title if any */}
             {/* ... */}
 
-            <div className="rcsb-search-type-selector-section">
+            <motion.div 
+                className="rcsb-search-type-selector-section"
+                variants={itemVariants}
+            >
                 <ActivitySearchTypeSelector
                     value={searchType}
                     onChange={setSearchType}
                     options={searchTypeOptions}
                     placeholder="Select Search Type"
                 />
-            </div>
+            </motion.div>
 
-            <form onSubmit={handleSubmit} className="rcsb-search-form">
+            <motion.form 
+                onSubmit={handleSubmit} 
+                className="rcsb-search-form"
+                variants={itemVariants}
+            >
                 {renderSearchInputs()}
                 <button type="submit" disabled={isLoading} className="rcsb-submit-button">
                     {isLoading ? 'Searching...' : 'Search PDB'}
                 </button>
-            </form>
+            </motion.form>
 
-            {error && <p style={{ color: 'red', marginTop: '10px' }}>Error: {error}</p>}
+            {error && (
+                <motion.p 
+                    style={{ color: 'red', marginTop: '10px' }}
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
+                >
+                    Error: {error}
+                </motion.p>
+            )}
 
-            <DataViewer data={apiData} /> {/* Using DataViewer */}
-        </div>
+            <motion.div variants={itemVariants}>
+                <DataViewer data={apiData} /> {/* Using DataViewer */}
+            </motion.div>
+        </motion.div>
     );
 };
 
