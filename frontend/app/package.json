@@ -25,11 +25,22 @@
     "three": "^0.177.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "build:analyze": "npm run build && npx webpack-bundle-analyzer build/static/js/*.js",
+    "build:prod": "GENERATE_SOURCEMAP=false react-app-rewired build",
+    "test": "react-app-rewired test",
+    "test:coverage": "react-app-rewired test --coverage --watchAll=false",
     "eject": "react-scripts eject",
-    "temp_serve": "http-server ./public -a 0.0.0.0 -p 3000"
+    "temp_serve": "http-server ./public -a 0.0.0.0 -p 3000",
+    "serve:build": "npx serve -s build -l 3000 --single",
+    "serve:build:cors": "npx serve -s build -l 3000 --single --cors",
+    "deploy:netlify": "npm run build:prod && npx netlify deploy --prod --dir=build",
+    "deploy:vercel": "npm run build:prod && npx vercel --prod",
+    "preview": "npm run build && npm run serve:build",
+    "lighthouse": "npm run build && npx lighthouse http://localhost:3000 --only-categories=performance,accessibility,best-practices,seo --output=html --output-path=./lighthouse-report.html",
+    "clean": "rm -rf build node_modules/.cache",
+    "typecheck": "tsc --noEmit"
   },
   "eslintConfig": {
     "extends": [

@@ -200,7 +200,7 @@ const ChemBLGetter = ({
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const [validationError, setValidationError] = useState(null);
-    
+
     // States for multiple candidates (preferred name search)
     const [multipleCandidates, setMultipleCandidates] = useState([]);
     const [selectedCandidate, setSelectedCandidate] = useState(null);
@@ -258,7 +258,7 @@ const ChemBLGetter = ({
 
             try {
                 const result = await getMoleculesByChemblIds({ chembl_ids: chemblIdsList });
-                
+
                 if (result && result.status === "success") {
                     const processible = JSON.parse(result.result["0"]);
                     console.log('Multiple ChEMBL results:', processible);
@@ -270,7 +270,19 @@ const ChemBLGetter = ({
                         setApiData(null); // Clear single molecule data
                         setMultipleCandidates([]);
                         setSelectedCandidate(null);
-                    } else {
+                    }
+                    else if (
+                        processible.data && Array.isArray(processible.data) && processible.data.length > 0
+                    ) {
+                        setMultipleChemblResults(processible.data);
+                        setSelectedChemblResult(processible.data[0]);
+                        setSelectedChemblIndex(0);
+                        setApiData(null); // Clear single molecule data
+                        setMultipleCandidates([]);
+                        setSelectedCandidate(null
+                        )
+                    }
+                    else {
                         setError("No molecules found for the provided ChEMBL IDs.");
                         setMultipleChemblResults([]);
                         setSelectedChemblResult(null);
@@ -326,12 +338,12 @@ const ChemBLGetter = ({
                 if (result.status === "success") {
                     var processible = result.result["0"]
                     processible = JSON.parse(processible);
-                    
+
                     console.log('Processible', processible);
 
                     if (searchType === "chembl_id") {
                         // For ChEMBL ID search, we expect a single molecule
-                        if (processible.result){
+                        if (processible.result) {
                             setApiData(processible.result);
                             setSearchValue(trimmedValue);
                             // Clear multiple candidates for single molecule view
@@ -339,7 +351,17 @@ const ChemBLGetter = ({
                             setSelectedCandidate(null);
                             setMultipleChemblResults([]);
                             setSelectedChemblResult(null);
-                        } else {
+                        }
+                        else if (processible.data) {
+                            setApiData(processible.data);
+                            setSearchValue(trimmedValue);
+                            // Clear multiple candidates for single molecule view
+                            setMultipleCandidates([]);
+                            setSelectedCandidate(null);
+                            setMultipleChemblResults([]);
+                            setSelectedChemblResult(null);
+                        }
+                        else {
                             // No data found for ChEMBL ID
                             setError(`No molecule found for ChEMBL ID "${trimmedValue}"`);
                             setApiData(null);
@@ -374,19 +396,35 @@ const ChemBLGetter = ({
                             // Single candidate found (non-array data)
                             setApiData(processible.result);
                             setSearchValue(trimmedValue);
-                            setMultipleCandidates([]);
+                            setMultipleCandidates();
                             setSelectedCandidate(null);
                             setMultipleChemblResults([]);
                             setSelectedChemblResult(null);
-                        } else {
+                        }
+                        else if (processible.data && Array.isArray(processible.data)) { // Single candidate found (non-array data)
+                            setApiData(null);
+                            setSearchValue(trimmedValue);
+                            setMultipleCandidates(processible.data);
+                            setSelectedCandidate(processible.data[0]);
+                            setMultipleChemblResults(processible.data);
+                            setSelectedChemblResult(processible.data[0]);
+                        }
+                        else if (processible.data) { // Single candidate found (non-array data)
+                            setApiData(processible.data);
+                            setSearchValue(trimmedValue);
+                            setMultipleCandidates(null);
+                            setSelectedCandidate(null);
+                            setMultipleChemblResults([]);
+                            setSelectedChemblResult(null);
+                        }
+                        else {
                             // No data found
                             setError(`No records found with preference search "${trimmedValue}"`);
-                            setMultipleCandidates([]);
+                            setMultipleCandidates(null);
                             setSelectedCandidate(null);
                             setApiData(null);
                             setMultipleChemblResults([]);
                             setSelectedChemblResult(null);
-                            // Don't set searchValue when there's an error to ensure error displays properly
                         }
                     } else if (searchType === "synonym") {
                         // For synonym search, we might get multiple candidates
@@ -418,7 +456,24 @@ const ChemBLGetter = ({
                             setSelectedCandidate(null);
                             setMultipleChemblResults([]);
                             setSelectedChemblResult(null);
-                        } else {
+                        }
+                        else if (processible.data && Array.isArray(processible.data)) { // Single candidate found (non-array data)
+                            setApiData(null);
+                            setSearchValue(trimmedValue);
+                            setMultipleCandidates(processible.data);
+                            setSelectedCandidate(processible.data[0]);
+                            setMultipleChemblResults([]);
+                            setSelectedChemblResult(null);
+                        }
+                        else if (processible.data) {
+                            setApiData(processible.data);
+                            setSearchValue(trimmedValue);
+                            setMultipleCandidates();
+                            setSelectedCandidate(processible.data[0]);
+                            setMultipleChemblResults([]);
+                            setSelectedChemblResult(null);
+                        }
+                        else {
                             // No data found
                             setError(`No records found with synonym search "${trimmedValue}"`);
                             setMultipleCandidates([]);
@@ -458,10 +513,10 @@ const ChemBLGetter = ({
     useEffect(() => {
         if (toolData && toolData.type && toolData.content) {
             console.log('Processing tool data:', toolData);
-            
+
             // Set search type based on tool data type
             setSearchType(toolData.type);
-            
+
             if (toolData.type === "pref_name" || toolData.type === "synonym") {
                 // Handle preferred name and synonym search results
                 if (Array.isArray(toolData.content) && toolData.content.length > 0) {
@@ -509,7 +564,7 @@ const ChemBLGetter = ({
                     setError("No molecules found for the provided ChEMBL IDs.");
                 }
             }
-            
+
             // Clear any existing errors
             setError(null);
             setValidationError(null);
@@ -558,10 +613,9 @@ const ChemBLGetter = ({
     };
 
     useEffect(() => {
-        console.log("Search type changed:", searchType);
-        // Clear validation errors when search type changes, but keep existing errors
+        setSearchValue("");
         setValidationError(null);
-        // Only clear error if user is actively changing search type (not on initial mount)
+        setInputValue("");
     }, [searchType])
 
     // Keyboard navigation for multiple candidates
@@ -584,7 +638,7 @@ const ChemBLGetter = ({
                     });
                 }
             }
-            
+
             // Keyboard navigation for multiple ChEMBL results
             if (multipleChemblResults.length > 0) {
                 if (event.key === 'ArrowUp') {
@@ -635,7 +689,7 @@ const ChemBLGetter = ({
             setError("Please add at least one ChEMBL ID to the list.");
             return;
         }
-        
+
         // Trigger the handleSubmit with a dummy value to process the list
         await handleSubmit("process_list");
     };
@@ -653,7 +707,7 @@ const ChemBLGetter = ({
     };
 
     useEffect(() => {
-        console.log("Error state changed:", error);    
+        console.log("Error state changed:", error);
     }, [error])
 
     return (
@@ -696,7 +750,7 @@ const ChemBLGetter = ({
                                                 buttonText="Add to List"
                                                 isLoading={false}
                                             />
-                                            
+
                                             {/* ChEMBL IDs List Display */}
                                             {chemblIdsList.length > 0 && (
                                                 <div style={{
@@ -806,7 +860,7 @@ const ChemBLGetter = ({
                                             placeholder={getPlaceholderText()}
                                             buttonText="Search Molecule"
                                             isLoading={isLoading}
-                                            // error={error || validationError}
+                                        // error={error || validationError}
                                         />
                                     )}
                                 </div>
@@ -882,17 +936,17 @@ const ChemBLGetter = ({
                             <h3 style={{ marginBottom: '15px', fontWeight: '700' }}>Molecule Structure Visualization</h3>
                             <div style={{ display: 'flex', gap: '20px' }}>
                                 <div style={{ flex: '1' }}>
-                                    <InfoBox 
-                                        activeMol={apiData.molecule_structures.canonical_smiles} 
-                                        isValidMol={true} 
-                                        infoType={"MOL"} 
+                                    <InfoBox
+                                        activeMol={apiData.molecule_structures.canonical_smiles}
+                                        isValidMol={true}
+                                        infoType={"MOL"}
                                     />
                                 </div>
                                 <div style={{ flex: '1' }}>
-                                    <TwoDViewer 
-                                        activeMol={apiData.molecule_structures.canonical_smiles} 
-                                        isValidMol={true} 
-                                        visType={"MOL"} 
+                                    <TwoDViewer
+                                        activeMol={apiData.molecule_structures.canonical_smiles}
+                                        isValidMol={true}
+                                        visType={"MOL"}
                                     />
                                 </div>
                             </div>
@@ -907,7 +961,7 @@ const ChemBLGetter = ({
                             <h3 style={{ marginBottom: '15px', fontWeight: '700' }}>
                                 Molecule Candidates {multipleCandidates.length > 0 ? `(${multipleCandidates.length} found)` : ''}
                             </h3>
-                            
+
                             <div className="chembl-results-container">
                                 {/* Left Panel - Candidate List */}
                                 <div className="chembl-candidates-panel">
@@ -929,7 +983,7 @@ const ChemBLGetter = ({
                                     </p>
                                     <div className="chembl-candidates-list">
                                         {multipleCandidates.map((candidate, index) => (
-                                            <div 
+                                            <div
                                                 key={index}
                                                 onClick={() => {
                                                     setSelectedCandidate(candidate);
@@ -967,34 +1021,34 @@ const ChemBLGetter = ({
                                                     margin: '0',
                                                     fontWeight: '500'
                                                 }}>
-                                                    Selected ({selectedIndex + 1}/{multipleCandidates.length}): <span style={{ 
-                                                        fontFamily: 'monospace', 
+                                                    Selected ({selectedIndex + 1}/{multipleCandidates.length}): <span style={{
+                                                        fontFamily: 'monospace',
                                                         color: 'var(--color-accent)',
-                                                        fontWeight: '600' 
+                                                        fontWeight: '600'
                                                     }}>
                                                         {selectedCandidate.pref_name || selectedCandidate.molecule_chembl_id || 'Unknown'}
                                                     </span>
                                                 </h4>
                                             </div>
-                                            
+
                                             {/* Show visualization only if we have SMILES data */}
                                             {selectedCandidate.molecule_structures && selectedCandidate.molecule_structures.canonical_smiles ? (
                                                 <div className="chembl-details-row">
                                                     {/* InfoBox */}
                                                     <div style={{ flex: '4' }}>
-                                                        <InfoBox 
-                                                            activeMol={selectedCandidate.molecule_structures.canonical_smiles} 
-                                                            isValidMol={isSelectedCandidateValid} 
-                                                            infoType={"MOL"} 
+                                                        <InfoBox
+                                                            activeMol={selectedCandidate.molecule_structures.canonical_smiles}
+                                                            isValidMol={isSelectedCandidateValid}
+                                                            infoType={"MOL"}
                                                         />
                                                     </div>
-                                                    
+
                                                     {/* TwoDViewer */}
                                                     <div style={{ flex: '6' }}>
-                                                        <TwoDViewer 
-                                                            activeMol={selectedCandidate.molecule_structures.canonical_smiles} 
-                                                            isValidMol={isSelectedCandidateValid} 
-                                                            visType={"MOL"} 
+                                                        <TwoDViewer
+                                                            activeMol={selectedCandidate.molecule_structures.canonical_smiles}
+                                                            isValidMol={isSelectedCandidateValid}
+                                                            visType={"MOL"}
                                                         />
                                                     </div>
                                                 </div>
@@ -1022,7 +1076,7 @@ const ChemBLGetter = ({
                             <h3 style={{ marginBottom: '15px', fontWeight: '700' }}>
                                 ChEMBL Molecules Results {multipleChemblResults.length > 0 ? `(${multipleChemblResults.length} found)` : ''}
                             </h3>
-                            
+
                             <div className="chembl-results-container">
                                 {/* Left Panel - Molecule List */}
                                 <div className="chembl-candidates-panel">
@@ -1044,7 +1098,7 @@ const ChemBLGetter = ({
                                     </p>
                                     <div className="chembl-candidates-list">
                                         {multipleChemblResults.map((molecule, index) => (
-                                            <div 
+                                            <div
                                                 key={index}
                                                 onClick={() => {
                                                     setSelectedChemblResult(molecule);
@@ -1081,34 +1135,34 @@ const ChemBLGetter = ({
                                                     margin: '0',
                                                     fontWeight: '500'
                                                 }}>
-                                                    Selected ({selectedChemblIndex + 1}/{multipleChemblResults.length}): <span style={{ 
-                                                        fontFamily: 'monospace', 
+                                                    Selected ({selectedChemblIndex + 1}/{multipleChemblResults.length}): <span style={{
+                                                        fontFamily: 'monospace',
                                                         color: 'var(--color-accent)',
-                                                        fontWeight: '600' 
+                                                        fontWeight: '600'
                                                     }}>
                                                         {selectedChemblResult.molecule_chembl_id || selectedChemblResult.pref_name || 'Unknown'}
                                                     </span>
                                                 </h4>
                                             </div>
-                                            
+
                                             {/* Show visualization only if we have SMILES data */}
                                             {selectedChemblResult.molecule_structures && selectedChemblResult.molecule_structures.canonical_smiles ? (
                                                 <div className="chembl-details-row">
                                                     {/* InfoBox */}
                                                     <div style={{ flex: '4' }}>
-                                                        <InfoBox 
-                                                            activeMol={selectedChemblResult.molecule_structures.canonical_smiles} 
-                                                            isValidMol={true} 
-                                                            infoType={"MOL"} 
+                                                        <InfoBox
+                                                            activeMol={selectedChemblResult.molecule_structures.canonical_smiles}
+                                                            isValidMol={true}
+                                                            infoType={"MOL"}
                                                         />
                                                     </div>
-                                                    
+
                                                     {/* TwoDViewer */}
                                                     <div style={{ flex: '6' }}>
-                                                        <TwoDViewer 
-                                                            activeMol={selectedChemblResult.molecule_structures.canonical_smiles} 
-                                                            isValidMol={true} 
-                                                            visType={"MOL"} 
+                                                        <TwoDViewer
+                                                            activeMol={selectedChemblResult.molecule_structures.canonical_smiles}
+                                                            isValidMol={true}
+                                                            visType={"MOL"}
                                                         />
                                                     </div>
                                                 </div>
@@ -1134,17 +1188,16 @@ const ChemBLGetter = ({
                     <div className="chembl-getter-row-3" style={{ marginTop: '20px' }}>
                         <DataViewer
                             data={
-                                searchType === "chembl_id" ? apiData : 
-                                searchType === "multiple_chembl_ids" ? selectedChemblResult :
-                                selectedCandidate
+                                searchType === "chembl_id" ? apiData :
+                                    searchType === "multiple_chembl_ids" ? selectedChemblResult :
+                                        selectedCandidate
                             }
-                            title={`ChEMBL Molecule Data${searchValue ? ` for "${searchValue}"` : ''}${
-                                searchType === "pref_name" && selectedCandidate ? 
-                                ` - ${selectedCandidate.pref_name || selectedCandidate.molecule_chembl_id || 'Unknown'}` : 
+                            title={`ChEMBL Molecule Data${searchValue ? ` for "${searchValue}"` : ''}${searchType === "pref_name" && selectedCandidate ?
+                                ` - ${selectedCandidate.pref_name || selectedCandidate.molecule_chembl_id || 'Unknown'}` :
                                 searchType === "multiple_chembl_ids" && selectedChemblResult ?
-                                ` - ${selectedChemblResult.molecule_chembl_id || selectedChemblResult.pref_name || 'Unknown'}` :
-                                ''
-                            }`}
+                                    ` - ${selectedChemblResult.molecule_chembl_id || selectedChemblResult.pref_name || 'Unknown'}` :
+                                    ''
+                                }`}
                             initiallyExpanded={true}
                         />
                     </div>

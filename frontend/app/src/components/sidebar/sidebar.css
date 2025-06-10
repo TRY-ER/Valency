@@ -42,7 +42,11 @@
     /* width: 100%; is inherited */
 }
 
-.logo img, .sidebar-menu-container img {
+.logo img{
+    width: 40px;
+} 
+
+.sidebar-menu-container img {
     width: 40px;
     border-radius: 0px;
     height: 40px;

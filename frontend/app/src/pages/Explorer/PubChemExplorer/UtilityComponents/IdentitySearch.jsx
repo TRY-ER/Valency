@@ -33,19 +33,9 @@ const IdentitySearch = ({ toolData = null }) => {
       let extractedCid = null;
       
       // Case 1: toolData already has the correct IdentifierList structure
-      if (toolData.CID && (toolData.SMILES || toolData.InChI || toolData.InChIKey)) {
-        extractedIdentityData = toolData;
-        extractedCid = toolData.CID;
-      }
-      // Case 2: toolData has IdentifierList structure
-      else if (toolData.IdentifierList && toolData.IdentifierList.CID) {
-        extractedIdentityData = toolData.IdentifierList;
-        extractedCid = toolData.IdentifierList.CID;
-      }
-      // Case 3: toolData has result.IdentifierList structure (similar to API response)
-      else if (toolData.result && toolData.result.IdentifierList && toolData.result.IdentifierList.CID) {
-        extractedIdentityData = toolData.result.IdentifierList;
-        extractedCid = toolData.result.IdentifierList.CID;
+      if (toolData.content && toolData.content.status === "success") {
+        extractedIdentityData = toolData.content.result.IdentifierList?.CID;
+        extractedCid = null;
       }
       // Case 4: toolData might have a nested structure like the API response
       else if (toolData.result && toolData.result["0"]) {

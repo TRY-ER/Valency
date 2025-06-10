@@ -233,7 +233,7 @@ def sequence_identity_search(sequence: str, identity_cutoff: float = 0.9, e_valu
         A JSON string with a list of polymer entity IDs.
     """
     try:
-        query = SequenceQuery(sequence, e_value_cutoff=e_value_cutoff, identity_cutoff=identity_cutoff, sequence_type=sequence_type)
+        query = SequenceQuery(sequence, sequence_type=sequence_type)
         results = list(query(return_type=return_type))
         if len(results) > max_results:
             print(f"Query returned {len(results)} results. Truncating to max_results: {max_results}")

@@ -118,18 +118,10 @@ const ChatInterface = () => {
 
     // Define suggestion queries
     const suggestionQueries = [
-        "Can you provide a detailed explanation of how the BRICSPSMILES tool works and its primary applications in cheminformatics?",
-        "What are the latest advancements in molecule exploration techniques, and how do they compare to traditional methods?",
-        "Tell me about the different types of улыбки (smiles) used in chemical informatics and their specific use cases.",
-        "Explain the concept of Polymer Similarity Search and discuss some of the common algorithms or tools used for this purpose.",
-        "What are the key challenges and future directions in the field of Protein Explorer tools and technologies?",
-        "Describe the process of using the UniProt Viewer for accessing and analyzing protein sequence and functional information.",
-        "How can machine learning models be applied to predict molecular properties, and what are some example use cases?",
-        "Discuss the importance of data visualization in bioinformatics and provide examples of effective visualization techniques.",
-        "What are the ethical considerations when working with large-scale biological datasets and AI in drug discovery?",
-        "Can you explain the role of SMILES strings in representing chemical structures and their advantages over other notations?",
-        "Explore the different databases available for protein structures and how to query them effectively.",
-        "What is the significance of the FASTA format in bioinformatics, and how is it typically used?"
+        "Can you provide me with details of insulin and its physicochemical properties?",
+        "What do you know about cellulose acetate, can you give me some structurally similar molecules?",
+        "What sequence of proteins are associated with Human Hemoglobin? Brief me about it!",
+        "Can you find SMILES of acetaminophen and use BRICS to generate a few candidates from its building blocks?"
     ];
 
     // useEffect(() => {

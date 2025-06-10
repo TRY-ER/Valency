@@ -217,6 +217,83 @@ html.dark .brics-dropdown option:hover {
     min-width: 200px;
 }
 
+/* New Custom Dropdown Styles - Portal-based */
+.brics-search-selector {
+    position: relative;
+    width: 100%;
+}
+
+.brics-search-selector.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.brics-search-selector .selector-trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--c-light-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+    user-select: none;
+}
+
+.brics-search-selector .selector-trigger:hover:not(.disabled) {
+    background-color: var(--glassy-color);
+    border-color: var(--color-accent);
+}
+
+.brics-search-selector .selector-trigger.open {
+    border-color: var(--color-accent);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    background-color: var(--color-bg-primary);
+}
+
+.brics-search-selector .selected-text {
+    color: var(--color-text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    flex: 1;
+    text-align: left;
+}
+
+.brics-search-selector .dropdown-arrow {
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+.brics-search-selector .dropdown-arrow.open {
+    transform: rotate(180deg);
+}
+
+/* Portal Dropdown Styles */
+.brics-search-dropdown-portal {
+    /* Styles are handled inline in the component for positioning */
+}
+
+.brics-selector-option {
+    /* Styles are handled inline in the component for better control */
+}
+
+.brics-selector-option.selected {
+    /* Handled inline */
+}
+
+.brics-selector-option:hover {
+    /* Handled inline */
+}
+
+/* Remove old dropdown styles that are no longer needed */
 .brics-custom-dropdown {
     width: 100%;
 }

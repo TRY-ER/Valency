@@ -459,7 +459,19 @@ const ChemBLSimilarityGetter = ({
                         setSimilarMolecules([]);
                         setSelectedMolecule(null);
                         setApiData(null);
-                    } else {
+                    } 
+                    else if(
+                        processible.data 
+                    ){
+                        // Single molecule found, treat it as a single-item array
+                        setSimilarMolecules(processible.data);
+                        setSelectedMolecule(processible.data[0]);
+                        setSelectedIndex(0);
+                        setApiData(null); // Clear single molecule data
+                        setSearchValue(trimmedValue);
+                        setError(null); // Clear any previous errors
+                    } 
+                    else {
                         // Unexpected data format
                         setError(`No similar molecules found for "${trimmedValue}"`);
                         setSimilarMolecules([]);
@@ -565,7 +577,7 @@ const ChemBLSimilarityGetter = ({
     }, [error]);
 
     useEffect(() => {
-        console.log("search type: ", searchType);
+        setInputValue("");
     }, [searchType])
 
     useEffect(() => {

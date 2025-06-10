@@ -109,8 +109,8 @@ const FunctionResponse = ({ data }) => {
                         <p>ID: {data?.function_response_id}</p>
                     </div>
                     <div className="tool-icon-container">
-                        <FiTool className="tool-icon" />
-                        <BsCheck2All className="tool-icon" style={{ marginLeft: "5px", color: "#2ecc71" }} />
+                        <FiTool className="chat-tool-icon" />
+                        <BsCheck2All className="chat-tool-icon" style={{ marginLeft: "5px", color: "#2ecc71" }} />
                     </div>
                     {toolResponse && toolTransferData && (
                         <motion.div
@@ -121,7 +121,7 @@ const FunctionResponse = ({ data }) => {
                             whileTap={{ scale: 0.95 }}
                             title="Open in fullscreen"
                         >
-                            <FiMaximize className="tool-icon" style={{ color: "#007bff" }} />
+                            <FiMaximize className="chat-tool-icon" style={{ color: "#007bff" }} />
                         </motion.div>
                     )}
                     <motion.div
@@ -131,7 +131,7 @@ const FunctionResponse = ({ data }) => {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        {expanded ? <FiChevronUp className="tool-icon" /> : <FiChevronDown className="tool-icon" />}
+                        {expanded ? <FiChevronUp className="chat-tool-icon" /> : <FiChevronDown className="chat-tool-icon" />}
                     </motion.div>
                 </div>
 
@@ -236,8 +236,8 @@ const FunctionCall = ({ data }) => {
                         <p>{data.args ? `${Object.keys(data.args).length} arguments` : 'No arguments'}</p>
                     </div>
                     <div className="tool-icon-container">
-                        <FiTool className="tool-icon" />
-                        <FiHelpCircle className="tool-icon" style={{ marginLeft: "5px", color: "#2ecc71" }} />
+                        <FiTool className="chat-tool-icon" />
+                        <FiHelpCircle className="chat-tool-icon" style={{ marginLeft: "5px", color: "#2ecc71" }} />
                     </div>
                     <motion.div
                         className="tool-icon-container"
@@ -246,7 +246,7 @@ const FunctionCall = ({ data }) => {
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.95 }}
                     >
-                        {expanded ? <FiChevronUp className="tool-icon" /> : <FiChevronDown className="tool-icon" />}
+                        {expanded ? <FiChevronUp className="chat-tool-icon" /> : <FiChevronDown className="chat-tool-icon" />}
                     </motion.div>
                 </div>
 
@@ -352,7 +352,7 @@ const AgentFunctionTransfer = ({ data }) => {
                     <p>Transfering to Agent</p>
                 </div>
                 <div className="tool-icon-container">
-                    <FiUser className="tool-icon" /> {/* Added FiUser icon */}
+                    <FiUser className="chat-tool-icon" /> {/* Added FiUser icon */}
                 </div>
             </div>
         </motion.div>
@@ -372,7 +372,7 @@ const AgentFunctionRecieve = ({ data }) => {
                     <p>{data?.agent_name}</p>
                 </div>
                 <div className="tool-icon-container">
-                    <FiUser className="tool-icon" /> {/* Added FiUser icon */}
+                    <FiUser className="chat-tool-icon" /> {/* Added FiUser icon */}
                 </div>
             </div>
         </motion.div>

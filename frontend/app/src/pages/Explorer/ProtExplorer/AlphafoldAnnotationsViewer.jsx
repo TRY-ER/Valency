@@ -310,7 +310,7 @@ const AlphafoldAnnotationsViewer = ({
                                         }}
                                     />
                                     <div style={{ fontSize: '0.8em', opacity: 0.6, marginTop: '5px' }}>
-                                        Common types: MUTAGEN, DOMAIN, BINDING, ACTIVE_SITE, TRANSMEM
+                                        Common type: MUTAGEN
                                     </div>
                                 </div>
                             </div>

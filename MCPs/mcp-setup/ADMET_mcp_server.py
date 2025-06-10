@@ -18,6 +18,9 @@ admet_api_server_host = os.getenv("ADMET_SERVER_HOST", "0.0.0.0")
 admet_api_server_port = int(os.getenv("ADMET_SERVER_PORT", "7373"))
 admet_api_base_url = f"http://{admet_api_server_host}:{admet_api_server_port}"
 
+# API key for ADMET server authorization
+admet_server_key = os.getenv("ADMET_SERVER_KEY")
+
 mcp = FastMCP(
     "ADMET MCP Server",
     description="MCP server for retrieving ADMET predictions for a given SMILES string.",
@@ -142,11 +145,17 @@ def get_admet_prediction(smiles: str) -> str:
     if not smiles or not isinstance(smiles, str):
         return json.dumps({"error": "Invalid input. SMILES string must be a non-empty string."})
 
+    if not admet_server_key:
+        return json.dumps({"error": "ADMET server API key not configured. Please set ADMET_SERVER_KEY environment variable."})
+
     predict_url = f"{admet_api_base_url}/predict/"
     try:
         payload = {"smiles": smiles}
-        # Ensure correct content type
-        headers = {"Content-Type": "application/json"}
+        # Ensure correct content type and authorization
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {admet_server_key}"
+        }
 
         # Using a timeout for the request
         response = requests.post(

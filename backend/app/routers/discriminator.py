@@ -1,85 +1,102 @@
+import os
+import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from engine.vector_stores.smiles_vectorstore_chromadb import ChromaSearcher
-from get_env_vars import CHROMADB_PERSISTENT_PATH, CHROMADB_SMILES_DB_NAME, CHROMADB_PSMILES_DB_NAME
-from engine.base import ALLOWED_TYPES
-from engine.discriminator.similarity_w_rcsb import RCSBSearcher, RCSBQuery
-from requests.exceptions import HTTPError
-from engine.explorers.mol_explorer.mol_visualizer import MolVisualizer
-from engine.explorers.poly_explorer.poly_visualizer import PolymerVisualizer 
-import requests
-import base64
 
 router = APIRouter()
+
+# Configuration for external ADMET API
+ADMET_API_BASE_URL = os.getenv("ADMET_API_BASE_URL", "http://localhost:8053")
+ADMET_API_KEY = os.getenv("ADMET_API_KEY", "")
+
+if not ADMET_API_KEY:
+    print("WARNING: ADMET_API_KEY not found in environment variables. Similarity search will not work.")
+
+# Define allowed types locally since we removed the engine import
+ALLOWED_TYPES = ["MOL", "POLY", "PROT"]
 
 class SimilarityQuery(BaseModel):
     input_type: str
     data: str
     k: int
 
-def format_smiles_search_results(results, input_type: str):
-    formatted_results = []
-    # try:
-    smiles_key_str = "smiles" if "smiles" in results["metadatas"][0][0] else "SMILES" 
-    for metadata, distance in zip(results["metadatas"][0], results["distances"][0]):
-        if input_type == "MOL":
-            image_data = MolVisualizer().visualize(metadata.get(smiles_key_str), (100, 100))
-        elif input_type == "POLY":
-            image_data = PolymerVisualizer().visualize(metadata.get(smiles_key_str), (100, 100))
-        else:
-            raise HTTPException(status_code=400, detail=f"Validation type should be one of {ALLOWED_TYPES}")
-        formatted_results.append({
-            "identifier": metadata.get(smiles_key_str),
-            "score": distance,
-            "image": image_data
-        })
-    return {"status": "success", "results": formatted_results} 
+async def call_remote_similarity_search(payload: SimilarityQuery):
+    """
+    Call the remote ADMET API similarity search endpoint.
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            headers = {"Authorization": f"Bearer {ADMET_API_KEY}"}
 
-def get_smiles_search(collection_name, payload, input_type: str):
-    searcher = ChromaSearcher(collection_name=collection_name, persist_directory=CHROMADB_PERSISTENT_PATH)
-    results = searcher.query(payload.data, top_k=payload.k)
-    return format_smiles_search_results(results, input_type)
-
-def get_protein_image(pdb_id: str):
-    url = f"https://cdn.rcsb.org/images/structures/{pdb_id.lower()}_assembly-1.jpeg"
-    # get the image using url and return the image data as base64 encoding
-
-    image_value = None 
-    response = requests.get(url)
-    if response.status_code == 200:
-        image_value = response.content
-        if image_value is None:
-            raise HTTPException(status_code=400, detail="Failed to get image data")
-        image_base64 = base64.b64encode(image_value).decode("utf-8")
-        return image_base64
+            print("admet api base url >>", ADMET_API_BASE_URL) 
+            print("admet key >>", ADMET_API_KEY) 
+            response = await client.post(
+                f"{ADMET_API_BASE_URL}/ssearch/local",
+                json={
+                    "input_type": payload.input_type,
+                    "data": payload.data,
+                    "k": payload.k
+                },
+                headers=headers
+            )
+            
+            if response.status_code != 200:
+                error_detail = f"Remote API error: {response.status_code}"
+                try:
+                    error_data = response.json()
+                    if "detail" in error_data:
+                        error_detail = error_data["detail"]
+                except:
+                    error_detail = f"Remote API error: {response.text}"
+                print("error details >>", error_detail)
+                raise HTTPException(status_code=response.status_code, detail=error_detail)
+            
+            return response.json()
+            
+    except httpx.RequestError as e:
+        raise HTTPException(
+            status_code=503, 
+            detail=f"Failed to connect to remote similarity search service: {str(e)}"
+        )
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(
+            status_code=e.response.status_code,
+            detail=f"Remote API returned error: {e.response.text}"
+        )
 
 
 @router.post("/ssearch/local")
-def similarity_search(payload: SimilarityQuery):
+async def similarity_search(payload: SimilarityQuery):
+    """
+    Perform similarity search using remote ADMET API service.
+    """
     if payload.k < 1:
         raise HTTPException(status_code=400, detail="k should be a positive integer")
     if payload.input_type not in ALLOWED_TYPES:
         raise HTTPException(status_code=400, detail=f"Validation type should be one of {ALLOWED_TYPES}")
-    if payload.input_type == "MOL":
-        collection_name = CHROMADB_SMILES_DB_NAME 
-        return get_smiles_search(collection_name, payload, "MOL")
-    elif payload.input_type == "POLY":
-        collection_name = CHROMADB_PSMILES_DB_NAME
-        return get_smiles_search(collection_name, payload, "POLY")
-    elif payload.input_type == "PROT":
-        query = RCSBQuery(entry_id=payload.data, rows=payload.k)
-        searcher = RCSBSearcher()
+    
+    # Call the remote similarity search service
+    return await call_remote_similarity_search(payload)
+
+if __name__ == "__main__":
+    # Test the external ADMET API connectivity
+    import asyncio
+    
+    async def test_api():
+        if not ADMET_API_KEY:
+            print("ERROR: ADMET_API_KEY not set in environment variables")
+            return
+            
         try:
-            results = searcher.search(query)
-            returnable = [] 
-            for r in results["result_set"]:
-                image_data = get_protein_image(r["identifier"])
-                returnable.append({
-                    "identifier": r["identifier"],
-                    "score": r["score"],
-                    "image": image_data
-                })
-            return {"status": "success", "results": returnable}
-        except HTTPError as e: 
-            return {"status": "failed", "message": "Try with a valid PDB Id"} 
+            async with httpx.AsyncClient() as client:
+                headers = {"Authorization": f"Bearer {ADMET_API_KEY}"}
+                response = await client.get(f"{ADMET_API_BASE_URL}/health", headers=headers)
+                if response.status_code == 200:
+                    print(f"✓ External ADMET API is healthy: {response.json()}")
+                else:
+                    print(f"✗ External ADMET API health check failed: {response.status_code}")
+        except Exception as e:
+            print(f"✗ Failed to connect to external ADMET API: {e}")
+    
+    asyncio.run(test_api()) 
     

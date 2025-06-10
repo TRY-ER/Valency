@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
 import MolInputBox from "../../../components/UI/InputBox/InputBox";
 import InfoBox from "../../../components/UI/InfoBox/InfoBox";
@@ -6,6 +7,246 @@ import TwoDViewer from "../../../components/UI/TwoDViewer/TwoDViewer";
 import GlassyContainer from "../../../components/glassy_container/gc";
 import { getBricsCandidates } from "../../../services/api/mcpToolsService";
 import "./PSMILESListComponent.css";
+
+// Standalone Portal Dropdown Menu for BRICS Input Type (adapted from PubChemGetter.jsx)
+const StandaloneBRICSPortalDropdownMenu = ({
+    isOpen,
+    options,
+    currentValue,
+    onOptionClick,
+    dropdownPosition,
+    dropdownRef
+}) => {
+    if (!isOpen || !options || options.length === 0) return null;
+
+    return createPortal(
+        <div
+            ref={dropdownRef}
+            className="brics-search-dropdown-portal"
+            style={{
+                position: 'fixed',
+                top: `${dropdownPosition.top}px`,
+                left: `${dropdownPosition.left}px`,
+                width: `${dropdownPosition.width}px`,
+                zIndex: 10000,
+                backgroundColor: 'var(--color-bg-primary)',
+                border: '1px solid var(--color-accent)',
+                borderTop: 'none',
+                borderRadius: '0 0 8px 8px',
+                boxShadow: '0 4px 16px var(--shadow-color)',
+                maxHeight: '300px',
+                overflowY: 'auto'
+            }}
+        >
+            {options.map((option) => (
+                <div
+                    key={option.value}
+                    className={`brics-selector-option ${option.value === currentValue ? 'selected' : ''}`}
+                    onClick={() => onOptionClick(option.value)}
+                    role="option"
+                    aria-selected={option.value === currentValue}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        padding: '12px 14px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        borderBottom: '1px solid var(--c-light-border)',
+                        backgroundColor: option.value === currentValue ? 'var(--color-accent)' : 'transparent',
+                        color: option.value === currentValue ? 'white' : 'var(--color-text-primary)',
+                        minHeight: '48px',
+                        flexShrink: 0
+                    }}
+                    onMouseEnter={(e) => {
+                        if (option.value !== currentValue) {
+                            e.target.style.backgroundColor = 'var(--glassy-color)';
+                        }
+                    }}
+                    onMouseLeave={(e) => {
+                        if (option.value !== currentValue) {
+                            e.target.style.backgroundColor = 'transparent';
+                        }
+                    }}
+                >
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '2px',
+                        flex: '1',
+                        minWidth: 0
+                    }}>
+                        <span className="option-label" style={{
+                            fontSize: '0.85rem',
+                            fontWeight: '500',
+                            color: 'inherit',
+                            lineHeight: '1.2'
+                        }}>
+                            {option.label}
+                        </span>
+                        {option.description && (
+                            <span className="option-description" style={{
+                                fontSize: '0.75rem',
+                                color: option.value === currentValue ? 'rgba(255, 255, 255, 0.8)' : 'var(--color-text-secondary)',
+                                lineHeight: '1.2'
+                            }}>
+                                {option.description}
+                            </span>
+                        )}
+                    </div>
+                    {option.value === currentValue && (
+                        <span className="check-icon" style={{
+                            color: 'white',
+                            fontWeight: 'bold',
+                            marginLeft: '8px',
+                            flexShrink: 0
+                        }}>
+                            <svg width="14" height="10" viewBox="0 0 14 10" fill="currentColor">
+                                <path d="M13 1L5 9L1 5" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                            </svg>
+                        </span>
+                    )}
+                </div>
+            ))}
+        </div>,
+        document.body
+    );
+};
+
+// BRICS Input Type Selector Component with Portal
+const BRICSInputTypeSelector = ({ value, onChange, options, disabled = false }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+    const dropdownRef = useRef(null);
+    const triggerRef = useRef(null);
+
+    // Update dropdown position when opened
+    const updateDropdownPosition = useCallback(() => {
+        if (isOpen && triggerRef.current) {
+            const rect = triggerRef.current.getBoundingClientRect();
+            setDropdownPosition({
+                top: rect.bottom,
+                left: rect.left,
+                width: rect.width
+            });
+        }
+    }, [isOpen]);
+
+    // Update position when dropdown opens or on scroll/resize
+    useEffect(() => {
+        if (isOpen) {
+            updateDropdownPosition();
+            const handleScroll = () => updateDropdownPosition();
+            const handleResize = () => updateDropdownPosition();
+            
+            window.addEventListener('scroll', handleScroll, true);
+            window.addEventListener('resize', handleResize);
+            
+            return () => {
+                window.removeEventListener('scroll', handleScroll, true);
+                window.removeEventListener('resize', handleResize);
+            };
+        }
+    }, [isOpen, updateDropdownPosition]);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target) &&
+                triggerRef.current && !triggerRef.current.contains(event.target)) {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('mousedown', handleClickOutside);
+            return () => document.removeEventListener('mousedown', handleClickOutside);
+        }
+    }, [isOpen]);
+
+    // Close dropdown on escape key
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                setIsOpen(false);
+            }
+        };
+
+        if (isOpen) {
+            document.addEventListener('keydown', handleKeyDown);
+            return () => document.removeEventListener('keydown', handleKeyDown);
+        }
+    }, [isOpen]);
+
+    const handleOptionClick = (optionValue) => {
+        onChange({ target: { value: optionValue } });
+        setIsOpen(false);
+    };
+
+    const selectedOption = options.find(option => option.value === value);
+
+    return (
+        <>
+            <div
+                className={`brics-search-selector ${disabled ? 'disabled' : ''}`}
+                ref={triggerRef}
+            >
+                <div
+                    className={`selector-trigger ${isOpen ? 'open' : ''}`}
+                    onClick={() => !disabled && setIsOpen(!isOpen)}
+                    role="button"
+                    tabIndex={disabled ? -1 : 0}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            if (!disabled) setIsOpen(!isOpen);
+                        }
+                    }}
+                >
+                    <span className="selected-text">
+                        {selectedOption ? selectedOption.label : 'Select input type'}
+                    </span>
+                    <span className={`dropdown-arrow ${isOpen ? 'open' : ''}`}>
+                        <svg
+                            width="12"
+                            height="8"
+                            viewBox="0 0 12 8"
+                            fill="currentColor"
+                            style={{
+                                transition: 'transform 0.2s ease',
+                                transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
+                            }}
+                        >
+                            <path d="M6 8L0 0h12z" />
+                        </svg>
+                    </span>
+                </div>
+            </div>
+            <StandaloneBRICSPortalDropdownMenu
+                isOpen={isOpen}
+                options={options}
+                currentValue={value}
+                onOptionClick={handleOptionClick}
+                dropdownPosition={dropdownPosition}
+                dropdownRef={dropdownRef}
+            />
+        </>
+    );
+};
+
+// Input type options for the dropdown
+const inputTypeOptions = [
+    { 
+        value: "molecule", 
+        label: "Molecule", 
+        description: "Small molecules/SMILES" 
+    },
+    { 
+        value: "polymer", 
+        label: "Polymer", 
+        description: "Polymers/PSMILES" 
+    }
+];
 
 /**
  * PSMILESListComponent - A React component for BRICS candidate generation
@@ -276,16 +517,12 @@ const PSMILESListComponent = ({ toolData = null }) => {
                     <label className="brics-type-label">
                         Input Type
                     </label>
-                    <div className="brics-custom-dropdown">
-                        <select
-                            value={candidateType}
-                            onChange={(e) => setCandidateType(e.target.value)}
-                            className="brics-dropdown"
-                        >
-                            <option value="molecule">Molecule</option>
-                            <option value="polymer">Polymer</option>
-                        </select>
-                    </div>
+                    <BRICSInputTypeSelector
+                        value={candidateType}
+                        onChange={(e) => setCandidateType(e.target.value)}
+                        options={inputTypeOptions}
+                        disabled={status === "loading"}
+                    />
                     <div className="brics-type-description">
                         {candidateType === "molecule" ? "Small molecules/SMILES" : "Polymers/PSMILES"}
                     </div>

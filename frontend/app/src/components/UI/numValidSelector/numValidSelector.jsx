@@ -132,7 +132,7 @@ export default function NumValidSelector({ status,
                                     status={isValidMol && genNum > 0 ? 'enabled' : 'disabled'}
                                 />
                                 : ""}
-                            {status === "completed" || status === "failed" ?
+                            {status === "completed" || status === "failed" || status === "no-data" ?
                                 <InterButtons
                                     labels={labels}
                                     actors={actors}

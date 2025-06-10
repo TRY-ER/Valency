@@ -127,6 +127,8 @@ async def upload_psmiles(file: UploadFile = File(...)):
         
         # Generate unique ID
         file_id = str(uuid.uuid4())
+
+        print("generated file id:", file_id)
         
         # Store content
         file_storage[file_id] = content
@@ -164,6 +166,7 @@ async def stream_smiles(file_id: str):
     if file_id not in file_storage:
         raise HTTPException(status_code=404, detail="File not found")
     
+    print("recieved file_id:", file_id)
     content = file_storage[file_id]
     del file_storage[file_id]
     generator = BRICSGenerator()
@@ -172,21 +175,21 @@ async def stream_smiles(file_id: str):
         media_type="text/event-stream"
     )
 
-# @router.get("/brics/psmiles/stream/{file_id}")
-# async def stream_psmiles(file_id: str):
-#     if file_id not in file_storage:
-#         raise HTTPException(status_code=404, detail="File not found")
+@router.get("/brics/psmiles/stream/{file_id}")
+async def stream_psmiles_brics(file_id: str):
+    if file_id not in file_storage:
+        raise HTTPException(status_code=404, detail="File not found")
     
-#     content = file_storage[file_id]
-#     del file_storage[file_id]
-#     generator = BRICSGenerator()
-#     return StreamingResponse(
-#         event_stream(content, generator, is_polymer=True),
-#         media_type="text/event-stream"
-#     )
+    content = file_storage[file_id]
+    del file_storage[file_id]
+    generator = BRICSGenerator()
+    return StreamingResponse(
+        event_stream(content, generator, is_polymer=True),
+        media_type="text/event-stream"
+    )
 
 @router.get("/lstm/stream/{gen_id}")
-async def stream_psmiles(gen_id: str):
+async def stream_psmiles_lstm(gen_id: str):
     if gen_id not in file_storage:
         raise HTTPException(status_code=404, detail="Generation ID not found")
     

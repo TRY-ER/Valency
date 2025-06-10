@@ -26,7 +26,12 @@ const SSContent = ({ inputType = "MOL" }) => {
             if(response.data.status === "success"){
                 console.log(response.data.results);
                 setGeneratedData(response.data.results);
-                setStatus("completed");
+                if(response.data.results && response.data.results.length === 0){
+                    setStatus("no-data");
+                    setErrorMsg("No matching data found for the given input.");
+                } else {
+                    setStatus("completed");
+                }
             }
             else if(response.data.status === "failed"){
                 setStatus("failed");
@@ -35,6 +40,7 @@ const SSContent = ({ inputType = "MOL" }) => {
         } 
         catch(error){
             setStatus("failed");
+            setErrorMsg("An unexpected error occurred. Please try again.");
         }
     };
 
@@ -43,6 +49,7 @@ const SSContent = ({ inputType = "MOL" }) => {
         setGeneratedData([]);
         setActiveMol("");
         setMaxNum(12);
+        setErrorMsg("");
     };
 
     const headerMapper = {
@@ -86,6 +93,30 @@ const SSContent = ({ inputType = "MOL" }) => {
                         generatedData={generatedData}
                     />
                 </div>
+                
+                {/* Error Message Display */}
+                {(status === "failed" || status === "no-data") && errorMsg && (
+                    <div style={{ 
+                        margin: '1rem 0',
+                        padding: '1rem',
+                        backgroundColor: status === "no-data" ? 'rgba(66, 153, 225, 0.1)' : 'rgba(239, 68, 68, 0.1)',
+                        border: `1px solid ${status === "no-data" ? 'rgba(66, 153, 225, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`,
+                        borderRadius: '8px',
+                        color: status === "no-data" ? 'var(--color-text-primary)' : 'var(--color-alert)',
+                        textAlign: 'center'
+                    }}>
+                        <h4 style={{ 
+                            margin: '0 0 0.5rem 0',
+                            fontWeight: '600'
+                        }}>
+                            {status === "no-data" ? "ℹ️ No Data Found" : "❌ Error"}
+                        </h4>
+                        <p style={{ margin: 0, fontSize: '0.9rem' }}>
+                            {errorMsg}
+                        </p>
+                    </div>
+                )}
+                
                 <div className="generator-row-2">
                     <SimilarityCardContainer data={generatedData} status={status} />
                 </div>

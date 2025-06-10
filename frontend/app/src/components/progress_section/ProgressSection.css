@@ -72,6 +72,7 @@
   flex-direction: row;
   width: 100%;
   justify-content: space-between;
+  color: var(--color-text-secondary);
 }
 
 @keyframes bulletBlip {
@@ -109,6 +110,6 @@
 }
 
 .step-label {
-  color: white;
+  color: var(--color-text-secondary);
   font-weight: 600;
 }

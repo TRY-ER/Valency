@@ -26,14 +26,14 @@ FROM nginx:alpine AS production
 
 # Install additional tools for better performance
 RUN apk add --no-cache \
-    brotli \
-    gzip
+    curl \
+    brotli
 
 # Remove default nginx config
 RUN rm /etc/nginx/conf.d/default.conf
 
 # Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built app from builder stage
 COPY --from=builder /app/build /usr/share/nginx/html
@@ -54,42 +54,3 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
-
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copy built app from builder stage
-COPY --from=builder /app/build /usr/share/nginx/html
-
-# Copy public assets that might be needed
-COPY --from=builder /app/public/images /usr/share/nginx/html/images
-COPY --from=builder /app/public/models /usr/share/nginx/html/models
-COPY --from=builder /app/public/icons /usr/share/nginx/html/icons
-
-# Expose port 80
-EXPOSE 80
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost/ || exit 1
-
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
-
-# Alternative Stage 2: Development/Testing with serve
-FROM node:20-alpine AS development
-
-WORKDIR /app
-
-# Copy built app from builder stage
-COPY --from=builder /app/build ./build
-COPY --from=builder /app/package*.json ./
-
-# Install serve globally
-RUN npm install -g serve
-
-# Expose port 3000
-EXPOSE 3000
-
-# Command to serve the built app with SPA support
-CMD ["serve", "-s", "build", "-l", "3000", "--single"]
