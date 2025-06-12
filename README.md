@@ -8,6 +8,8 @@
   [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
   [![React](https://img.shields.io/badge/react-18+-blue.svg)](https://reactjs.org)
   [![FastAPI](https://img.shields.io/badge/fastapi-latest-green.svg)](https://fastapi.tiangolo.com)
+  
+  [![Launch Platform](https://img.shields.io/badge/🚀_Launch_Platform-Live_Demo-FF6B6B?style=for-the-badge&labelColor=2C3E50&color=E74C3C)](http://34.72.128.82/)
 </div>
 
 ---
