@@ -27,7 +27,7 @@ const VerifyEmail: React.FC = () => {
 
     if (!token) {
       setStatus('error');
-      setMessage('No verification token found. Please check your email link or request a new one.');
+      setMessage('No verification token found. Please check your email link or request a new one. Ensure to check your spam for the verification email / link.');
       return;
     }
 
@@ -38,8 +38,8 @@ const VerifyEmail: React.FC = () => {
           setStatus('success');
           setMessage(response.data?.message || 'Email verified successfully!');
           setIsVerifiedState(true); // Update the verification status in the context
-          // Navigate to dashboard or next step after a short delay
-          setTimeout(() => navigate('/dashboard'), 2000); 
+          // Navigate to home page after a short delay
+          setTimeout(() => navigate('/'), 1000); 
         } else {
           setStatus('error');
           // Use the error message from the response if available
@@ -71,7 +71,7 @@ const VerifyEmail: React.FC = () => {
       // console.log('Resend email response:', response);
       if (response.success) {
         setStatus('success');
-        setMessage(response.data?.message || 'A new verification email has been sent. Please check your inbox.');
+        setMessage(response.data?.message || 'A new verification email has been sent. Please check your inbox. Do not forget to check you spam folder as well.');
       } else {
         setStatus('error');
         setMessage(response.error || 'Failed to send verification email. Please try again.');
@@ -105,10 +105,10 @@ const VerifyEmail: React.FC = () => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/')}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-major hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-major mb-4"
           >
-            Proceed to Login
+            Continue to Dashboard
           </motion.button>
         )}
 

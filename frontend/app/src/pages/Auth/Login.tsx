@@ -32,7 +32,7 @@ const Login: React.FC = () => {
         } else if (response.data.mfa_required) {
           navigate('/mfa-verification'); // Redirect to MFA page if MFA is required
         } else {
-          navigate('/dashboard'); // Redirect to dashboard or home page
+          navigate('/'); // Redirect to home page
         }
       } else {
         setError(response.error || 'Login failed. Please try again.');

@@ -41,8 +41,8 @@ const LoginOTP: React.FC = () => {
       if (response.data) {
         AuthService.storeAuthToken(response.data);
         
-        // Redirect to dashboard
-        navigate('/dashboard');
+        // Redirect to home page
+        navigate('/');
       } else {
         throw new Error('Invalid response from server');
       }

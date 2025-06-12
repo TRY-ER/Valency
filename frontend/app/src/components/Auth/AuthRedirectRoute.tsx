@@ -3,7 +3,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthContext } from '../../contexts/AuthContext.tsx';
 
 const AuthRedirectRoute: React.FC = () => {
-  const { isAuthenticated, isLoading } = useAuthContext();
+  const { isAuthenticated, isVerified, isLoading } = useAuthContext();
 
   if (isLoading) {
     // Show a loading indicator while auth state is being determined
@@ -11,7 +11,12 @@ const AuthRedirectRoute: React.FC = () => {
   }
 
   if (isAuthenticated) {
-    // If user is authenticated, redirect them to the main page (e.g., root)
+    // If user is authenticated but not verified, redirect to verify email page
+    if (!isVerified) {
+      return <Navigate to="/verify-email" replace />;
+    }
+    
+    // If user is authenticated and verified, redirect them to the main page
     return <Navigate to="/" replace />;
   }
 

@@ -1,10 +1,11 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import menuContent from '../contents/menuContent';
 import FunctionalSection from '../components/functional_section/Functional';
 
 // Auth components
 import ProtectedRoute from '../components/Auth/ProtectedRoute.tsx';
+import VerifiedRoute from '../components/Auth/VerifiedRoute.tsx';
 import AuthRedirectRoute from '../components/Auth/AuthRedirectRoute.tsx';
 
 // Page components
@@ -42,7 +43,6 @@ function ReRoutes() {
             <Route element={<AuthRedirectRoute />}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
-                <Route path="/verify-email" element={<VerifyEmail />} /> {/* Token is read from query params in the component */}
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} /> {/* Token is read from query params in the component */}
                 <Route path="/request-otp-email" element={<RequestOtpEmail />} />
@@ -53,72 +53,84 @@ function ReRoutes() {
             {/* Protected application routes */}
             {/* Accessible only if the user IS authenticated. */}
             {/* If not authenticated, ProtectedRoute redirects to '/login'. */}
-            {/* ProtectedLayout includes the Sidebar and an Outlet for the page content. */}
             <Route element={<ProtectedRoute />}>
                 {/* MFA Verification route - should be accessed after login if MFA is required */}
-                <Route path="/mfa-verification" element={<MFAVerification />} /> 
-                <Route element={<ProtectedLayout />}>
-                    {
-                        menuContent.map((item) => {
-                            // Determine if the current item is the 'Structure Analysis' (explorer) section
-                            const isExplorer = item.link === 'explorer';
-                            // For the explorer route, we want its direct component to render, and its subElements to define nested routes.
-                            // The Explorer component itself contains an <Outlet/> for these nested routes.
-                            const elementToRender = item.component;
+                <Route path="/mfa-verification" element={<MFAVerification />} />
+                {/* Email verification route - should be accessible to authenticated but unverified users */}
+                <Route path="/verify-email" element={<VerifyEmail />} />
+                
+                {/* Routes that require both authentication AND email verification */}
+                <Route element={<VerifiedRoute />}>
+                    <Route element={<ProtectedLayout />}>
+                        {
+                            menuContent.map((item) => {
+                                // Handle the root route (Home page with empty link)
+                                if (item.link === '') {
+                                    return (
+                                        <Route key={item.id} index element={item.component} />
+                                    );
+                                }
+                                
+                                // Determine if the current item is the 'Structure Analysis' (explorer) section
+                                const isExplorer = item.link === 'explorer';
+                                // For the explorer route, we want its direct component to render, and its subElements to define nested routes.
+                                // The Explorer component itself contains an <Outlet/> for these nested routes.
+                                const elementToRender = item.component;
 
-                            return (
-                                <Route key={item.id} path={`${item.link}`} element={elementToRender}>
-                                    {/* Nested routes for sub-elements (e.g., tabs within Explorer) */}
-                                    {item.subElements && item.subElements.map((subItem) => {
-                                        const subElementPath = subItem.link; // subItem.link is already relative
-                                        const subElementComponent = subItem.includeDocs ? (
-                                            <FunctionalSection
-                                                docElem={subItem.docs}
-                                                funcElem={subItem.component}
-                                            />
-                                        ) : subItem.component;
+                                return (
+                                    <Route key={item.id} path={`${item.link}`} element={elementToRender}>
+                                        {/* Nested routes for sub-elements (e.g., tabs within Explorer) */}
+                                        {item.subElements && item.subElements.map((subItem) => {
+                                            const subElementPath = subItem.link; // subItem.link is already relative
+                                            const subElementComponent = subItem.includeDocs ? (
+                                                <FunctionalSection
+                                                    docElem={subItem.docs}
+                                                    funcElem={subItem.component}
+                                                />
+                                            ) : subItem.component;
 
-                                        return (
-                                            <Route key={subItem.id} path={subElementPath} element={subElementComponent}>
-                                                {/* Handling third-level nesting if necessary (e.g., Protein Explorer's own tabs) */}
-                                                {subItem.subElements && subItem.subElements.map((subSubItem) => {
-                                                    const subSubElementPath = subSubItem.link;
-                                                    const subSubElementComponent = subSubItem.includeDocs ? (
+                                            return (
+                                                <Route key={subItem.id} path={subElementPath} element={subElementComponent}>
+                                                    {/* Handling third-level nesting if necessary (e.g., Protein Explorer's own tabs) */}
+                                                    {subItem.subElements && subItem.subElements.map((subSubItem) => {
+                                                        const subSubElementPath = subSubItem.link;
+                                                        const subSubElementComponent = subSubItem.includeDocs ? (
+                                                            <FunctionalSection
+                                                                docElem={subSubItem.docs}
+                                                                funcElem={subSubItem.component}
+                                                            />
+                                                        ) : subSubItem.component;
+                                                        return (
+                                                            <Route key={subSubItem.id} path={subSubElementPath} element={subSubElementComponent} />
+                                                        );
+                                                    })}
+                                                </Route>
+                                            );
+                                        })}
+                                        {/* If it's the explorer route and it has subElements, 
+                                            create an index route for the first subElement if its link is empty. 
+                                            This makes /explorer default to its first tab.*/}
+                                        {isExplorer && item.subElements && item.subElements.find(se => se.link === '') && (
+                                            <Route 
+                                                index 
+                                                element={(
+                                                    item.subElements.find(se => se.link === '').includeDocs ? (
                                                         <FunctionalSection
-                                                            docElem={subSubItem.docs}
-                                                            funcElem={subSubItem.component}
+                                                            docElem={item.subElements.find(se => se.link === '').docs}
+                                                            funcElem={item.subElements.find(se => se.link === '').component}
                                                         />
-                                                    ) : subSubItem.component;
-                                                    return (
-                                                        <Route key={subSubItem.id} path={subSubElementPath} element={subSubElementComponent} />
-                                                    );
-                                                })}
-                                            </Route>
-                                        );
-                                    })}
-                                    {/* If it's the explorer route and it has subElements, 
-                                        create an index route for the first subElement if its link is empty. 
-                                        This makes /explorer default to its first tab.*/}
-                                    {isExplorer && item.subElements && item.subElements.find(se => se.link === '') && (
-                                        <Route 
-                                            index 
-                                            element={(
-                                                item.subElements.find(se => se.link === '').includeDocs ? (
-                                                    <FunctionalSection
-                                                        docElem={item.subElements.find(se => se.link === '').docs}
-                                                        funcElem={item.subElements.find(se => se.link === '').component}
-                                                    />
-                                                ) : item.subElements.find(se => se.link === '').component
-                                            )}
-                                        />
-                                    )}
-                                </Route>
-                            );
-                        })
-                    }
-                    {/* Add other top-level protected routes here if not in menuContent */}
-                    <Route path="/profile" element={<Profile />} /> {/* Added */}
-                    <Route path="/settings" element={<Settings />} /> {/* Added */}
+                                                    ) : item.subElements.find(se => se.link === '').component
+                                                )}
+                                            />
+                                        )}
+                                    </Route>
+                                );
+                            })
+                        }
+                        {/* Add other top-level protected routes here if not in menuContent */}
+                        <Route path="/profile" element={<Profile />} />
+                        <Route path="/settings" element={<Settings />} />
+                    </Route>
                 </Route>
             </Route>
 
