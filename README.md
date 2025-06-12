@@ -1,67 +1,167 @@
-# VALENCY: UI and API Distribution for AI Implementation in Chemistry, Material Discovery and Simulations  
+# VALENCY
+### Agentic Drug Discovery and Molecular Analysis Platform
 
-![Project Banner](./Resources/images/valency_logo_w_name_light.png)
+<div align="center">
+  <img src="./Resources/images/logo_rendered_main.png" alt="VALENCY Logo" width="200" style="margin: 20px 0;">
+  
+  [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+  [![Python](https://img.shields.io/badge/python-3.12+-blue.svg)](https://python.org)
+  [![React](https://img.shields.io/badge/react-18+-blue.svg)](https://reactjs.org)
+  [![FastAPI](https://img.shields.io/badge/fastapi-latest-green.svg)](https://fastapi.tiangolo.com)
+</div>
 
-## Overview
+---
 
-This project provides a suite of tools for chemistry and material science. It combines robust backend APIs, efficient data engines, and a modern React frontend to deliver functionalities such as:
+## 🧬 Overview
 
-- **Property and Structure Exploration for Molecules, Polymers and Proteins**
-- **Structural Similarity Search** using vector stores and RCSB API
-- **Candidate Generations** via chemistry simulation and deep learning models
-- **Interactive Chat Interface** powered by an LLM to navigate through the tools and services
+**VALENCY** is a comprehensive AI-powered platform for drug discovery and molecular analysis that combines cutting-edge artificial intelligence with robust scientific tools. Our platform offers both manual tool access and intelligent agentic automation, making complex molecular research accessible to scientists at all levels.
 
-## Features
-The features have two layers:
+### 🎯 Mission
+To accelerate drug discovery and molecular research through intelligent automation, comprehensive analysis tools, and seamless integration of multiple scientific databases and algorithms.
 
-- **Tool Layer** contains the tools to conduct various exploration, discrimination and generation tasks.
-- **Automation Layer** contains the chatbot interface that assigns a LLM with reasoning and thinking capability to look into the tools available and suggest a sequntial pathway to follow to get a given scientific task.
+---
 
-The system is organized into three key components:
+## ✨ Key Features
 
-- **Backend:** FastAPI endpoints handling chat, queries, and tool orchestration.
-- **Engine:** Core algorithms for vector storage, molecule generation, and chat formatting.
-- **Frontend:** A React-based interface that renders responses with rich formatting and tool redirection.
+### 🤖 **Agentic Automation System**
+- **Master Agent**: Natural language query processing with intelligent task delegation
+- **Specialized Sub-Agents**: Domain-specific agents for proteins, drugs, and optimization
+- **Multi-Agent Coordination**: Seamless orchestration of complex workflows
+- **Conversational Interface**: Interactive chat-based research assistance
 
-## Installation
+### 🔬 **Comprehensive Analysis Tools**
+- **Molecular Structure Analysis**: SMILES-based exploration and visualization
+- **Protein Structure Exploration**: UniProt & PDB integration with 3D visualization
+- **Polymer Characterization**: Advanced polymer structure analysis
+- **ADMET Property Prediction**: AI-powered drug safety and efficacy assessment
 
-### Clone the Repository
+### 🎯 **Advanced Identification & Search**
+- **Multi-Database Integration**: ChEMBL (1.6M+ compounds), PubChem (100M+ compounds), UniProt (150M+ entries)
+- **Similarity Search Algorithms**: Chemical fingerprint comparison and substructure matching
+- **Cross-Database Identification**: Unified search across multiple scientific databases
 
-```bash
-git clone https://github.com/your-org/chemistry-api.git
-cd chemistry-api
-```
+### 🧪 **AI-Powered Drug Optimization**
+- **BRICS-Based Generation**: Fragment-based molecular generation
+- **LSTM Neural Networks**: Advanced molecular candidate generation
+- **Structure-Based Drug Design**: Intelligent lead compound optimization
+- **Real-Time Property Prediction**: Instant ADMET analysis
 
-### Backend & Engine Setup
-Ensure you are using Python 3.12. Create and activate a virtual environment, then install dependencies:
+### 📊 **Activity Management**
+- **Comprehensive Tracking**: Monitor all research activities and agent interactions
+- **Persistent Logs**: Fail-safe activity storage across browser sessions
+- **Usage Analytics**: Tool usage statistics and resource optimization
 
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r req.txt
-cd ../engine
-pip install .
-```
+---
 
-### Frontend Setup
-Install dependencies and start the React application:
+## 🏗️ Architecture & Components
 
-```bash
-cd ../frontend/app
-npm install
-npm start
-```
+### **Frontend** (`/frontend/`)
+Modern React-based user interface featuring:
+- Interactive molecular visualizations
+- Real-time chat interface with AI agents
+- Responsive design with advanced animations
+- Tool integration and workflow management
+- 3D molecular structure viewers
 
-### Running the Application
-- Backend:
-    Launch the API server with:
+### **Backend** (`/backend/`)
+FastAPI-powered server infrastructure:
+- RESTful API endpoints for all platform features
+- Authentication and user management
+- Database integration and data processing
+- Tool orchestration and workflow management
 
-```bash
-uvicorn main:app --host 0.0.0.0 --port 8000
-```
+### **Agents** (`/agents/`)
+Intelligent agent system with specialized capabilities:
+- **Master Agent**: Central orchestrator and query processor
+- **Drug Agent**: Database searches and compound exploration
+- **Protein Agent**: Protein analysis and structure prediction
+- **Drug Optimization Agent**: ADMET prediction and molecular generation
 
-- Frontend:
-    Start the React app by running `npm start` from the app folder.
+### **Authentication Service** (`/auth_service/`)
+Secure user authentication and authorization:
+- JWT-based authentication
+- User registration and management
+- Email verification system
+- Role-based access control
 
-*Note - We are still working on finalizing some services. On completion of that phase we will make the Docker build available. We are planning to make a desktop app from the same codebase for windows and linux.*
+### **Engine** (`/engine/`)
+Core computational algorithms:
+- Vector storage and similarity search
+- Molecular generation algorithms
+- ADMET property prediction models
+- Database integration utilities
+
+### **Model Context Protocol Servers** (`/MCPs/`)
+Specialized Model Context Protocol(MCP) servers for:
+- ADMET property prediction
+- PubChem Query
+- ChEMBL Query
+- Alphafold Data Retrieval
+- UniProt Query
+- RCSB PDB Query
+- BRICS Generation Requests
+
+---
+
+## 🔧 Supported Databases
+
+### **Scientific Databases**
+| Database | Content | Records |
+|----------|---------|---------|
+| **ChEMBL** | Bioactivity data | 1.6M+ compounds |
+| **PubChem** | Chemical information | 100M+ compounds |
+| **UniProt** | Protein sequences | 150M+ entries |
+| **PDB** | Protein structures | 200K+ structures |
+
+---
+
+## 🚀 Getting Started
+
+### **Prerequisites**
+- Python 3.12+
+- Node.js 18+
+- Modern web browser with WebGL support
+
+### **Quick Overview**
+1. **Explore the Platform**: Navigate through our interactive homepage
+2. **Try Manual Tools**: Use individual analysis tools for specific tasks
+3. **Engage with AI Agents**: Ask natural language questions for complex workflows
+4. **Manage Activities**: Track your research progress and results
+
+---
+
+## 📱 User Interface
+
+### **Homepage Features**
+- **Interactive Platform Overview**: Comprehensive introduction to all features
+- **Quick Action Buttons**: Direct access to popular tools
+- **Animated Infographics**: Visual representation of platform capabilities
+- **Progress Tracking**: Real-time system metrics and performance indicators
+
+### **Tool Categories**
+1. **Structure Analysis**: Molecular, protein, and polymer exploration
+2. **Identification**: Database searches and similarity analysis
+3. **Optimization**: AI-powered drug design and generation
+
+---
+
+## 🎯 Use Cases
+
+### **Academic Research**
+- Molecular property analysis for research publications
+- Protein structure prediction and analysis
+- Educational molecular visualization
+- Cross-database literature searches
+
+### **Pharmaceutical Development**
+- Lead compound identification and optimization
+- ADMET property screening
+- Drug-target interaction analysis
+- Candidate molecule generation
+
+### **Biotechnology Applications**
+- Protein engineering and design
+- Molecular similarity screening
+- Bioactivity understanding 
+
+---
