@@ -10,17 +10,16 @@ const AuthRedirectRoute: React.FC = () => {
     return <div>Loading authentication status...</div>; 
   }
 
-  if (isAuthenticated) {
-    // If user is authenticated but not verified, redirect to verify email page
-    if (!isVerified) {
-      return <Navigate to="/verify-email" replace />;
-    }
-    
-    // If user is authenticated and verified, redirect them to the main page
+  // If user is authenticated AND verified, they should not be on auth pages like /login, /signup.
+  // So, redirect them to the main application page (e.g., '/').
+  if (isAuthenticated && isVerified) {
     return <Navigate to="/" replace />;
   }
 
-  // If user is not authenticated, render the requested auth page (Login, Signup, etc.)
+  // In all other cases:
+  // 1. User is not authenticated (isAuthenticated is false) -> allow access to auth pages.
+  // 2. User is authenticated but not verified (isAuthenticated is true, isVerified is false) -> allow access to auth pages.
+  // This allows an unverified user to go back to /login or /signup if needed.
   return <Outlet />;
 };
 
