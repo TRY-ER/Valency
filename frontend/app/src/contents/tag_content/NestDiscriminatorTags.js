@@ -21,6 +21,7 @@ const SimilaritySearchTabContents = [
                       as well as can be copied to the clipboard.`,
         component: <SSContent key="smiles" inputType={"MOL"} />, 
         docs: <DocRenderer filePath="/markdown_repo/MoleculeSimilaritySearch.md"/>,
+        includeDocs: true
     },
     {
         id: 2,
@@ -33,6 +34,7 @@ const SimilaritySearchTabContents = [
                       as well as can be copied to the clipboard.`,
         component:  <SSContent key="psmiles" inputType={"POLY"} />,
         docs: <DocRenderer filePath="/markdown_repo/PolymerSimilaritySearch.md"/>,
+        includeDocs: true
     },
     {
         id: 3,
@@ -45,6 +47,7 @@ const SimilaritySearchTabContents = [
                       copied to the clipboard.`,
         component:  <SSContent key="pdb" inputType={"PROT"} />,
         docs: <DocRenderer filePath="/markdown_repo/ProteinSimilaritySearch.md"/>,
+        includeDocs: true
     }
 ]; 
 
@@ -57,8 +60,8 @@ const ChemBLTabContents = [
                       It allows you to search for molecules using either their unique ChEMBL identifier or their 
                       common/preferred name and displays comprehensive molecular data.`,
         component: <ChemBLGetter />,
-        // component: null,
-        docs: null,
+        docs: <DocRenderer filePath="/markdown_repo/ChEMBLGetter.md"/>,
+        includeDocs: true
     },
     {
         id: 2,
@@ -66,7 +69,8 @@ const ChemBLTabContents = [
         link: 'similarity-search',
         description: `This tool uses ChemBL database to conduct a similarity search for molecules.`,
         component: <ChemBLSimilarityGetter />,
-        docs: null,
+        docs: <DocRenderer filePath="/markdown_repo/ChEMBLSimilarityGetter.md"/>,
+        includeDocs: true
     },
     {
         id: 3,
@@ -75,23 +79,25 @@ const ChemBLTabContents = [
         description: `This tool fetches bioactivity data for biological targets and molecules using ChEMBL database.
                       You can search for target activities using target ChEMBL ID or molecule activities using molecule ChEMBL ID.`,
         component: <ChemBLActivityFetcher />,
-        docs: null,
+        docs: <DocRenderer filePath="/markdown_repo/ChEMBLActivityFetcher.md"/>,
+        includeDocs: true
     },
+    // {
+    //     id: 4,
+    //     title: 'Approved Drugs',
+    //     link: 'app-drugs',
+    //     description: `This tool uses ChemBL database to retrieve information about approved drugs.`,
+    //     component: <ApprovedDrugsViewer />,
+    //     docs: null,
+    // },
     {
         id: 4,
-        title: 'Approved Drugs',
-        link: 'app-drugs',
-        description: `This tool uses ChemBL database to retrieve information about approved drugs.`,
-        component: <ApprovedDrugsViewer />,
-        docs: null,
-    },
-    {
-        id: 5,
         title: 'Utilities',
         link: 'utils',
         description: `This tool provides various utilities for working with ChemBL data including target searches by gene name, SMILES to CTAB conversion, molecular descriptor calculations, structural alerts analysis, molecule standardization, and parent molecule extraction.`,
         component: <ChemBLUtilities />,
-        docs: null,
+        docs: <DocRenderer filePath="/markdown_repo/ChEMBLUtilities.md"/>,
+        includeDocs: true
     },
 ];
 
@@ -104,7 +110,8 @@ const PubChemTabContents = [
                       It allows you to search for compounds using various identifiers and displays comprehensive molecular data
                       including structure, properties, and synonyms.`,
         component: <PubChemGetter />,
-        docs: null,
+        docs: <DocRenderer filePath="/markdown_repo/PubChemGetter.md"/>,
+        includeDocs: true
     },
     {
         id: 2,
@@ -113,7 +120,8 @@ const PubChemTabContents = [
         description: `This tool uses PubChem database to conduct similarity searches for compounds based on CID or SMILES.
                       Find structurally similar compounds with adjustable similarity thresholds and comprehensive results display.`,
         component: <PubChemSimilarityGetter />,
-        docs: null,
+        docs: <DocRenderer filePath="/markdown_repo/PubChemSimilarityGetter.md"/>,
+        includeDocs: true,
     },
     {
         id: 3,
@@ -122,7 +130,8 @@ const PubChemTabContents = [
         description: `This tool provides various utilities for working with PubChem data including compound search by various identifiers,
                       substructure search, mass-based search, cross-reference lookup, synonym retrieval, and property calculation.`,
         component: <PubChemUtilities />,
-        docs: null,
+        docs: <DocRenderer filePath="/markdown_repo/PubChemUtilities.md"/>,
+        includeDocs: true,
     },
 ];
 

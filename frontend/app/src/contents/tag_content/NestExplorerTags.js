@@ -21,7 +21,8 @@ const ProtExploreTabContents = [
                       the output panel shows the steps details as well as completed steps and the molecules generated. This tool is specifically useful when you have
                       a set of molecules and you want to generate more molecules based on the given set.`,
         component: <BasicProtViewer />, 
-        docs: <DocRenderer filePath="/markdown_repo/BRICSSMILES.md"/>,
+        docs: <DocRenderer filePath="/markdown_repo/ProteinExplorer.md"/>,
+        includeDocs: true,
     },
     {
         id: 2,
@@ -46,7 +47,9 @@ const UniProtExploreTabContents = [
         link: '', // New link for the UniProt tab
         description: `Explore protein structures and information from AlphaFold using a UniProt accession key. Fetches data from the AlphaFold DB API and displays the 3D model, sequence, and other relevant details.`,
         component: <UniProtViewer />,
-        docs: null 
+        docs: <DocRenderer filePath="/markdown_repo/UniProtViewer.md"/>,
+        // docs: <DocRenderer filePath="/markdown_repo/BRICSSMILES.md"/>,
+        includeDocs: true
     },
     {
         id: 2, // New ID for the UniProt tab
@@ -54,7 +57,8 @@ const UniProtExploreTabContents = [
         link: 'summary', // New link for the UniProt tab
         description: `Explore protein structures and information from AlphaFold using a UniProt accession key. Fetches data from the AlphaFold DB API and displays the 3D model, sequence, and other relevant details.`,
         component: <UniProtSummaryViewer />, 
-        docs: null 
+        docs: <DocRenderer filePath="/markdown_repo/UniProtSummaryViewer.md"/>,
+        includeDocs: true
     },
     {
         id: 3, // New ID for the AlphaFold Annotations tab
@@ -62,7 +66,8 @@ const UniProtExploreTabContents = [
         link: 'annotations', // New link for the AlphaFold Annotations tab
         description: `View AlphaFold annotations for a specific UniProt accession. Fetches annotation data from the AlphaFold API and displays it in an interactive visualization with detailed annotation tracks.`,
         component: <AlphafoldAnnotationsViewer />, 
-        docs: <DocRenderer filePath="/markdown_repo/AlphaFoldAnnotationsViewer.md"/>
+        docs: <DocRenderer filePath="/markdown_repo/AlphaFoldAnnotationsViewer.md"/>,
+        includeDocs: true
     }
 ]
 
@@ -73,7 +78,8 @@ const RCSBExplorerTabContent= [
         link: '', // New link for the UniProt tab
         description: `RCSB PDB Explorer is a tool that allows users to search and retrieve protein structures from the RCSB Protein Data Bank (PDB) using various identifiers such as PDB ID, UniProt ID, or Gene Name. It provides a user-friendly interface for exploring protein structures and their associated data.`,
         component: <RCSBPDBExplorer />,
-        docs: null 
+        docs: <DocRenderer filePath="/markdown_repo/RCSBPDBExplorer.md"/>,
+        includeDocs: true
     },
     {
         id: 2, // New ID for the UniProt tab
@@ -81,7 +87,8 @@ const RCSBExplorerTabContent= [
         link: 'ssearch', // New link for the UniProt tab
         description: `Similarity search in RCSB PDB Explorer allows users to find protein structures that are similar to a given structure based on sequence or structural similarity. This feature helps in identifying homologous proteins and understanding structural relationships.`,
         component: <RCSBStructureSimilaritySearch />,
-        docs: null 
+        docs: <DocRenderer filePath="/markdown_repo/RCSBStructureSimilaritySearch.md"/>,
+        includeDocs: true
     },
 ]
 
@@ -92,7 +99,8 @@ const UniprotTabContent= [
         link: '', // New link for the UniProt tab
         description: `Uniprot Explorer is a tool that allows users to search and retrieve protein information from the Uniprot database using various identifiers such as UniProt ID, Gene Name, or Protein Name. It provides a user-friendly interface for exploring protein sequences, functions, and annotations. with query and UniProt ID.`,
         component: <UniProtExplorer />,
-        docs: <DocRenderer filePath="/markdown_repo/UniProtExplorer.md"/>
+        docs: <DocRenderer filePath="/markdown_repo/UniProtExplorer.md"/>,
+        includeDocs: true
     },
 ]
 

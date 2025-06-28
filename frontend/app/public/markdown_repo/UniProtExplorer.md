@@ -1,136 +1,252 @@
-# UniProt Explorer
+# UniProt Explorer Documentation
+---
 
-The UniProt Explorer is a comprehensive tool for searching and retrieving protein information from the UniProt database. It provides an intuitive interface for accessing the UniProtKB (Universal Protein Knowledgebase) using various search methods and identifiers.
+## Overview
+---
+
+The **UniProt Explorer** is a comprehensive protein database search and retrieval tool that provides direct access to the UniProtKB (Universal Protein Knowledgebase). This powerful interface allows users to search through millions of protein sequences and annotations using sophisticated query syntax, or retrieve specific protein entries by their identifiers. It serves as a gateway to one of the world's most comprehensive protein information resources.
 
 ## Features
+---
+- **Flexible Search Methods**: Two distinct search approaches for different research needs
+- **Advanced Query Syntax**: Sophisticated search capabilities with field-specific queries
+- **Database Search**: Comprehensive searches across the entire UniProtKB database
+- **Direct Entry Retrieval**: Quick access to specific protein entries by ID
+- **Multiple Output Formats**: Various data formats for different analysis needs
+- **Isoform Support**: Option to include protein isoforms in search results
+- **Pagination Control**: Manage large result sets with customizable page sizes
+- **Real-time Results**: Interactive interface with immediate data display
 
-### Search Types
+### Tool Sections
+---
+1. **Search Method Selector**
+   - Dropdown to choose between database search or direct entry retrieval
+   - Clear descriptions for each search type
+   - Dynamic interface adaptation
 
-#### 1. Search UniProtKB
-- **Query-based search**: Use natural language queries to search the UniProtKB database
-- **Advanced filtering**: Filter results by various criteria
-- **Flexible result formats**: Choose from JSON, TSV, FASTA, XML, TXT, List, GFF, OBO, RDF, and XLSX formats
-- **Custom fields**: Specify which data fields to retrieve (e.g., 'id,xref_pdb,gene_names')
-- **Pagination support**: Control the number of results and navigate through pages
-- **Isoform inclusion**: Option to include protein isoforms in search results
+2. **Search Configuration**
+   - Query string input with advanced syntax support
+   - UniProt ID input for direct lookups
+   - Result size controls and pagination
+   - Isoform inclusion options
 
-#### 2. Get UniProtKB Entry
-- **Direct retrieval**: Fetch specific protein entries using UniProt IDs
-- **Multiple ID formats**: Support for accession numbers (e.g., P12345) and entry names (e.g., SPIKE_SARS2)
-- **Various output formats**: JSON, FASTA, TXT, XML, RDF, GFF formats available
+3. **Results Display**
+   - Structured presentation of protein data
+   - Expandable JSON data viewer
+   - Multiple format support for different analysis needs
+   - Direct access to protein annotations and sequences
+
+## Data Source
+---
+The tool accesses UniProtKB, the world's leading high-quality protein database, providing:
+
+- **Protein Sequences**: Complete amino acid sequences for millions of proteins
+- **Functional Annotations**: Detailed information about protein function and structure
+- **Cross-References**: Links to hundreds of biological databases
+- **Literature Citations**: Connection to scientific publications
+- **Evolutionary Information**: Taxonomic and phylogenetic data
+- **Structural Data**: Links to 3D structures and structural annotations
+- **Disease Associations**: Medical and clinical relevance information
+
+## Search Types
+---
+
+### **Search UniProtKB**
+Comprehensive database search using powerful query syntax to find proteins based on various criteria.
+
+**What you'll enter:**
+- **Query String**: Advanced search terms with field-specific syntax
+- **Number of Results**: How many entries to retrieve (1-500)
+- **Include Isoforms**: Whether to include protein variants
+
+**Query Examples:**
+- Simple terms: `insulin`, `hemoglobin`
+- Organism-specific: `human kinase`, `organism_name:"Escherichia coli"`
+- Gene names: `gene:BRCA1`, `gene_exact:TP53`
+- Protein families: `family:immunoglobulin`
+- Disease-related: `disease:cancer`, `keyword:tumor`
+- Structural features: `length:[100 TO 500]`, `mass:[50000 TO *]`
+
+**What you'll get:**
+- List of matching protein entries
+- Complete protein annotations and metadata
+- Sequence information and cross-references
+- Functional classifications and descriptions
+
+### **Get UniProtKB Entry**
+Direct retrieval of specific protein information using UniProt identifiers.
+
+**What you'll enter:**
+- **UniProt ID**: Specific protein identifier (accession number or entry name)
+
+**ID Examples:**
+- Accession numbers: `P12345`, `Q9Y6R4`
+- Entry names: `SPIKE_SARS2`, `INS_HUMAN`
+- Swiss-Prot IDs: `P53_HUMAN`, `BRCA1_HUMAN`
+
+**What you'll get:**
+- Complete protein entry information
+- Detailed functional annotations
+- Sequence data and structural information
+- Cross-references to related databases
+
+## Advanced Query Syntax
+---
+
+### **Basic Search Operations**
+- **Simple terms**: `insulin` (searches all text fields)
+- **Multiple terms**: `human antigen` or `human AND antigen`
+- **Exact phrases**: `"serum albumin"` (use quotes for exact matches)
+- **Exclusion**: `human NOT mouse` or `human -mouse`
+- **OR searches**: `human OR mouse`
+- **Grouping**: `(human OR mouse) AND kinase`
+- **Wildcards**: `anti*` (starts with), `*kinase*` (contains)
+
+### **Field-Specific Searches**
+The tool supports sophisticated field-specific queries:
+
+**Identification Fields:**
+- **Accession**: `accession:P62988`
+- **Gene names**: `gene:HPSE` (partial match), `gene_exact:HPSE` (exact match)
+- **Protein names**: `protein_name:CD233`
+- **Secondary accession**: `sec_acc:P02023`
+
+**Organism and Taxonomy:**
+- **Organism name**: `organism_name:"Homo sapiens"`
+- **Organism ID**: `organism_id:9606`
+- **Taxonomy**: `taxonomy_name:mammal`, `taxonomy_id:40674`
+- **Strain**: `strain:wistar`
+- **Virus host**: `virus_host_id:10090`
+
+**Functional Classification:**
+- **Protein families**: `family:serpin`
+- **Keywords**: `keyword:toxin`, `keyword:KW-0800`
+- **EC numbers**: `ec:3.2.1.23`
+- **Gene Ontology**: `go:0015629`
+- **Protein existence**: `existence:3`
+
+**Physical Properties:**
+- **Sequence length**: `length:[500 TO 700]`, `length:[50 TO *]`
+- **Molecular mass**: `mass:[500000 TO *]`
+- **Fragment status**: `fragment:true`
+
+**Database Cross-References:**
+- **PDB structures**: `database:pdb`, `xref:pdb-1aut`
+- **Pfam domains**: `database:pfam`
+- **ChEBI compounds**: `chebi:18420`
+- **InChIKey**: `inchikey:WQZGKKKJIJFFOK-GASJEMHNSA-N`
+
+**Dates and Status:**
+- **Creation date**: `date_created:[2012-10-01 TO *]`
+- **Modification date**: `date_modified:[2019-01-01 TO 2019-03-01]`
+- **Review status**: `reviewed:true` (Swiss-Prot entries)
+- **Active status**: `active:false` (obsolete entries)
+
+**Literature and Evidence:**
+- **Authors**: `lit_author:ashburner`
+- **Publication scope**: `scope:mutagenesis`
+- **Mass spectrometry**: `cc_mass_spectrometry:maldi`
+
+### **Range Queries**
+Use square brackets for numerical ranges:
+- `length:[100 TO 500]` (proteins 100-500 amino acids)
+- `mass:[50000 TO *]` (proteins over 50 kDa)
+- `date_created:[2020-01-01 TO *]` (entries from 2020 onwards)
 
 ## Usage
+---
+1. **Select Search Method**: Choose between "Search UniProtKB" or "Get UniProtKB Entry"
+2. **Configure Search Parameters**:
+   - For database search: Enter query string and set result preferences
+   - For direct retrieval: Enter specific UniProt ID
+3. **Set Additional Options**: Configure result size and isoform inclusion
+4. **Execute Search**: Click "Search" to retrieve protein information
+5. **Explore Results**: Use the data viewer to examine detailed protein information
+6. **Refine Search**: Modify parameters to narrow or broaden your results
 
-### Search UniProtKB
+## What You'll See
+---
+When you use the UniProt Explorer, the interface displays:
 
-1. **Select Search Type**: Choose "Search UniProtKB" from the dropdown
-2. **Enter Query**: Input your search query in the query string field
-   - Examples:
-     - `gene:BRCA1` - Search for BRCA1 gene
-     - `organism:human` - Search for human proteins
-     - `protein kinase` - General text search
-     - `reviewed:true AND organism:9606` - Reviewed human proteins
-3. **Configure Options**:
-   - **Result Format**: Choose your preferred output format
-   - **Fields**: Specify which data columns to retrieve (optional)
-   - **Number of Results**: Set how many results to return (max 500)
-   - **Include Isoforms**: Check to include protein isoforms
-4. **Execute Search**: Click the "Search" button to retrieve results
+### Search Interface
+- **Search Type Dropdown**: Selection between database search and direct entry retrieval
+- **Query Input Fields**: Dynamic forms based on selected search method
+- **Parameter Controls**: Options for result size and isoform inclusion
+- **Search Controls**: Execute and clear buttons with loading feedback
 
-### Get UniProtKB Entry
+### Results Display
+The results show comprehensive protein information:
 
-1. **Select Search Type**: Choose "Get UniProtKB Entry" from the dropdown
-2. **Enter UniProt ID**: Input the specific UniProt identifier
-   - Examples:
-     - `P12345` (accession number)
-     - `SPIKE_SARS2` (entry name)
-3. **Choose Format**: Select the desired output format
-4. **Retrieve Entry**: Click "Search" to fetch the protein entry
+**Database Search Results:**
+- List of matching protein entries
+- Entry identifiers and primary names
+- Organism information and gene names
+- Functional descriptions and classifications
+- Cross-references to related databases
 
-## Query Examples
+**Direct Entry Results:**
+- Complete protein entry information
+- Detailed sequence and structural data
+- Functional annotations and features
+- Literature references and evidence
+- Cross-references to external databases
 
-### Common Search Patterns
+## Example Searches
+---
 
-- **Gene-based search**: `gene:TP53`
-- **Organism-specific**: `organism:"Homo sapiens"`
-- **Protein family**: `family:"protein kinase"`
-- **Disease-related**: `annotation:(type:disease diabetes)`
-- **Subcellular location**: `locations:(location:"membrane")`
-- **Combined search**: `gene:BRCA1 AND organism:human AND reviewed:true`
-
-### Advanced Queries
-
-- **Date range**: `created:[2020-01-01 TO 2023-12-31]`
-- **Length range**: `length:[100 TO 500]`
-- **Mass range**: `mass:[10000 TO 50000]`
-- **Taxonomic range**: `taxonomy:mammalia`
-
-## Result Fields
-
-When using the "Fields" option in Search UniProtKB, you can specify which data to retrieve:
-
-### Common Fields
-- `id` - UniProt ID
-- `gene_names` - Gene names
-- `protein_name` - Protein name
-- `organism_name` - Organism name
-- `length` - Sequence length
-- `mass` - Molecular mass
-- `xref_pdb` - PDB cross-references
-- `cc_function` - Function annotation
-- `cc_subcellular_location` - Subcellular location
-- `ft_domain` - Domain features
-
-### Example Field Specification
+### Find Human Kinases
 ```
-id,gene_names,protein_name,organism_name,xref_pdb,length,mass
+Search Type: Search UniProtKB
+Query String: human kinase
+Number of Results: 50
+Include Isoforms: false
 ```
+*Returns human protein kinases with functional annotations*
 
-## Output Formats
+### Search for BRCA1 Gene Products
+```
+Search Type: Search UniProtKB
+Query String: gene:BRCA1
+Number of Results: 30
+Include Isoforms: true
+```
+*Finds all proteins from the BRCA1 gene including variants*
 
-### JSON Format
-- Structured data suitable for programmatic access
-- Complete information with nested objects
-- Default format for web applications
+### Get Specific Protein Entry
+```
+Search Type: Get UniProtKB Entry
+UniProt ID: P04637
+```
+*Retrieves complete information for the p53 tumor suppressor protein*
 
-### FASTA Format
-- Protein sequences in FASTA format
-- Includes sequence headers with metadata
-- Ideal for sequence analysis tools
+### Find Large Membrane Proteins
+```
+Search Type: Search UniProtKB
+Query String: length:[500 TO *] AND keyword:membrane
+Number of Results: 100
+Include Isoforms: false
+```
+*Searches for large membrane proteins over 500 amino acids*
 
-### TSV/XLSX Format
-- Tabular data for spreadsheet applications
-- Customizable columns via fields parameter
-- Easy to import into analysis tools
+### Explore COVID-19 Proteins
+```
+Search Type: Search UniProtKB
+Query String: organism_name:"SARS-CoV-2"
+Number of Results: 25
+Include Isoforms: false
+```
+*Finds all proteins from the SARS-CoV-2 virus*
 
-### XML Format
-- Structured markup with complete annotations
-- UniProtKB XML schema compliant
-- Suitable for data exchange
-
-## Tips for Effective Searching
-
-1. **Use specific terms**: More specific queries yield better results
-2. **Combine filters**: Use Boolean operators (AND, OR, NOT) for complex queries
-3. **Check reviewed entries**: Add `reviewed:true` for manually curated entries
-4. **Limit organism**: Specify organism to reduce irrelevant results
-5. **Use field restrictions**: Specify fields to get only needed data and improve performance
-
-## Error Handling
-
-The tool provides clear error messages for:
-- Invalid UniProt IDs
-- Malformed query strings
-- Network connectivity issues
-- API rate limiting
-- Invalid parameter combinations
-
-## Integration
-
-The UniProt Explorer integrates with the broader drug discovery toolkit, allowing seamless transition between:
-- Protein structure analysis (PDB Explorer)
-- Sequence similarity searches
-- Functional annotation analysis
-- Cross-database references
-
-This tool serves as a crucial component for protein research, drug target identification, and biochemical pathway analysis within the integrated platform.
+## Use Cases
+---
+This tool is particularly valuable for:
+- **Protein Research**: Comprehensive protein database exploration and analysis
+- **Gene Function Studies**: Understanding protein products of specific genes
+- **Comparative Biology**: Studying protein evolution across species
+- **Drug Discovery**: Identifying and characterizing therapeutic targets
+- **Structural Biology**: Finding proteins for structural studies
+- **Systems Biology**: Mapping protein networks and pathways
+- **Disease Research**: Exploring disease-associated proteins
+- **Educational Research**: Learning about protein structure and function
+- **Literature Mining**: Finding proteins mentioned in scientific publications
+- **Database Integration**: Collecting protein data for bioinformatics pipelines

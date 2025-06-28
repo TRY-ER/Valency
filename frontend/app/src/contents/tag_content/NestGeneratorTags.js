@@ -17,6 +17,7 @@ const BRICSGeneratorTabContents = [
                       a set of molecules and you want to generate more molecules based on the given set.`,
         component: <BRICSComponent key="smiles" inputType="smiles"/>, 
         docs: <DocRenderer filePath="/markdown_repo/BRICSSMILES.md"/>,
+        includeDocs: true
     },
     {
         id: 2,
@@ -31,14 +32,16 @@ const BRICSGeneratorTabContents = [
                       a set of polymers and you want to generate more polymers based on the given set.`,
         component: <BRICSComponent key="psmiles" inputType="psmiles"/>, 
         docs: <DocRenderer filePath="/markdown_repo/BRICSPSMILES.md"/>,
+        includeDocs: true
     },
     {
         id: 3,
         title: 'Advanced',
         link: 'adv',
-        description: `This tool uses SMILES string to generate molecules using LSTM algorithm. The algorithm generates hypothetical molecules without any given input molecule string.`,
+        description: `Advanced BRICS generator for creating novel molecular candidates from curated input lists. This sophisticated tool allows interactive management of candidate molecules with enhanced visualization, real-time validation, and comprehensive result analysis. Features dual-panel interface with keyboard navigation, molecular property display, and 2D structure visualization for systematic molecular design workflows.`,
         component: <PSMILESListComponent />,
-        docs: null,
+        docs: <DocRenderer filePath="/markdown_repo/AdvancedBRICS.md"/>,
+        includeDocs: true,
     }
 ];
 
@@ -55,6 +58,7 @@ const LSTMGeneratorTabContents = [
         component: <LSTMComponent key="psmiles" />, 
         includeDocs: true, 
         docs: <DocRenderer filePath="/markdown_repo/LSTMPSMILES.md"/>,
+        includeDocs: true
     },
     {
         id: 2,
@@ -67,6 +71,7 @@ const LSTMGeneratorTabContents = [
                       consists of a output panel, download button and the reset button. the output panel shows the steps details as well as completed steps and the psmiles generated upon completed.`,
         component: <LSTMComponent inputType="wdg" key="wdg" />,
         docs: <DocRenderer filePath="/markdown_repo/LSTMWDG.md"/>,
+        includeDocs: true
     }
 ];
 

@@ -2,6 +2,7 @@ import BRICSGenerator from "../../pages/Generator/BRICS/BRICSGenerator";
 import LSTMGenerator from "../../pages/Generator/LSTM/LSTMGenerator";
 import ADMETComponent from "../../pages/Generator/ADMET/ADMET";
 import { BRICSGeneratorTabContents, LSTMGeneratorTabContents } from "./NestGeneratorTags";
+import DocRenderer from "../doc_content/DocRenderer";
 
 const GeneratorTabContents = [
     {
@@ -37,7 +38,8 @@ const GeneratorTabContents = [
                       metabolized, excreted, and its potential toxicity. This tool helps in early drug discovery by identifying promising compounds
                       with favorable pharmacokinetic and safety profiles.`,
         component: <ADMETComponent />,   
-        docs: null,
+        docs: <DocRenderer filePath="/markdown_repo/ADMETPredictor.md"/>,
+        includeDocs: true,
     },
 ];
 

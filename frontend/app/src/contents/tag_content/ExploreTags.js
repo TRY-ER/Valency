@@ -21,6 +21,7 @@ const ExplorerTabContent = [
                      Topological Polar Surface Area (TPSA), and Number of rings`,
         component: <MolEComponent />,
         docs: <DocRenderer filePath="/markdown_repo/MoleculeExplorer.md"/>,
+        includeDocs:  true,
     },
     {
         id: 2,
@@ -63,6 +64,7 @@ const ExplorerTabContent = [
         description: `The Uniprot explorer tool enables various mode of search for query and UniProt ID`,
         component: <UniProtExplorer />, // Use UniProtExplorer directly
         docs: <DocRenderer filePath="/markdown_repo/UniProtExplorer.md"/>,
+        includeDocs: true,
     },
     {
         id: 6,
@@ -74,6 +76,7 @@ const ExplorerTabContent = [
                       indexes to indicate wher the potential bonds can be formed to connect with the next monomer.`,
         component: <PolyEComponent />,
         docs: <DocRenderer filePath="/markdown_repo/PolymerExplorer.md"/>,
+        includeDocs: true,
     }
 ]
 
