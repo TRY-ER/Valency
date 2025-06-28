@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import GlassyContainer from '../glassy_container/gc';
-import { FaCompress, FaExpand } from "react-icons/fa6";
+import { FaCompressArrowsAlt, FaExpandArrowsAlt } from "react-icons/fa";
 import { IoDocumentText } from "react-icons/io5";
 import "./Docs.css";
 
@@ -43,14 +43,14 @@ const DocsContainer = ({ docElem, isCollapsed, onToggleCollapse, onExpand }) => 
                             onClick={handleExpand}
                             title="Expand to full screen"
                         >
-                            <FaExpand />
+                            <FaExpandArrowsAlt />
                         </button>
                         <button 
                             className="docs-control-btn collapse-btn"
                             onClick={onToggleCollapse}
                             title="Collapse documentation panel"
                         >
-                            <FaCompress />
+                            <FaCompressArrowsAlt />
                         </button>
                     </div>
                 </div>

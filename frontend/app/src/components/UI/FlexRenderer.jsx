@@ -10,6 +10,8 @@ import {
     CompleteDisplay    // Added CompleteDisplay import
 } from './customChatElements/FunctionResponse';
 
+// FlexRenderer now supports redirection buttons for function_response types only
+// Redirection paths are automatically mapped based on tool data.name using redirectionMapper.js
 const FlexRenderer = ({ items }) => {
   if (!items || !Array.isArray(items)) {
     return null; // Or some fallback UI
@@ -22,11 +24,13 @@ const FlexRenderer = ({ items }) => {
         // You can expand this switch statement to handle different item types
         switch (item.type) {
           case 'function_response':
+            // Function responses include redirection buttons based on tool name
             if (item.data.name === "transfer_to_agent"){
                 return <AgentFunctionTransfer key={index} data={item.data} />; 
             }
             return <FunctionResponse key={index} data={item.data} />;
           case 'function_call':
+            // Function calls do not include redirection buttons to avoid interface clutter
             if (item.data.name === "transfer_to_agent"){
                 return <AgentFunctionRecieve key={index} data={item.data.args} />;
             }

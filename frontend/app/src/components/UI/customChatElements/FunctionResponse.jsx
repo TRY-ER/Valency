@@ -9,6 +9,9 @@ import { BsCheck2All } from 'react-icons/bs';
 import { getToolResponse } from "../../../services/api/agentService"; // Import the getToolResponse function
 import ToolResponseHandler from "../../ToolResponseHandler/ToolResponseHandler";
 import toolTypeMapper from "../../../utils/toolTypeMapper";
+import RedirectionButton from "./RedirectionButton";
+import DocumentationButton from "./DocumentationButton";
+import FloatingDocPanel from "../FloatingDocPanel/FloatingDocPanel";
 
 const FunctionResponse = ({ data }) => {
     const [expanded, setExpanded] = useState(false);
@@ -17,11 +20,10 @@ const FunctionResponse = ({ data }) => {
     const [error, setError] = useState(null);
     const [toolTransferData, setToolTransferData] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDocPanelOpen, setIsDocPanelOpen] = useState(false);
 
     // Fetch the tool response when the component mounts or when expanded is toggled to true
-    console.log("function call data >>", data)
     useEffect(() => {
-        console.log("function call data >>", data)
         if (expanded && !toolResponse && data.function_response_id) {
             setLoading(true);
             setError(null);
@@ -57,20 +59,19 @@ const FunctionResponse = ({ data }) => {
                     
                     // Process the tool data using the type mapper
                     const processedData = toolTypeMapper.processToolData(data.name, rawData);
-                    console.log("processed data >>", processedData);
                     setToolTransferData(processedData);
                 }
             }
         } 
     }, [toolResponse])
 
-    useEffect(() => {
-        console.log("tool transfer data >>", toolTransferData)
-    }, [toolTransferData])
-
     const toggleExpand = () => setExpanded(!expanded);
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
+    const handleShowDocs = (toolName) => {
+        setIsDocPanelOpen(true);
+    };
+    const handleCloseDocs = () => setIsDocPanelOpen(false);
 
     // Handle Escape key to close modal
     useEffect(() => {
@@ -112,6 +113,14 @@ const FunctionResponse = ({ data }) => {
                         <FiTool className="chat-tool-icon" />
                         <BsCheck2All className="chat-tool-icon" style={{ marginLeft: "5px", color: "#2ecc71" }} />
                     </div>
+                    <RedirectionButton 
+                        toolName={data.name} 
+                        label={`Go to ${data.name} tool`}
+                    />
+                    <DocumentationButton 
+                        toolName={data.name}
+                        onShowDocs={handleShowDocs}
+                    />
                     {toolResponse && toolTransferData && (
                         <motion.div
                             className="tool-icon-container"
@@ -121,7 +130,7 @@ const FunctionResponse = ({ data }) => {
                             whileTap={{ scale: 0.95 }}
                             title="Open in fullscreen"
                         >
-                            <FiMaximize className="chat-tool-icon" style={{ color: "#007bff" }} />
+                            <FiMaximize className="chat-tool-icon" style={{ color: "var(--color-text-secondary)" }} />
                         </motion.div>
                     )}
                     <motion.div
@@ -211,6 +220,13 @@ const FunctionResponse = ({ data }) => {
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            {/* Floating Documentation Panel */}
+            <FloatingDocPanel 
+                toolName={data.name}
+                isOpen={isDocPanelOpen}
+                onClose={handleCloseDocs}
+            />
         </motion.div>
     )
 
