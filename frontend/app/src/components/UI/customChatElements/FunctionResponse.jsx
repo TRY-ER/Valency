@@ -295,11 +295,23 @@ const TextResponse = ({ content }) => {
             transition={{ duration: 0.5 }}
             className="func-tag-container"
         >
-            <div className="func-tag-inner-container">
+            <div className="func-tag-inner-container" style={{
+                wordWrap: 'break-word',
+                wordBreak: 'break-all',
+                overflowWrap: 'break-word',
+                maxWidth: '100%',
+                overflow: 'hidden'
+            }}>
                 <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                        p: props => <p style={{ marginBlockStart: '1em', marginBlockEnd: '1em' }} {...props} />,
+                        p: props => <p style={{ 
+                            marginBlockStart: '1em', 
+                            marginBlockEnd: '1em',
+                            wordWrap: 'break-word',
+                            wordBreak: 'break-word',
+                            overflowWrap: 'break-word'
+                        }} {...props} />,
                         strong: props => <strong style={{ fontWeight: 'bold' }} {...props} />,
                         em: props => <em style={{ fontStyle: 'italic' }} {...props} />,
                         code: ({ inline, className, children, ...props }) => {
@@ -308,7 +320,11 @@ const TextResponse = ({ content }) => {
                                 backgroundColor: 'rgba(211, 211, 211, 0.2)', // Light gray background
                                 padding: '0.2em 0.4em',
                                 borderRadius: '3px',
-                                color: 'rgb(69, 199, 37)' // A common color for code text
+                                color: 'rgb(69, 199, 37)', // A common color for code text
+                                wordWrap: 'break-word',
+                                wordBreak: 'break-all',
+                                overflowWrap: 'break-word',
+                                whiteSpace: inline ? 'pre-wrap' : 'pre-wrap'
                             };
                             if (inline) {
                                 return <code style={style} className={className} {...props}>{children}</code>;
@@ -323,11 +339,37 @@ const TextResponse = ({ content }) => {
                             padding: '1em',
                             borderRadius: '3px',
                             overflowX: 'auto',
-                            color: 'rgb(199, 37, 78)'
+                            color: 'rgb(199, 37, 78)',
+                            wordWrap: 'break-word',
+                            wordBreak: 'break-all',
+                            overflowWrap: 'break-word',
+                            whiteSpace: 'pre-wrap',
+                            maxWidth: '100%'
                         }} {...props} />,
-                        ul: props => <ul style={{ listStyleType: 'disc', paddingInlineStart: '40px', marginBlockStart: '1em', marginBlockEnd: '1em' }} {...props} />,
-                        ol: props => <ol style={{ listStyleType: 'decimal', paddingInlineStart: '40px', marginBlockStart: '1em', marginBlockEnd: '1em' }} {...props} />,
-                        li: props => <li style={{ display: 'list-item' }} {...props} />,
+                        ul: props => <ul style={{ 
+                            listStyleType: 'disc', 
+                            paddingInlineStart: '40px', 
+                            marginBlockStart: '1em', 
+                            marginBlockEnd: '1em',
+                            wordWrap: 'break-word',
+                            wordBreak: 'break-word',
+                            overflowWrap: 'break-word'
+                        }} {...props} />,
+                        ol: props => <ol style={{ 
+                            listStyleType: 'decimal', 
+                            paddingInlineStart: '40px', 
+                            marginBlockStart: '1em', 
+                            marginBlockEnd: '1em',
+                            wordWrap: 'break-word',
+                            wordBreak: 'break-word',
+                            overflowWrap: 'break-word'
+                        }} {...props} />,
+                        li: props => <li style={{ 
+                            display: 'list-item',
+                            wordWrap: 'break-word',
+                            wordBreak: 'break-word',
+                            overflowWrap: 'break-word'
+                        }} {...props} />,
                         // You can add more elements here like h1, etc. if needed
                         // h1: props => <h1 style={{ fontSize: '2em', fontWeight: 'bold' }} {...props} />,
                     }}

@@ -1,5 +1,4 @@
 # ChEMBL Similarity Getter Documentation
-        docs: <DocRenderer filePath="/markdown_repo/UniProtExplorer.md"/>,
 ---
 
 ## Overview

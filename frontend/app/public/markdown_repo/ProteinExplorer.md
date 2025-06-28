@@ -26,7 +26,3 @@ The **Protein Explorer** tool allows users to input a Protein Data Bank ID (**PD
 ## Usage
 ---
 The `Protein Explorer` component can be used by providing a PDB ID. Once the PDB ID is supplied, the tool will display a 3D model of the protein and populate the information panel with relevant properties.
-
-## Example
----
-You can pass a PDB ID like so:
